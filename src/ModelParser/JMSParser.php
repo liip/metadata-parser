@@ -12,6 +12,7 @@ use JMS\Serializer\Annotation\Exclude;
 use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Groups;
 use JMS\Serializer\Annotation\PostDeserialize;
+use JMS\Serializer\Annotation\ReadOnly;
 use JMS\Serializer\Annotation\SerializedName;
 use JMS\Serializer\Annotation\Since;
 use JMS\Serializer\Annotation\Type;
@@ -254,6 +255,10 @@ final class JMSParser implements ModelParserInterface
 
                 case $annotation instanceof Until:
                     $property->setVersionRange($property->getVersionRange()->withUntil($annotation->version));
+                    break;
+
+                case $annotation instanceof ReadOnly:
+                    $property->setReadOnly(true);
                     break;
 
                 case $annotation instanceof VirtualProperty:

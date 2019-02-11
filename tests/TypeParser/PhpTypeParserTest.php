@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Tests\Tests\Liip\MetadataParser\TypeParser;
+namespace Tests\Liip\MetadataParser\TypeParser;
 
 use Liip\MetadataParser\Exception\InvalidTypeException;
 use Liip\MetadataParser\TypeParser\PhpTypeParser;
 use PHPUnit\Framework\TestCase;
-use Tests\Tests\Liip\MetadataParser\ModelParser\Model\BaseModel;
-use Tests\Tests\Liip\MetadataParser\ModelParser\Model\ReflectionAbstractModel;
-use Tests\Tests\Liip\MetadataParser\ModelParser\Model\WithImports;
-use Tests\Tests\Liip\MetadataParser\RecursionContextTest;
+use Tests\Liip\MetadataParser\ModelParser\Model\BaseModel;
+use Tests\Liip\MetadataParser\ModelParser\Model\ReflectionAbstractModel;
+use Tests\Liip\MetadataParser\ModelParser\Model\WithImports;
+use Tests\Liip\MetadataParser\RecursionContextTest;
 
 /**
  * @small

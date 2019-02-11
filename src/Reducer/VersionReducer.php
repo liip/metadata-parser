@@ -23,7 +23,7 @@ final class VersionReducer implements PropertyReducerInterface
     {
         $includedProperties = [];
         foreach ($properties as $property) {
-            if ($property->getVersion()->isIncluded($this->version)) {
+            if ($property->getVersionRange()->isIncluded($this->version)) {
                 $includedProperties[] = $property;
             }
         }
