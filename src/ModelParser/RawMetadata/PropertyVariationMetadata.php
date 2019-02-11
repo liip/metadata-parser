@@ -46,6 +46,11 @@ final class PropertyVariationMetadata extends AbstractPropertyMetadata
         return $this->type;
     }
 
+    public function setReadOnly(bool $readOnly): void
+    {
+        parent::setReadOnly($readOnly);
+    }
+
     public function setPublic(bool $public): void
     {
         parent::setPublic($public);

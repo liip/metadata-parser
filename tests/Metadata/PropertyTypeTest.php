@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Tests\Liip\MetadataParser\Metadata;
+namespace Tests\Liip\MetadataParser\Metadata;
 
 use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeArray;

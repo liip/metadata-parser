@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Tests\Liip\MetadataParser\TypeParser;
+namespace Tests\Liip\MetadataParser\TypeParser;
 
 use Liip\MetadataParser\Exception\InvalidTypeException;
 use Liip\MetadataParser\Metadata\PropertyTypeDateTime;

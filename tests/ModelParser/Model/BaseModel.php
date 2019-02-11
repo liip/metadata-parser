@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Tests\Liip\MetadataParser\ModelParser\Model;
+namespace Tests\Liip\MetadataParser\ModelParser\Model;
 
 use JMS\Serializer\Annotation as JMS;
 

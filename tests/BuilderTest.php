@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Tests\Liip\MetadataParser;
+namespace Tests\Liip\MetadataParser;
 
 use Liip\MetadataParser\Builder;
 use Liip\MetadataParser\Metadata\PropertyMetadata;
@@ -14,7 +14,7 @@ use Liip\MetadataParser\Parser;
 use Liip\MetadataParser\RecursionChecker;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Tests\Tests\Liip\MetadataParser\ModelParser\Model\Nested;
+use Tests\Liip\MetadataParser\ModelParser\Model\Nested;
 
 /**
  * @small
