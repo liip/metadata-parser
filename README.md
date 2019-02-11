@@ -19,12 +19,12 @@ You could write your own parsers, but this library comes with support for:
 ## Setup
 ```php
 use Doctrine\Common\Annotations\AnnotationReader;
-use Migros\Infrastructure\Schema\Builder;
-use Migros\Infrastructure\Schema\Parser;
-use Migros\Infrastructure\Schema\RecursionChecker;
-use Migros\Infrastructure\Schema\ModelParser\JMSParser;
-use Migros\Infrastructure\Schema\ModelParser\PhpDocParser;
-use Migros\Infrastructure\Schema\ModelParser\ReflectionParser;
+use Liip\Metadata\Builder;
+use Liip\Metadata\Parser;
+use Liip\Metadata\RecursionChecker;
+use Liip\Metadata\ModelParser\JMSParser;
+use Liip\Metadata\ModelParser\PhpDocParser;
+use Liip\Metadata\ModelParser\ReflectionParser;
 
 $parser = new Parser(
     new ReflectionParser(),
@@ -55,9 +55,9 @@ JMSSerializer:
   other reducers.
 
 ```php
-use Migros\Infrastructure\Schema\Reducer\GroupReducer;
-use Migros\Infrastructure\Schema\Reducer\TakeBestReducer;
-use Migros\Infrastructure\Schema\Reducer\VersionReducer;
+use Liip\Metadata\Reducer\GroupReducer;
+use Liip\Metadata\Reducer\TakeBestReducer;
+use Liip\Metadata\Reducer\VersionReducer;
 
 $reducers = [
     new VersionReducer('2'),
