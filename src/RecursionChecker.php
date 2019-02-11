@@ -25,7 +25,7 @@ use Psr\Log\LoggerInterface;
 final class RecursionChecker
 {
     /**
-     * @var LoggerInterface
+     * @var LoggerInterface|null
      */
     private $logger;
 
