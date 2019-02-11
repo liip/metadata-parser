@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Tests\Liip\MetadataParser\ModelParser;
+namespace Tests\Liip\MetadataParser\ModelParser;
 
 use Liip\MetadataParser\ModelParser\ParserContext;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
