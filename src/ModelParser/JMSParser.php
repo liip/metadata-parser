@@ -249,11 +249,11 @@ final class JMSParser implements ModelParserInterface
                     break;
 
                 case $annotation instanceof Since:
-                    $property->getVersion()->setSince($annotation->version);
+                    $property->setVersionRange($property->getVersionRange()->withSince($annotation->version));
                     break;
 
                 case $annotation instanceof Until:
-                    $property->getVersion()->setUntil($annotation->version);
+                    $property->setVersionRange($property->getVersionRange()->withUntil($annotation->version));
                     break;
 
                 case $annotation instanceof VirtualProperty:
@@ -286,12 +286,13 @@ final class JMSParser implements ModelParserInterface
      */
     private function getProperty(RawClassMetadata $classMetadata, \ReflectionProperty $reflProperty, array $annotations): PropertyVariationMetadata
     {
-        $name = $this->getSerializedName($annotations) ?: $reflProperty->getName();
+        $defaultName = PropertyCollection::serializedName($reflProperty->getName());
+        $name = $this->getSerializedName($annotations) ?: $defaultName;
         if ($classMetadata->hasPropertyVariation($reflProperty->getName())) {
             $property = $classMetadata->getPropertyVariation($reflProperty->getName());
-            if ($reflProperty->getName() !== $name) {
-                if ($classMetadata->hasPropertyCollection($reflProperty->getName())) {
-                    $classMetadata->renameProperty($reflProperty->getName(), $name);
+            if ($defaultName !== $name) {
+                if ($classMetadata->hasPropertyCollection($defaultName)) {
+                    $classMetadata->renameProperty($defaultName, $name);
                 }
             }
         } else {

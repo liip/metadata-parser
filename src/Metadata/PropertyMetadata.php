@@ -27,16 +27,18 @@ final class PropertyMetadata extends AbstractPropertyMetadata
         PropertyType $type = null,
         bool $readOnly = true,
         bool $public = false,
-        Version $version = null,
+        VersionRange $versionRange = null,
         array $groups = [],
         PropertyAccessor $accessor = null
     ) {
         parent::__construct($name, $readOnly, $public);
         $this->serializedName = $serializedName;
         $this->type = $type ?: new PropertyTypeUnknown(true);
-        $this->setVersion($version ?: new Version(null, null));
+        $this->setVersionRange($versionRange ?: new VersionRange(null, null));
         $this->setGroups($groups);
-        $this->setAccessor($accessor ?: new PropertyAccessor(null, null));
+        if ($accessor) {
+            $this->setAccessor($accessor);
+        }
     }
 
     public function __toString(): string
@@ -52,7 +54,7 @@ final class PropertyMetadata extends AbstractPropertyMetadata
             $property->getType(),
             $property->isReadOnly(),
             $property->isPublic(),
-            $property->getVersion(),
+            $property->getVersionRange(),
             $property->getGroups(),
             $property->getAccessor()
         );
