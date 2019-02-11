@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Tests\Liip\MetadataParser;
+namespace Tests\Liip\MetadataParser;
 
 use Liip\MetadataParser\Metadata\PropertyMetadata;
 use Liip\MetadataParser\RecursionContext;
