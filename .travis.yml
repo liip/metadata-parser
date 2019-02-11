@@ -13,4 +13,4 @@ matrix:
 
 install: composer install
 
-script: composer ci
+script: composer phpstan-all && composer phpunit
