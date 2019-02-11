@@ -5,7 +5,7 @@ Thank you for your work.
 These are the people who in any way contributed to the project (in no particular order): 
 David Buchmann (dbu)
 Michelle Sanver (michellesanver)
-Rae Knowler (belllisk)
+Rae Knowler (bellisk)
 Tobias Schultze (Tobion)
 Christian Riesen (ChristianRiesen)
 Martin Sanser (mjanser)
