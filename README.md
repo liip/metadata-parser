@@ -19,17 +19,19 @@ You could write your own parsers, but this library comes with support for:
 ## Setup
 ```php
 use Doctrine\Common\Annotations\AnnotationReader;
-use Liip\Metadata\Builder;
-use Liip\Metadata\Parser;
-use Liip\Metadata\RecursionChecker;
-use Liip\Metadata\ModelParser\JMSParser;
-use Liip\Metadata\ModelParser\PhpDocParser;
-use Liip\Metadata\ModelParser\ReflectionParser;
+use Liip\MetadataParser\Builder;
+use Liip\MetadataParser\Parser;
+use Liip\MetadataParser\RecursionChecker;
+use Liip\MetadataParser\ModelParser\JMSParser;
+use Liip\MetadataParser\ModelParser\LiipMetadataAnnotationParser;
+use Liip\MetadataParser\ModelParser\PhpDocParser;
+use Liip\MetadataParser\ModelParser\ReflectionParser;
 
 $parser = new Parser(
     new ReflectionParser(),
     new PhpDocParser(),
     new JMSParser(new AnnotationReader()),
+    new LiipMetadataAnnotationParser(new AnnotationReader()),
 );
 
 $recursionChecker = new RecursionChecker(new NullLogger());
@@ -55,13 +57,15 @@ JMSSerializer:
   other reducers.
 
 ```php
-use Liip\Metadata\Reducer\GroupReducer;
-use Liip\Metadata\Reducer\TakeBestReducer;
-use Liip\Metadata\Reducer\VersionReducer;
+use Liip\MetadataParser\Reducer\GroupReducer;
+use Liip\MetadataParser\Reducer\PreferredReducer;
+use Liip\MetadataParser\Reducer\TakeBestReducer;
+use Liip\MetadataParser\Reducer\VersionReducer;
 
 $reducers = [
     new VersionReducer('2'),
     new GroupReducer(['api', 'detail']),
+    new PreferredReducer(),
     new TakeBestReducer(),
 ];
 $metadata = $builder->build(MyClass::class, $reducers);
@@ -72,6 +76,35 @@ The `ClassMetadata` provides all information on a class. Properties have a
 another class, are of the type `PropertyTypeClass` that has the method
 `getClassMetadata()` to get the metadata of the nested class. This structure
 is validated to not contain any infinite recursion.
+
+## Handling Edge Cases with @Preferred
+
+This library provides its own annotation in `Liip\MetadataParser\Annotation\Preferred`
+to specify which property to use in case there are several options. This can be
+useful for example when serializing models without specifying a version, when
+they use different virtual properties in different versions.
+
+```php
+use JMS\Serializer\Annotation as JMS;
+use Liip\MetadataParser\Annotation as Liip;
+
+class Product
+{
+    /**
+     * @JMS\Since("2")
+     * @JMS\Type("string")
+     */
+    public $name;
+    
+    /**
+     * @JMS\Until("1")
+     * @JMS\SerializedName("name")
+     * @JMS\Type("string")
+     * @Liip\Preferred
+     */
+    public $legacyName;
+}
+```
 
 ## Expected Recursion: Working with Flawed Models
 
