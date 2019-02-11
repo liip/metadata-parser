@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Tests\Liip\MetadataParser\Reducer;
 
-use Liip\MetadataParser\Metadata\Version;
+use Liip\MetadataParser\Metadata\VersionRange;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\Reducer\OldestVersionReducer;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +17,7 @@ class OldestVersionReducerTest extends TestCase
     public function testReduceUnversioned(): void
     {
         $property1 = new PropertyVariationMetadata('property1', false, true);
-        $property1->setVersion(new Version('1', '2'));
+        $property1->setVersionRange(new VersionRange('1', '2'));
         $property2 = new PropertyVariationMetadata('property2', false, true);
         $property3 = new PropertyVariationMetadata('property3', false, true);
 
@@ -34,9 +34,9 @@ class OldestVersionReducerTest extends TestCase
     public function testReduceOldest(): void
     {
         $property1 = new PropertyVariationMetadata('property1', false, true);
-        $property1->setVersion(new Version('3', '4'));
+        $property1->setVersionRange(new VersionRange('3', '4'));
         $property2 = new PropertyVariationMetadata('property2', false, true);
-        $property2->setVersion(new Version('1', '2'));
+        $property2->setVersionRange(new VersionRange('1', '2'));
 
         $properties = [
             $property1,

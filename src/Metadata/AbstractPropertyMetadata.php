@@ -35,9 +35,9 @@ abstract class AbstractPropertyMetadata implements \JsonSerializable
     private $accessor;
 
     /**
-     * @var Version
+     * @var VersionRange
      */
-    private $version;
+    private $versionRange;
 
     /**
      * @param string $name Name of the property in PHP or the method name for a virtual property
@@ -48,7 +48,7 @@ abstract class AbstractPropertyMetadata implements \JsonSerializable
         $this->readOnly = $readOnly;
         $this->public = $public;
         $this->accessor = PropertyAccessor::none();
-        $this->version = Version::all();
+        $this->versionRange = VersionRange::all();
     }
 
     public function __toString(): string
@@ -84,9 +84,9 @@ abstract class AbstractPropertyMetadata implements \JsonSerializable
         return $this->accessor;
     }
 
-    public function getVersion(): Version
+    public function getVersionRange(): VersionRange
     {
-        return $this->version;
+        return $this->versionRange;
     }
 
     public function jsonSerialize(): array
@@ -103,8 +103,8 @@ abstract class AbstractPropertyMetadata implements \JsonSerializable
         if ($this->accessor->isDefined()) {
             $data['accessor'] = $this->accessor;
         }
-        if ($this->version->isDefined()) {
-            $data['version'] = $this->version;
+        if ($this->versionRange->isDefined()) {
+            $data['version'] = $this->versionRange;
         }
 
         return $data;
@@ -112,9 +112,9 @@ abstract class AbstractPropertyMetadata implements \JsonSerializable
 
     abstract public function getType(): PropertyType;
 
-    protected function setVersion(Version $version): void
+    protected function setVersionRange(VersionRange $version): void
     {
-        $this->version = $version;
+        $this->versionRange = $version;
     }
 
     protected function setAccessor(PropertyAccessor $accessor): void

@@ -11,20 +11,23 @@ use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
  */
 final class OldestVersionReducer implements PropertyReducerInterface
 {
+    /**
+     * We keep track of properties with no lower version boundary and return
+     * all of those if there are any, for other reducers to choose from them.
+     */
     public function reduce(string $serializedName, array $properties): array
     {
-        $version = (string) PHP_INT_MAX;
+        /** @var PropertyVariationMetadata|null $lowest */
         $lowest = null;
         $unversioned = [];
         /** @var PropertyVariationMetadata $property */
         foreach ($properties as $property) {
-            if (null === $property->getVersion()->getSince()) {
+            if (null === $property->getVersionRange()->getSince()) {
                 $unversioned[] = $property;
                 continue;
             }
-            if (version_compare($property->getVersion()->getSince(), $version, '<')) {
+            if (null === $lowest || $property->getVersionRange()->allowsLowerThan($lowest->getVersionRange())) {
                 $lowest = $property;
-                $version = $property->getVersion()->getSince();
             }
         }
 

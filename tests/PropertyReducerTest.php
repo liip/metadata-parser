@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Tests\Liip\MetadataParser;
 
 use Liip\MetadataParser\Metadata\ParameterMetadata;
-use Liip\MetadataParser\Metadata\Version;
+use Liip\MetadataParser\Metadata\VersionRange;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 use Liip\MetadataParser\PropertyReducer;
@@ -66,7 +66,7 @@ class PropertyReducerTest extends TestCase
     public function testReducePropertiesWithReducers(): void
     {
         $property1 = new PropertyVariationMetadata('property1', false, true);
-        $property1->setVersion(new Version('1.0', '1.4'));
+        $property1->setVersionRange(new VersionRange('1.0', '1.4'));
         $property1->setGroups(['group1']);
         $property2 = new PropertyVariationMetadata('property2', false, true);
 
