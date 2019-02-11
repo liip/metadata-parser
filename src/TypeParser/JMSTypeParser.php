@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Liip\MetadataParser\TypeParser;
 
-use JMS\Serializer\TypeParser;
+use JMS\Serializer\TypeParser as TypeParserV1;
+use JMS\Serializer\Type\Parser as TypeParserV2;
 use Liip\MetadataParser\Exception\InvalidTypeException;
 use Liip\MetadataParser\Metadata\DateTimeOptions;
 use Liip\MetadataParser\Metadata\PropertyType;
@@ -19,13 +20,13 @@ final class JMSTypeParser
     private const TYPE_ARRAY = 'array';
 
     /**
-     * @var TypeParser
+     * @var TypeParserV1|TypeParserV2
      */
     private $jmsTypeParser;
 
     public function __construct()
     {
-        $this->jmsTypeParser = new TypeParser();
+        $this->jmsTypeParser = class_exists(TypeParserV2::class) ? new TypeParserV2() : new TypeParserV1();
     }
 
     /**
