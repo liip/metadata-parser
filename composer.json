@@ -21,14 +21,11 @@
         "phpstan/phpstan-shim": "^0.11.0",
         "phpstan/phpstan-phpunit": "^0.11",
         "phpunit/phpunit": "^7.5",
-        "jms/serializer": "^1.13",
+        "jms/serializer": "^1.13 || ^2",
         "friendsofphp/php-cs-fixer": "v2.14.0"
     },
     "suggest": {
-        "jms/serializer": "^1.13"
-    },
-    "conflict": {
-        "jms/serializer": ">= 2"
+        "jms/serializer": "^1.13 || ^2"
     },
     "autoload": {
         "psr-4": {
