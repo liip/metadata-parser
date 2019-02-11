@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Tests\Liip\MetadataParser\Reducer;
+namespace Tests\Liip\MetadataParser\Reducer;
 
 use Liip\MetadataParser\Metadata\VersionRange;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;

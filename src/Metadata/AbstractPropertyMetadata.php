@@ -45,8 +45,8 @@ abstract class AbstractPropertyMetadata implements \JsonSerializable
     public function __construct(string $name, bool $readOnly, bool $public)
     {
         $this->name = $name;
-        $this->readOnly = $readOnly;
-        $this->public = $public;
+        $this->setReadOnly($readOnly);
+        $this->setPublic($public);
         $this->accessor = PropertyAccessor::none();
         $this->versionRange = VersionRange::all();
     }
@@ -128,6 +128,11 @@ abstract class AbstractPropertyMetadata implements \JsonSerializable
     protected function setGroups(array $groups): void
     {
         $this->groups = $groups;
+    }
+
+    protected function setReadOnly(bool $readOnly): void
+    {
+        $this->readOnly = $readOnly;
     }
 
     protected function setPublic(bool $public): void

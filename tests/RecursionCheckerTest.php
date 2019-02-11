@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Tests\Liip\MetadataParser;
+namespace Tests\Liip\MetadataParser;
 
 use Liip\MetadataParser\Exception\RecursionException;
 use Liip\MetadataParser\Metadata\ClassMetadata;
@@ -12,8 +12,8 @@ use Liip\MetadataParser\Metadata\PropertyTypeClass;
 use Liip\MetadataParser\RecursionChecker;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Tests\Tests\Liip\MetadataParser\ModelParser\Model\Nested;
-use Tests\Tests\Liip\MetadataParser\ModelParser\Model\Recursion;
+use Tests\Liip\MetadataParser\ModelParser\Model\Nested;
+use Tests\Liip\MetadataParser\ModelParser\Model\Recursion;
 
 /**
  * @small

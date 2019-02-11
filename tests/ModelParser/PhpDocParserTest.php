@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Tests\Liip\MetadataParser\ModelParser;
+namespace Tests\Liip\MetadataParser\ModelParser;
 
 use Liip\MetadataParser\Exception\InvalidTypeException;
 use Liip\MetadataParser\Exception\ParseException;
@@ -15,8 +15,8 @@ use Liip\MetadataParser\ModelParser\RawMetadata\PropertyCollection;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 use PHPUnit\Framework\TestCase;
-use Tests\Tests\Liip\MetadataParser\ModelParser\Model\BaseModel;
-use Tests\Tests\Liip\MetadataParser\ModelParser\Model\Nested;
+use Tests\Liip\MetadataParser\ModelParser\Model\BaseModel;
+use Tests\Liip\MetadataParser\ModelParser\Model\Nested;
 
 /**
  * @small
