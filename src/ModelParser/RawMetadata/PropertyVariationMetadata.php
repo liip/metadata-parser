@@ -8,7 +8,7 @@ use Liip\MetadataParser\Metadata\AbstractPropertyMetadata;
 use Liip\MetadataParser\Metadata\PropertyAccessor;
 use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
-use Liip\MetadataParser\Metadata\Version;
+use Liip\MetadataParser\Metadata\VersionRange;
 
 /**
  * A single property variant represents one item of a class that is serialized to a specific name.
@@ -61,9 +61,9 @@ final class PropertyVariationMetadata extends AbstractPropertyMetadata
         parent::setAccessor($accessor);
     }
 
-    public function setVersion(Version $version): void
+    public function setVersionRange(VersionRange $version): void
     {
-        parent::setVersion($version);
+        parent::setVersionRange($version);
     }
 
     public function jsonSerialize(): array

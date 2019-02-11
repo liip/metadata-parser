@@ -111,6 +111,9 @@ final class RawClassMetadata implements \JsonSerializable
 
         if ($this->hasPropertyCollection($serializedName)) {
             $target = $this->getPropertyCollection($serializedName);
+            if ($target === $prop) {
+                throw new \LogicException(sprintf('You can not rename %s into %s as it is the same property. Did you miss to handle camelCase properties with PropertyCollection::serializedName?', $propertyName, $serializedName));
+            }
             foreach ($target->getVariations() as $variation) {
                 $prop->addVariation($variation);
             }
