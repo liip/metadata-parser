@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Tests\Liip\MetadataParser\ModelParser;
+namespace Tests\Liip\MetadataParser\ModelParser;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use JMS\Serializer\Annotation as JMS;
@@ -19,8 +19,8 @@ use Liip\MetadataParser\ModelParser\RawMetadata\PropertyCollection;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 use PHPUnit\Framework\TestCase;
-use Tests\Tests\Liip\MetadataParser\ModelParser\Model\BaseModel;
-use Tests\Tests\Liip\MetadataParser\ModelParser\Model\Nested;
+use Tests\Liip\MetadataParser\ModelParser\Model\BaseModel;
+use Tests\Liip\MetadataParser\ModelParser\Model\Nested;
 
 /**
  * @small
@@ -186,7 +186,7 @@ class JMSParserTest extends TestCase
     {
         $c = new class() {
             /**
-             * @JMS\Type("Tests\Tests\Liip\MetadataParser\ModelParser\Model\Nested")
+             * @JMS\Type("Tests\Liip\MetadataParser\ModelParser\Model\Nested")
              */
             private $property;
         };
@@ -254,6 +254,25 @@ class JMSParserTest extends TestCase
         $property = $props[2]->getVariations()[0];
         $this->assertPropertyVariation('property1', false, false, $property);
         $this->assertPropertyType(PropertyTypePrimitive::class, 'string|null', true, $property->getType());
+    }
+
+    public function testReadOnly(): void
+    {
+        $c = new class() {
+            /**
+             * @JMS\ReadOnly
+             */
+            private $property;
+        };
+
+        $classMetadata = new RawClassMetadata(\get_class($c));
+        $this->parser->parse($classMetadata);
+
+        $props = $classMetadata->getPropertyCollections();
+        $this->assertCount(1, $props, 'Number of properties should match');
+
+        $this->assertPropertyCollection('property', 1, $props[0]);
+        $this->assertPropertyVariation('property', false, true, $props[0]->getVariations()[0]);
     }
 
     public function testSerializedName(): void
