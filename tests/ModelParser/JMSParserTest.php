@@ -496,7 +496,7 @@ class JMSParserTest extends TestCase
         $this->assertPropertyAccessor('getProperty', 'setProperty', $props[3]->getVariations()[0]->getAccessor());
     }
 
-    public function testVersion(): void
+    public function testVersionRange(): void
     {
         $c = new class() {
             private $property1;
@@ -526,25 +526,25 @@ class JMSParserTest extends TestCase
 
         $this->assertPropertyCollection('property1', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
-        $this->assertTrue($property->getVersion()->isIncluded('1.0'));
-        $this->assertTrue($property->getVersion()->isIncluded('3.8'));
+        $this->assertTrue($property->getVersionRange()->isIncluded('1.0'));
+        $this->assertTrue($property->getVersionRange()->isIncluded('3.8'));
 
         $this->assertPropertyCollection('property2', 1, $props[1]);
         $property = $props[1]->getVariations()[0];
-        $this->assertFalse($property->getVersion()->isIncluded('1.0'));
-        $this->assertTrue($property->getVersion()->isIncluded('2.2'));
+        $this->assertFalse($property->getVersionRange()->isIncluded('1.0'));
+        $this->assertTrue($property->getVersionRange()->isIncluded('2.2'));
 
         $this->assertPropertyCollection('property3', 1, $props[2]);
         $property = $props[2]->getVariations()[0];
-        $this->assertTrue($property->getVersion()->isIncluded('2.2'));
-        $this->assertFalse($property->getVersion()->isIncluded('4.0'));
+        $this->assertTrue($property->getVersionRange()->isIncluded('2.2'));
+        $this->assertFalse($property->getVersionRange()->isIncluded('4.0'));
 
         $this->assertPropertyCollection('property4', 1, $props[3]);
         $property = $props[3]->getVariations()[0];
-        $this->assertFalse($property->getVersion()->isIncluded('3.9'));
-        $this->assertTrue($property->getVersion()->isIncluded('4.0'));
-        $this->assertTrue($property->getVersion()->isIncluded('8.1'));
-        $this->assertFalse($property->getVersion()->isIncluded('8.2'));
+        $this->assertFalse($property->getVersionRange()->isIncluded('3.9'));
+        $this->assertTrue($property->getVersionRange()->isIncluded('4.0'));
+        $this->assertTrue($property->getVersionRange()->isIncluded('8.1'));
+        $this->assertFalse($property->getVersionRange()->isIncluded('8.2'));
     }
 
     public function testInvalidPropertyAnnotations(): void
@@ -1088,7 +1088,7 @@ class JMSParserTest extends TestCase
         $this->assertSame(['group1', 'group2'], $props[0]->getVariations()[0]->getGroups());
     }
 
-    public function testVirtualPropertyWithVersion(): void
+    public function testVirtualPropertyWithVersionRange(): void
     {
         $c = new class() {
             /**
@@ -1110,9 +1110,9 @@ class JMSParserTest extends TestCase
 
         $this->assertPropertyCollection('foo', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
-        $this->assertFalse($property->getVersion()->isIncluded('1.0'));
-        $this->assertTrue($property->getVersion()->isIncluded('1.2'));
-        $this->assertFalse($property->getVersion()->isIncluded('4.0'));
+        $this->assertFalse($property->getVersionRange()->isIncluded('1.0'));
+        $this->assertTrue($property->getVersionRange()->isIncluded('1.2'));
+        $this->assertFalse($property->getVersionRange()->isIncluded('4.0'));
     }
 
     public function testVirtualPropertyOverridesProperty(): void
