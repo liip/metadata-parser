@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Liip\MetadataParser\TypeParser;
 
-use JMS\Serializer\TypeParser as TypeParserV1;
 use JMS\Serializer\Type\Parser as TypeParserV2;
+use JMS\Serializer\TypeParser as TypeParserV1;
 use Liip\MetadataParser\Exception\InvalidTypeException;
 use Liip\MetadataParser\Metadata\DateTimeOptions;
 use Liip\MetadataParser\Metadata\PropertyType;
