@@ -414,6 +414,28 @@ class JMSParserTest extends TestCase
         $this->assertPropertyCollection('property2', 1, $props[0]);
     }
 
+    public function testExcludePrefilled(): void
+    {
+        $c = new class() {
+            /**
+             * @JMS\Exclude
+             */
+            private $property1;
+            private $property2;
+        };
+
+        $classMetadata = new RawClassMetadata(\get_class($c));
+        $classMetadata->addPropertyVariation('property1', new PropertyVariationMetadata('property1', false, true));
+        $classMetadata->addPropertyVariation('property2', new PropertyVariationMetadata('property2', false, true));
+
+        $this->parser->parse($classMetadata);
+
+        $props = $classMetadata->getPropertyCollections();
+        $this->assertCount(1, $props, 'Number of properties should match');
+
+        $this->assertPropertyCollection('property2', 1, $props[0]);
+    }
+
     public function testExcludePartial(): void
     {
         $c = new class() {
