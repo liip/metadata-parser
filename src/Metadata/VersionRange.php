@@ -59,10 +59,10 @@ final class VersionRange implements \JsonSerializable
      */
     public function allowsHigherThan(self $other)
     {
-        if (null === $other->until) {
+        if (null === $this->until) {
             return false;
         }
-        if (null === $this->until) {
+        if (null === $other->until) {
             return true;
         }
 

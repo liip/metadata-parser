@@ -23,12 +23,18 @@ final class PropertyVariationMetadata extends AbstractPropertyMetadata
     private $type;
 
     /**
+     * @var bool
+     */
+    private $preferred;
+
+    /**
      * @param string $name Name of the property in PHP or the method name for a virtual property
      */
-    public function __construct(string $name, bool $readOnly, bool $public)
+    public function __construct(string $name, bool $readOnly, bool $public, bool $preferred = false)
     {
         parent::__construct($name, $readOnly, $public);
         $this->type = new PropertyTypeUnknown(true);
+        $this->setPreferred($preferred);
     }
 
     public static function fromReflection(\ReflectionProperty $reflProperty): self
@@ -44,6 +50,16 @@ final class PropertyVariationMetadata extends AbstractPropertyMetadata
     public function getType(): PropertyType
     {
         return $this->type;
+    }
+
+    public function setPreferred(bool $preferred): void
+    {
+        $this->preferred = $preferred;
+    }
+
+    public function isPreferred(): bool
+    {
+        return $this->preferred;
     }
 
     public function setReadOnly(bool $readOnly): void
