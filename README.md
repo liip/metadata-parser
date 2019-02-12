@@ -1,6 +1,6 @@
-# Schema Parser
+# Liip Metadata Parser
 
-A parser for building model metadata from PHP classes. The metadata model can
+This is a parser for building model metadata from PHP classes. The metadata model can
 then be used to generate code or configuration. For example a serializer or
 ElasticSearch schema for types.
 
@@ -15,6 +15,12 @@ You could write your own parsers, but this library comes with support for:
 * Reflection
 * PhpDoc
 * JMSSerializer annotations
+
+## Contributing
+
+If you want to contribute to the project (awesome!!), please read the
+[Contributing Guidelines](https://github.com/liip/metadata-parser/blob/master/CONTRIBUTING.md)
+and adhere to our [Code Of Conduct](https://github.com/liip/metadata-parser/blob/master/CODE_OF_CONDUCT.md)
 
 ## Setup
 ```php
