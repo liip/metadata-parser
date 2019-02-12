@@ -15,7 +15,7 @@ use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
 
 final class PhpTypeParser
 {
-    private const TYPE_SERARATOR = '|';
+    private const TYPE_SEPARATOR = '|';
     private const TYPE_NULL = 'null';
     private const TYPE_MIXED = 'mixed';
     private const TYPE_RESOURCE = 'resource';
@@ -48,7 +48,7 @@ final class PhpTypeParser
 
         $types = [];
         $nullable = false;
-        foreach (explode(self::TYPE_SERARATOR, $rawType) as $part) {
+        foreach (explode(self::TYPE_SEPARATOR, $rawType) as $part) {
             if (self::TYPE_NULL === $part || self::TYPE_MIXED === $part) {
                 $nullable = true;
             } elseif (!\in_array($part, self::TYPES_GENERIC, true)) {
@@ -111,7 +111,7 @@ final class PhpTypeParser
     private function resolveClass(string $className, \ReflectionClass $reflClass = null): string
     {
         // leading backslash means absolute class name
-        if ('\\' === substr($className, 0, 1)) {
+        if (0 === strpos($className, '\\')) {
             return substr($className, 1);
         }
 
