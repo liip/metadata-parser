@@ -87,6 +87,17 @@ final class PropertyVariationMetadata extends AbstractPropertyMetadata
         parent::setVersionRange($version);
     }
 
+    /**
+     * The value can be anything that the consumer understands.
+     *
+     * However, if it is an object, it should implement JsonSerializable to not
+     * break debugging.
+     */
+    public function setCustomInformation(string $key, $value): void
+    {
+        parent::setCustomInformation($key, $value);
+    }
+
     public function jsonSerialize(): array
     {
         $data = parent::jsonSerialize();
