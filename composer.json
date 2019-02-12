@@ -41,7 +41,7 @@
         "fix-cs": "vendor/bin/php-cs-fixer fix -v",
         "cs-fixer": "vendor/bin/php-cs-fixer fix --dry-run --diff --diff-format udiff -v",
         "phpstan": "vendor/bin/phpstan analyse --no-progress --level 5 src/",
-        "phpstan-tests": "vendor/bin/phpstan analyse --no-progress --level 1 tests/",
+        "phpstan-tests": "vendor/bin/phpstan analyse --no-progress --level 1 -c phpstan.tests.neon tests/",
         "phpstan-all": [
             "@phpstan",
             "@phpstan-tests"
