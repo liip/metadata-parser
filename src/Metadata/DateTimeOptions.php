@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Liip\MetadataParser\Metadata;
 
 /**
- * Options as provided in the JMSSerializer DateTime / DateTimeImmuatable type annotations.
+ * Options as provided in the JMSSerializer DateTime / DateTimeImmutable type annotations.
  */
 final class DateTimeOptions implements \JsonSerializable
 {

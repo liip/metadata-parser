@@ -48,11 +48,11 @@ final class Builder
      */
     public function build(string $className, array $reducers = []): ClassMetadata
     {
-        $rawClassMetadaList = $this->parser->parse($className);
+        $rawClassMetadataList = $this->parser->parse($className);
 
         /** @var ClassMetadata[] $classMetadataList */
         $classMetadataList = [];
-        foreach ($rawClassMetadaList as $rawClassMetadata) {
+        foreach ($rawClassMetadataList as $rawClassMetadata) {
             $classMetadataList[$rawClassMetadata->getClassName()] = PropertyReducer::reduce($rawClassMetadata, $reducers);
         }
 
@@ -77,7 +77,7 @@ final class Builder
     private function setTypeClassMetadata(PropertyType $type, array $classMetadataList): void
     {
         if ($type instanceof PropertyTypeClass) {
-            if (!array_key_exists($type->getClassName(), $classMetadataList)) {
+            if (!\array_key_exists($type->getClassName(), $classMetadataList)) {
                 throw new \UnexpectedValueException($type->getClassName());
             }
             $type->setClassMetadata($classMetadataList[$type->getClassName()]);

@@ -184,7 +184,7 @@ final class JMSParser implements ModelParserInterface
 
                 default:
                     if (0 === strncmp('JMS\Serializer\\', \get_class($annotation), \mb_strlen('JMS\Serializer\\'))) {
-                        // if there are annotations we can savely ignore, we need to explicitly ignore them
+                        // if there are annotations we can safely ignore, we need to explicitly ignore them
                         throw ParseException::unsupportedClassAnnotation((string) $classMetadata, \get_class($annotation));
                     }
             }
@@ -275,7 +275,7 @@ final class JMSParser implements ModelParserInterface
 
                 default:
                     if (0 === strncmp('JMS\Serializer\\', \get_class($annotation), \mb_strlen('JMS\Serializer\\'))) {
-                        // if there are annotations we can savely ignore, we need to explicitly ignore them
+                        // if there are annotations we can safely ignore, we need to explicitly ignore them
                         throw ParseException::unsupportedPropertyAnnotation((string) $classMetadata, (string) $property, \get_class($annotation));
                     }
                     break;
@@ -295,10 +295,8 @@ final class JMSParser implements ModelParserInterface
         $name = $this->getSerializedName($annotations) ?: $defaultName;
         if ($classMetadata->hasPropertyVariation($reflProperty->getName())) {
             $property = $classMetadata->getPropertyVariation($reflProperty->getName());
-            if ($defaultName !== $name) {
-                if ($classMetadata->hasPropertyCollection($defaultName)) {
-                    $classMetadata->renameProperty($defaultName, $name);
-                }
+            if ($defaultName !== $name && $classMetadata->hasPropertyCollection($defaultName)) {
+                $classMetadata->renameProperty($defaultName, $name);
             }
         } else {
             $property = PropertyVariationMetadata::fromReflection($reflProperty);

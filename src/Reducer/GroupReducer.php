@@ -38,10 +38,6 @@ final class GroupReducer implements PropertyReducerInterface
 
     private function includeProperty(PropertyVariationMetadata $property): bool
     {
-        if (\count($this->groups) > 0 && 0 === \count(array_intersect($property->getGroups(), $this->groups))) {
-            return false;
-        }
-
-        return true;
+        return 0 === \count($this->groups) || 0 < \count(array_intersect($property->getGroups(), $this->groups));
     }
 }

@@ -27,7 +27,7 @@ final class RawClassMetadataRegistry
 
     public function contains(string $className): bool
     {
-        return array_key_exists($className, $this->classMetadata);
+        return \array_key_exists($className, $this->classMetadata);
     }
 
     /**
