@@ -28,7 +28,7 @@ final class PropertyTypePrimitive extends AbstractPropertyType
     public function __construct(string $typeName, bool $nullable)
     {
         parent::__construct($nullable);
-        if (array_key_exists($typeName, self::TYPE_MAP)) {
+        if (\array_key_exists($typeName, self::TYPE_MAP)) {
             $typeName = self::TYPE_MAP[$typeName];
         }
         if (!self::isTypePrimitive($typeName)) {
@@ -66,7 +66,7 @@ final class PropertyTypePrimitive extends AbstractPropertyType
 
     public static function isTypePrimitive(string $typeName): bool
     {
-        if (array_key_exists($typeName, self::TYPE_MAP)) {
+        if (\array_key_exists($typeName, self::TYPE_MAP)) {
             $typeName = self::TYPE_MAP[$typeName];
         }
 
