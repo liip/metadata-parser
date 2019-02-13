@@ -1,5 +1,7 @@
 # Liip Metadata Parser
 
+**This project is Open Sourced based on work that we did initially as closed source at Liip, it may be lacking some documentation. If there is anything that you need or have questions about we would love to see you open an issue! :)**
+
 This is a parser for building model metadata from PHP classes. The metadata model can
 then be used to generate code or configuration. For example a serializer or
 ElasticSearch schema for types.
@@ -21,6 +23,9 @@ You could write your own parsers, but this library comes with support for:
 If you want to contribute to the project (awesome!!), please read the
 [Contributing Guidelines](https://github.com/liip/metadata-parser/blob/master/CONTRIBUTING.md)
 and adhere to our [Code Of Conduct](https://github.com/liip/metadata-parser/blob/master/CODE_OF_CONDUCT.md)
+
+## Where do I go for help?
+If you need, open an issue.
 
 ## Setup
 ```php
