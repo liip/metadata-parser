@@ -48,18 +48,18 @@ $builder = new Builder($parser, $recursionChecker);
 ## Usage
 
 The `Builder::build` method is the main entry point to get a `ClassMetadata`
-object. The builder accepts an array of `Reducer` to select which property to 
-use when there are several options. A reducer can lead to drop a property if 
-none of the variants is acceptable. Multiple options for a single field mainly 
+object. The builder accepts an array of `Reducer` to select which property to
+use when there are several options. A reducer can lead to drop a property if
+none of the variants is acceptable. Multiple options for a single field mainly
 come from the `@SerializedName` and `@VirtualProperty` annotations of
 JMSSerializer:
 
-* GroupReducer: Select the property based on whether it is in any of the 
+* GroupReducer: Select the property based on whether it is in any of the
   specified groups;
 * VersionReducer: Select the property based on whether it is included in the
   specified version;
 * TakeBestReducer: Make sure that we end up with the property that has the same
-  name as the serialized name, if we still have multiple options after the 
+  name as the serialized name, if we still have multiple options after the
   other reducers.
 
 ```php
@@ -83,7 +83,7 @@ another class, are of the type `PropertyTypeClass` that has the method
 `getClassMetadata()` to get the metadata of the nested class. This structure
 is validated to not contain any infinite recursion.
 
-## Handling Edge Cases with @Preferred
+### Handling Edge Cases with @Preferred
 
 This library provides its own annotation in `Liip\MetadataParser\Annotation\Preferred`
 to specify which property to use in case there are several options. This can be
@@ -112,7 +112,7 @@ class Product
 }
 ```
 
-## Expected Recursion: Working with Flawed Models
+### Expected Recursion: Working with Flawed Models
 
 The RecursionChecker accepts a second parameter to specify places where to
 break recursion. This is useful if your model tree looks like it has recursions
@@ -135,3 +135,11 @@ $recursionChecker = new RecursionChecker(new NullLogger(), $expectedRecursions);
 With this configuration, the `ClassMetadata` found in the property type for the
 variants property of the final model will have no field `variants`, so that
 code working on the metadata does not need to worry about infinite recursion.
+
+## Extending the metadata parser
+
+This library comes with a couple of parsers, but you can write your own to
+handle custom information specific to your project. Use the
+`PropertyVariationMetadata::setCustomInformation` method to add custom data,
+and use `PropertyMetadata::getCustomInformation` to read it in your metadata
+consumers.
