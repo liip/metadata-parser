@@ -20,6 +20,7 @@ final class PropertyMetadata extends AbstractPropertyMetadata
 
     /**
      * @param string[] $groups
+     * @param mixed[]  $customInformation
      */
     public function __construct(
         string $serializedName,
@@ -29,7 +30,8 @@ final class PropertyMetadata extends AbstractPropertyMetadata
         bool $public = false,
         VersionRange $versionRange = null,
         array $groups = [],
-        PropertyAccessor $accessor = null
+        PropertyAccessor $accessor = null,
+        array $customInformation = []
     ) {
         parent::__construct($name, $readOnly, $public);
         $this->serializedName = $serializedName;
@@ -38,6 +40,9 @@ final class PropertyMetadata extends AbstractPropertyMetadata
         $this->setGroups($groups);
         if ($accessor) {
             $this->setAccessor($accessor);
+        }
+        foreach ($customInformation as $key => $value) {
+            $this->setCustomInformation((string) $key, $value);
         }
     }
 
@@ -56,7 +61,8 @@ final class PropertyMetadata extends AbstractPropertyMetadata
             $property->isPublic(),
             $property->getVersionRange(),
             $property->getGroups(),
-            $property->getAccessor()
+            $property->getAccessor(),
+            $property->getAllCustomInformation()
         );
     }
 
