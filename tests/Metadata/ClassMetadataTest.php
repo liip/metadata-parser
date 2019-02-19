@@ -7,7 +7,6 @@ namespace Tests\Liip\MetadataParser\Metadata;
 use Liip\MetadataParser\Metadata\ClassMetadata;
 use Liip\MetadataParser\Metadata\ParameterMetadata;
 use Liip\MetadataParser\Metadata\PropertyMetadata;
-use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 use PHPUnit\Framework\TestCase;
 
