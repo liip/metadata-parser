@@ -1,4 +1,7 @@
 parameters:
+    level: 5
+    paths:
+        - src/
     ignoreErrors:
         # Allow JMS parser version 1
         - '#has unknown class JMS\\Serializer\\TypeParser as its type#'
