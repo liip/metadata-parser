@@ -71,7 +71,11 @@ final class PhpTypeParser
      */
     public function parseReflectionType(\ReflectionType $reflType): PropertyType
     {
-        return $this->createType($reflType->getName(), $reflType->allowsNull());
+        if ($reflType instanceof \ReflectionNamedType) {
+            return $this->createType($reflType->getName(), $reflType->allowsNull());
+        }
+
+        throw new InvalidTypeException(sprintf('No type information found, got %s but expected %s', \ReflectionType::class, \ReflectionNamedType::class));
     }
 
     private function createType(string $rawType, bool $nullable, \ReflectionClass $reflClass = null): PropertyType
@@ -118,9 +122,20 @@ final class PhpTypeParser
         if (null !== $reflClass) {
             // resolve use statements of the class with the type information
             $lowerClassName = strtolower($className);
-            $imports = $this->useStatementsParser->parseClass($reflClass);
-            if (isset($imports[$lowerClassName])) {
-                return $imports[$lowerClassName];
+
+            $reflCurrentClass = $reflClass;
+            do {
+              $imports = $this->useStatementsParser->parseClass($reflCurrentClass);
+              if (isset($imports[$lowerClassName])) {
+                  return $imports[$lowerClassName];
+              }
+            } while (false !== ($reflCurrentClass = $reflCurrentClass->getParentClass()));
+
+            foreach ($reflClass->getTraits() as $reflTrait) {
+                $imports = $this->useStatementsParser->parseClass($reflTrait);
+                if (isset($imports[$lowerClassName])) {
+                    return $imports[$lowerClassName];
+                }
             }
 
             // the referenced class is expected to be in the same namespace
