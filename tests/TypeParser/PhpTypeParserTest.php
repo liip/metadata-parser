@@ -192,14 +192,17 @@ class PhpTypeParserTest extends TestCase
         $c = new class() {
             private function method1(): string
             {
+                return '1';
             }
 
             private function method2(): ?int
             {
+                return 1;
             }
 
             private function method3(): array
             {
+                return [1];
             }
         };
         $reflClass = new \ReflectionClass(\get_class($c));
