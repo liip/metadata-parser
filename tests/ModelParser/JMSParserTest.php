@@ -953,6 +953,7 @@ class JMSParserTest extends TestCase
              */
             public function foo(): ?string
             {
+                return 'foo';
             }
         };
 
@@ -977,6 +978,7 @@ class JMSParserTest extends TestCase
              */
             public function foo(): ?\DateTime
             {
+                return new \DateTime();
             }
         };
 
