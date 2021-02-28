@@ -17,8 +17,8 @@ class PropertyTypeArrayTest extends TestCase
     {
         $propertyType = new PropertyTypeArray(new PropertyTypeArray(new PropertyTypePrimitive('int', false), false, false), false, false);
 
-        $this->assertInstanceOf(PropertyTypeArray::class, $propertyType->getSubType());
-        $this->assertInstanceOf(PropertyTypePrimitive::class, $propertyType->getSubType()->getSubType());
-        $this->assertInstanceOf(PropertyTypePrimitive::class, $propertyType->getLeafType());
+        static::assertInstanceOf(PropertyTypeArray::class, $propertyType->getSubType());
+        static::assertInstanceOf(PropertyTypePrimitive::class, $propertyType->getSubType()->getSubType());
+        static::assertInstanceOf(PropertyTypePrimitive::class, $propertyType->getLeafType());
     }
 }

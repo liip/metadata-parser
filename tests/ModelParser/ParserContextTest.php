@@ -18,9 +18,9 @@ class ParserContextTest extends TestCase
         $context = new ParserContext('Root');
 
         $s = (string) $context;
-        $this->assertStringContainsString('Root', $s);
-        $this->assertStringNotContainsString('property1', $s);
-        $this->assertStringNotContainsString('property2', $s);
+        static::assertStringContainsString('Root', $s);
+        static::assertStringNotContainsString('property1', $s);
+        static::assertStringNotContainsString('property2', $s);
     }
 
     public function testPush(): void
@@ -30,8 +30,8 @@ class ParserContextTest extends TestCase
         $context = $context->push(new PropertyVariationMetadata('property2', false, true));
 
         $s = (string) $context;
-        $this->assertStringContainsString('Root', $s);
-        $this->assertStringContainsString('property1', $s);
-        $this->assertStringContainsString('property2', $s);
+        static::assertStringContainsString('Root', $s);
+        static::assertStringContainsString('property1', $s);
+        static::assertStringContainsString('property2', $s);
     }
 }

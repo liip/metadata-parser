@@ -2,8 +2,12 @@
 /vendor
 /composer.lock
 
+# PHPStorm configuration
+/.idea
+
 ###> phpunit/phpunit ###
 /phpunit.xml
+/.phpunit.result.cache
 ###< phpunit/phpunit ###
 
 ###> friendsofphp/php-cs-fixer ###

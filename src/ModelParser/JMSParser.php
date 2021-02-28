@@ -24,6 +24,7 @@ use JMS\Serializer\Annotation\XmlList;
 use JMS\Serializer\Annotation\XmlMap;
 use JMS\Serializer\Annotation\XmlRoot;
 use JMS\Serializer\Annotation\XmlValue;
+use JMS\Serializer\Type\Exception\SyntaxError;
 use Liip\MetadataParser\Exception\InvalidTypeException;
 use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\PropertyAccessor;
@@ -74,9 +75,13 @@ final class JMSParser implements ModelParserInterface
             throw ParseException::classNotFound($classMetadata->getClassName(), $e);
         }
 
-        $this->parseProperties($reflClass, $classMetadata);
-        $this->parseMethods($reflClass, $classMetadata);
-        $this->parseClass($reflClass, $classMetadata);
+        try {
+            $this->parseProperties($reflClass, $classMetadata);
+            $this->parseMethods($reflClass, $classMetadata);
+            $this->parseClass($reflClass, $classMetadata);
+        } catch (SyntaxError $exception) {
+            throw new ParseException($exception->getMessage(), $exception->getCode(), $exception);
+        }
     }
 
     private function parseProperties(\ReflectionClass $reflClass, RawClassMetadata $classMetadata): void

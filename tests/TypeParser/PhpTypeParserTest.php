@@ -136,9 +136,9 @@ class PhpTypeParserTest extends TestCase
     {
         $type = $this->parser->parseAnnotationType($rawType, new \ReflectionClass($this));
 
-        $this->assertSame($expectedType, (string) $type, 'Type should match');
+        static::assertSame($expectedType, (string) $type, 'Type should match');
         if (null !== $expectedNullable) {
-            $this->assertSame($expectedNullable, $type->isNullable(), 'Nullable flag should match');
+            static::assertSame($expectedNullable, $type->isNullable(), 'Nullable flag should match');
         }
     }
 
@@ -184,7 +184,7 @@ class PhpTypeParserTest extends TestCase
     {
         $type = $this->parser->parseAnnotationType($rawType, new \ReflectionClass(WithImports::class));
 
-        $this->assertSame($expectedType, (string) $type, 'Type should match');
+        static::assertSame($expectedType, (string) $type, 'Type should match');
     }
 
     public function provideReflectionTypes(): iterable
@@ -231,9 +231,9 @@ class PhpTypeParserTest extends TestCase
     {
         $type = $this->parser->parseReflectionType($reflType);
 
-        $this->assertSame($expectedType, (string) $type, 'Type should match');
+        static::assertSame($expectedType, (string) $type, 'Type should match');
         if (null !== $expectedNullable) {
-            $this->assertSame($expectedNullable, $type->isNullable(), 'Nullable flag should match');
+            static::assertSame($expectedNullable, $type->isNullable(), 'Nullable flag should match');
         }
     }
 }

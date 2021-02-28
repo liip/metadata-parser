@@ -45,8 +45,8 @@ class JMSParserTest extends TestCase
         $classMetadata = new RawClassMetadata(\get_class($c));
         $this->parser->parse($classMetadata);
 
-        $this->assertSame(\get_class($c), $classMetadata->getClassName());
-        $this->assertCount(0, $classMetadata->getPropertyCollections(), 'Number of properties should match');
+        static::assertSame(\get_class($c), $classMetadata->getClassName());
+        static::assertCount(0, $classMetadata->getPropertyCollections(), 'Number of properties should match');
     }
 
     public function testInvalidClass(): void
@@ -101,7 +101,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
         $this->assertPropertyCollection('property', 1, $props[0]);
     }
 
@@ -174,7 +174,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('property', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
@@ -195,7 +195,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('property', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
@@ -215,7 +215,7 @@ class JMSParserTest extends TestCase
         $classMetadata = new RawClassMetadata(\get_class($c));
 
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('__invalid__');
+        $this->expectExceptionMessage('unexpected "__" (T_UNKNOWN)');
         $this->parser->parse($classMetadata);
     }
 
@@ -238,7 +238,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(3, $props, 'Number of properties should match');
+        static::assertCount(3, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('parent_property1', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
@@ -269,7 +269,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('property', 1, $props[0]);
         $this->assertPropertyVariation('property', false, true, $props[0]->getVariations()[0]);
@@ -288,10 +288,10 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('foo', 1, $props[0]);
-        $this->assertSame('property', $props[0]->getVariations()[0]->getName(), 'Name of property should match');
+        static::assertSame('property', $props[0]->getVariations()[0]->getName(), 'Name of property should match');
     }
 
     public function testSerializedNameTwice(): void
@@ -312,11 +312,11 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('foo', 2, $props[0]);
-        $this->assertSame('property1', $props[0]->getVariations()[0]->getName(), 'Name of property should match');
-        $this->assertSame('property2', $props[0]->getVariations()[1]->getName(), 'Name of property should match');
+        static::assertSame('property1', $props[0]->getVariations()[0]->getName(), 'Name of property should match');
+        static::assertSame('property2', $props[0]->getVariations()[1]->getName(), 'Name of property should match');
     }
 
     public function testSerializedNameMerge(): void
@@ -339,11 +339,11 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('links', 2, $props[0]);
-        $this->assertSame('property', $props[0]->getVariations()[0]->getName(), 'Name of property should match');
-        $this->assertSame('links', $props[0]->getVariations()[1]->getName(), 'Name of property should match');
+        static::assertSame('property', $props[0]->getVariations()[0]->getName(), 'Name of property should match');
+        static::assertSame('links', $props[0]->getVariations()[1]->getName(), 'Name of property should match');
     }
 
     public function testSerializedNamePrefilled(): void
@@ -360,10 +360,10 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('foo', 1, $props[0]);
-        $this->assertSame('property', $props[0]->getVariations()[0]->getName(), 'Name of property should match');
+        static::assertSame('property', $props[0]->getVariations()[0]->getName(), 'Name of property should match');
     }
 
     public function testSerializedNamePrefilledMerge(): void
@@ -388,11 +388,11 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('links', 2, $props[0]);
-        $this->assertSame('fakeLinks', $props[0]->getVariations()[0]->getName(), 'Name of property should match');
-        $this->assertSame('links', $props[0]->getVariations()[1]->getName(), 'Name of property should match');
+        static::assertSame('fakeLinks', $props[0]->getVariations()[0]->getName(), 'Name of property should match');
+        static::assertSame('links', $props[0]->getVariations()[1]->getName(), 'Name of property should match');
     }
 
     public function testExclude(): void
@@ -409,7 +409,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('property2', 1, $props[0]);
     }
@@ -431,7 +431,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('property2', 1, $props[0]);
     }
@@ -455,10 +455,10 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('foo', 1, $props[0]);
-        $this->assertSame('property1', $props[0]->getVariations()[0]->getName(), 'Name of property should match');
+        static::assertSame('property1', $props[0]->getVariations()[0]->getName(), 'Name of property should match');
     }
 
     public function testConditionalExclude(): void
@@ -491,10 +491,10 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('property', 1, $props[0]);
-        $this->assertSame(['group1', 'group2'], $props[0]->getVariations()[0]->getGroups());
+        static::assertSame(['group1', 'group2'], $props[0]->getVariations()[0]->getGroups());
     }
 
     public function testAccessor(): void
@@ -522,7 +522,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(4, $props, 'Number of properties should match');
+        static::assertCount(4, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('property', 1, $props[0]);
         $this->assertPropertyAccessor(null, null, $props[0]->getVariations()[0]->getAccessor());
@@ -563,29 +563,29 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(4, $props, 'Number of properties should match');
+        static::assertCount(4, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('property1', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
-        $this->assertTrue($property->getVersionRange()->isIncluded('1.0'));
-        $this->assertTrue($property->getVersionRange()->isIncluded('3.8'));
+        static::assertTrue($property->getVersionRange()->isIncluded('1.0'));
+        static::assertTrue($property->getVersionRange()->isIncluded('3.8'));
 
         $this->assertPropertyCollection('property2', 1, $props[1]);
         $property = $props[1]->getVariations()[0];
-        $this->assertFalse($property->getVersionRange()->isIncluded('1.0'));
-        $this->assertTrue($property->getVersionRange()->isIncluded('2.2'));
+        static::assertFalse($property->getVersionRange()->isIncluded('1.0'));
+        static::assertTrue($property->getVersionRange()->isIncluded('2.2'));
 
         $this->assertPropertyCollection('property3', 1, $props[2]);
         $property = $props[2]->getVariations()[0];
-        $this->assertTrue($property->getVersionRange()->isIncluded('2.2'));
-        $this->assertFalse($property->getVersionRange()->isIncluded('4.0'));
+        static::assertTrue($property->getVersionRange()->isIncluded('2.2'));
+        static::assertFalse($property->getVersionRange()->isIncluded('4.0'));
 
         $this->assertPropertyCollection('property4', 1, $props[3]);
         $property = $props[3]->getVariations()[0];
-        $this->assertFalse($property->getVersionRange()->isIncluded('3.9'));
-        $this->assertTrue($property->getVersionRange()->isIncluded('4.0'));
-        $this->assertTrue($property->getVersionRange()->isIncluded('8.1'));
-        $this->assertFalse($property->getVersionRange()->isIncluded('8.2'));
+        static::assertFalse($property->getVersionRange()->isIncluded('3.9'));
+        static::assertTrue($property->getVersionRange()->isIncluded('4.0'));
+        static::assertTrue($property->getVersionRange()->isIncluded('8.1'));
+        static::assertFalse($property->getVersionRange()->isIncluded('8.2'));
     }
 
     public function testInvalidPropertyAnnotations(): void
@@ -622,7 +622,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
         $this->assertPropertyCollection('property', 1, $props[0]);
     }
 
@@ -663,7 +663,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(5, $props, 'Number of properties should match');
+        static::assertCount(5, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('pro_perty4', 1, $props[0]);
         $this->assertPropertyCollection('pro_perty1', 1, $props[1]);
@@ -701,7 +701,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
         $this->assertPropertyCollection('property', 1, $props[0]);
     }
 
@@ -734,7 +734,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(0, $props, 'Number of properties should match');
+        static::assertCount(0, $props, 'Number of properties should match');
     }
 
     public function testVirtualProperty(): void
@@ -753,7 +753,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('foo', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
@@ -778,7 +778,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('bar', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
@@ -803,7 +803,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('foo', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
@@ -828,7 +828,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('foo', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
@@ -893,7 +893,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('foo', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
@@ -961,7 +961,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('foo', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
@@ -986,7 +986,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('foo', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
@@ -994,9 +994,9 @@ class JMSParserTest extends TestCase
         /** @var PropertyTypeDateTime $type */
         $type = $property->getType();
         $this->assertPropertyType(PropertyTypeDateTime::class, 'DateTime|null', true, $type);
-        $this->assertSame('Y-m-d H:i:s', $type->getFormat(), 'Date time format should match');
-        $this->assertSame('Europe/Zurich', $type->getZone(), 'Date time zone should match');
-        $this->assertSame('Y-m-d', $type->getDeserializeFormat(), 'Date time deserialize format should match');
+        static::assertSame('Y-m-d H:i:s', $type->getFormat(), 'Date time format should match');
+        static::assertSame('Europe/Zurich', $type->getZone(), 'Date time zone should match');
+        static::assertSame('Y-m-d', $type->getDeserializeFormat(), 'Date time deserialize format should match');
     }
 
     public function testVirtualPropertyTypeExtendingDateTimeWithUnknown(): void
@@ -1016,7 +1016,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('foo', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
@@ -1024,9 +1024,9 @@ class JMSParserTest extends TestCase
         /** @var PropertyTypeDateTime $type */
         $type = $property->getType();
         $this->assertPropertyType(PropertyTypeDateTime::class, 'DateTime|null', true, $type);
-        $this->assertSame('Y-m-d H:i:s', $type->getFormat(), 'Date time format should match');
-        $this->assertSame('Europe/Zurich', $type->getZone(), 'Date time zone should match');
-        $this->assertSame('Y-m-d', $type->getDeserializeFormat(), 'Date time deserialize format should match');
+        static::assertSame('Y-m-d H:i:s', $type->getFormat(), 'Date time format should match');
+        static::assertSame('Europe/Zurich', $type->getZone(), 'Date time zone should match');
+        static::assertSame('Y-m-d', $type->getDeserializeFormat(), 'Date time deserialize format should match');
     }
 
     public function testVirtualPropertyInvalidType(): void
@@ -1045,7 +1045,7 @@ class JMSParserTest extends TestCase
         $classMetadata = new RawClassMetadata(\get_class($c));
 
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('__invalid__');
+        $this->expectExceptionMessage('unexpected "__" (T_UNKNOWN)');
         $this->parser->parse($classMetadata);
     }
 
@@ -1105,7 +1105,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(0, $props, 'Number of properties should match');
+        static::assertCount(0, $props, 'Number of properties should match');
     }
 
     public function testVirtualPropertyWithGroups(): void
@@ -1125,10 +1125,10 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('foo', 1, $props[0]);
-        $this->assertSame(['group1', 'group2'], $props[0]->getVariations()[0]->getGroups());
+        static::assertSame(['group1', 'group2'], $props[0]->getVariations()[0]->getGroups());
     }
 
     public function testVirtualPropertyWithVersionRange(): void
@@ -1149,13 +1149,13 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('foo', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
-        $this->assertFalse($property->getVersionRange()->isIncluded('1.0'));
-        $this->assertTrue($property->getVersionRange()->isIncluded('1.2'));
-        $this->assertFalse($property->getVersionRange()->isIncluded('4.0'));
+        static::assertFalse($property->getVersionRange()->isIncluded('1.0'));
+        static::assertTrue($property->getVersionRange()->isIncluded('1.2'));
+        static::assertFalse($property->getVersionRange()->isIncluded('4.0'));
     }
 
     public function testVirtualPropertyOverridesProperty(): void
@@ -1179,16 +1179,16 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('foo', 2, $props[0]);
 
         $property = $props[0]->getVariations()[0];
-        $this->assertSame('foo', $property->getName());
+        static::assertSame('foo', $property->getName());
         $this->assertPropertyType(PropertyTypePrimitive::class, 'string|null', true, $property->getType());
 
         $property = $props[0]->getVariations()[1];
-        $this->assertSame('foo', $property->getName());
+        static::assertSame('foo', $property->getName());
         $this->assertPropertyType(PropertyTypePrimitive::class, 'int', false, $property->getType());
     }
 
@@ -1214,16 +1214,16 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('foo', 2, $props[0]);
 
         $property = $props[0]->getVariations()[0];
-        $this->assertSame('foo', $property->getName());
+        static::assertSame('foo', $property->getName());
         $this->assertPropertyType(PropertyTypePrimitive::class, 'string|null', true, $property->getType());
 
         $property = $props[0]->getVariations()[1];
-        $this->assertSame('bar', $property->getName());
+        static::assertSame('bar', $property->getName());
         $this->assertPropertyType(PropertyTypePrimitive::class, 'int', false, $property->getType());
     }
 
@@ -1248,7 +1248,7 @@ class JMSParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
         $this->assertPropertyCollection('foo', 1, $props[0]);
     }
 
@@ -1293,32 +1293,32 @@ class JMSParserTest extends TestCase
         $classMetadata = new RawClassMetadata(\get_class($c));
         $this->parser->parse($classMetadata);
 
-        $this->assertSame(['foo', 'bar'], $classMetadata->getPostDeserializeMethods());
+        static::assertSame(['foo', 'bar'], $classMetadata->getPostDeserializeMethods());
     }
 
     private function assertPropertyCollection(string $serializedName, int $variations, PropertyCollection $prop): void
     {
-        $this->assertSame($serializedName, $prop->getSerializedName(), 'Serialized name of property should match');
-        $this->assertCount($variations, $prop->getVariations(), "Number of variations of property ${serializedName} should match");
+        static::assertSame($serializedName, $prop->getSerializedName(), 'Serialized name of property should match');
+        static::assertCount($variations, $prop->getVariations(), "Number of variations of property {$serializedName} should match");
     }
 
     private function assertPropertyVariation(string $name, bool $public, bool $readOnly, PropertyVariationMetadata $property): void
     {
-        $this->assertSame($name, $property->getName(), 'Name of property should match');
-        $this->assertSame($public, $property->isPublic(), "Public flag of property ${name} should match");
-        $this->assertSame($readOnly, $property->isReadOnly(), "Read only flag of property ${name} should match");
+        static::assertSame($name, $property->getName(), 'Name of property should match');
+        static::assertSame($public, $property->isPublic(), "Public flag of property {$name} should match");
+        static::assertSame($readOnly, $property->isReadOnly(), "Read only flag of property {$name} should match");
     }
 
     private function assertPropertyType(string $propertyTypeClass, string $typeString, bool $nullable, PropertyType $type): void
     {
-        $this->assertInstanceOf($propertyTypeClass, $type);
-        $this->assertSame($nullable, $type->isNullable(), 'Nullable flag should match');
-        $this->assertSame($typeString, (string) $type);
+        static::assertInstanceOf($propertyTypeClass, $type);
+        static::assertSame($nullable, $type->isNullable(), 'Nullable flag should match');
+        static::assertSame($typeString, (string) $type);
     }
 
     private function assertPropertyAccessor(?string $getterMethod, ?string $setterMethod, PropertyAccessor $accessor): void
     {
-        $this->assertSame($getterMethod, $accessor->getGetterMethod(), 'Getter method of property should match');
-        $this->assertSame($setterMethod, $accessor->getSetterMethod(), 'Setter method of property should match');
+        static::assertSame($getterMethod, $accessor->getGetterMethod(), 'Getter method of property should match');
+        static::assertSame($setterMethod, $accessor->getSetterMethod(), 'Setter method of property should match');
     }
 }

@@ -68,7 +68,7 @@ final class PropertyTypeArray extends AbstractPropertyType
             return new self($this->subType, $this->isHashmap(), $nullable);
         }
         if (!$other instanceof self) {
-            throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be the same or unknown', \get_class($this), \get_class($other)));
+            throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be the same or unknown', static::class, \get_class($other)));
         }
 
         /*
@@ -77,7 +77,7 @@ final class PropertyTypeArray extends AbstractPropertyType
          * PHPDoc has no clear definition for hashmaps with string indexes, but JMS Serializer annotations do.
          */
         if ($this->isHashmap() && !$other->isHashmap()) {
-            throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, can\'t change hashmap into plain array', \get_class($this), \get_class($other)));
+            throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, can\'t change hashmap into plain array', static::class, \get_class($other)));
         }
 
         $hashmap = $this->isHashmap() || $other->isHashmap();

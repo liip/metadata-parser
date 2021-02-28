@@ -101,9 +101,9 @@ class JMSTypeParserTest extends TestCase
     {
         $type = $this->parser->parse($rawType);
 
-        $this->assertSame($expectedType, (string) $type, 'Type should match');
+        static::assertSame($expectedType, (string) $type, 'Type should match');
         if (null !== $expectedNullable) {
-            $this->assertSame($expectedNullable, $type->isNullable(), 'Nullable flag should match');
+            static::assertSame($expectedNullable, $type->isNullable(), 'Nullable flag should match');
         }
     }
 
@@ -197,11 +197,11 @@ class JMSTypeParserTest extends TestCase
     {
         /** @var PropertyTypeDateTime $type */
         $type = $this->parser->parse($rawType);
-        $this->assertInstanceOf(PropertyTypeDateTime::class, $type);
-        $this->assertSame($expectedType, (string) $type, 'Type should match');
-        $this->assertSame($expectedFormat, $type->getFormat(), 'Date time format should match');
-        $this->assertSame($expectedZone, $type->getZone(), 'Date time zone should match');
-        $this->assertSame($expectedDeserializeFormat, $type->getDeserializeFormat(), 'Date time deserialize format should match');
+        static::assertInstanceOf(PropertyTypeDateTime::class, $type);
+        static::assertSame($expectedType, (string) $type, 'Type should match');
+        static::assertSame($expectedFormat, $type->getFormat(), 'Date time format should match');
+        static::assertSame($expectedZone, $type->getZone(), 'Date time zone should match');
+        static::assertSame($expectedDeserializeFormat, $type->getDeserializeFormat(), 'Date time deserialize format should match');
     }
 
     public function testInvalidTypeWithParameters(): void

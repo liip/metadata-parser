@@ -41,8 +41,8 @@ class PhpDocParserTest extends TestCase
         $classMetadata = new RawClassMetadata(\get_class($c));
         $this->parser->parse($classMetadata);
 
-        $this->assertSame(\get_class($c), $classMetadata->getClassName());
-        $this->assertCount(0, $classMetadata->getPropertyCollections(), 'Number of properties should match');
+        static::assertSame(\get_class($c), $classMetadata->getClassName());
+        static::assertCount(0, $classMetadata->getPropertyCollections(), 'Number of properties should match');
     }
 
     public function testInvalidClass(): void
@@ -95,9 +95,6 @@ class PhpDocParserTest extends TestCase
 
         yield [
             new class() {
-                /**
-                 * @var mixed
-                 */
                 private $property;
             },
             PropertyTypeUnknown::class,
@@ -139,7 +136,7 @@ class PhpDocParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('property', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
@@ -166,7 +163,7 @@ class PhpDocParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(2, $props, 'Number of properties should match');
+        static::assertCount(2, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('foo', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
@@ -197,7 +194,7 @@ class PhpDocParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(3, $props, 'Number of properties should match');
+        static::assertCount(3, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('parent_property1', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
@@ -228,7 +225,7 @@ class PhpDocParserTest extends TestCase
         $this->parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
+        static::assertCount(1, $props, 'Number of properties should match');
 
         $this->assertPropertyCollection('property', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
@@ -238,21 +235,21 @@ class PhpDocParserTest extends TestCase
 
     private function assertPropertyCollection(string $serializedName, int $variations, PropertyCollection $prop): void
     {
-        $this->assertSame($serializedName, $prop->getSerializedName(), 'Serialized name of property should match');
-        $this->assertCount($variations, $prop->getVariations(), "Number of variations of property ${serializedName} should match");
+        static::assertSame($serializedName, $prop->getSerializedName(), 'Serialized name of property should match');
+        static::assertCount($variations, $prop->getVariations(), "Number of variations of property {$serializedName} should match");
     }
 
     private function assertProperty(string $name, bool $public, bool $readOnly, PropertyVariationMetadata $property): void
     {
-        $this->assertSame($name, $property->getName(), 'Name of property should match');
-        $this->assertSame($public, $property->isPublic(), "Public flag of property ${name} should match");
-        $this->assertSame($readOnly, $property->isReadOnly(), "Read only flag of property ${name} should match");
+        static::assertSame($name, $property->getName(), 'Name of property should match');
+        static::assertSame($public, $property->isPublic(), "Public flag of property {$name} should match");
+        static::assertSame($readOnly, $property->isReadOnly(), "Read only flag of property {$name} should match");
     }
 
     private function assertPropertyType(string $propertyTypeClass, string $typeString, bool $nullable, PropertyType $type): void
     {
-        $this->assertInstanceOf($propertyTypeClass, $type);
-        $this->assertSame($nullable, $type->isNullable());
-        $this->assertSame($typeString, (string) $type);
+        static::assertInstanceOf($propertyTypeClass, $type);
+        static::assertSame($nullable, $type->isNullable());
+        static::assertSame($typeString, (string) $type);
     }
 }

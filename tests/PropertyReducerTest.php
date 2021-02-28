@@ -25,9 +25,9 @@ class PropertyReducerTest extends TestCase
 
         $reduced = PropertyReducer::reduce($rawClassMetadata);
 
-        $this->assertCount(0, $reduced->getProperties(), 'Number of properties should match');
-        $this->assertCount(0, $reduced->getPostDeserializeMethods(), 'Number of post deserialize methods should match');
-        $this->assertCount(0, $reduced->getConstructorParameters(), 'Number of constructor parameters should match');
+        static::assertCount(0, $reduced->getProperties(), 'Number of properties should match');
+        static::assertCount(0, $reduced->getPostDeserializeMethods(), 'Number of post deserialize methods should match');
+        static::assertCount(0, $reduced->getConstructorParameters(), 'Number of constructor parameters should match');
     }
 
     public function testReduceKeepsPostDeserializeMethods(): void
@@ -38,7 +38,7 @@ class PropertyReducerTest extends TestCase
 
         $reduced = PropertyReducer::reduce($rawClassMetadata);
 
-        $this->assertSame(['method1', 'method2'], $reduced->getPostDeserializeMethods());
+        static::assertSame(['method1', 'method2'], $reduced->getPostDeserializeMethods());
     }
 
     public function testReduceKeepsConstructorParameters(): void
@@ -49,7 +49,7 @@ class PropertyReducerTest extends TestCase
 
         $reduced = PropertyReducer::reduce($rawClassMetadata);
 
-        $this->assertCount(2, $reduced->getConstructorParameters(), 'Number of constructor parameters should match');
+        static::assertCount(2, $reduced->getConstructorParameters(), 'Number of constructor parameters should match');
     }
 
     public function testReduceSimpleProperties(): void
@@ -116,6 +116,6 @@ class PropertyReducerTest extends TestCase
             $names[] = $property->getName();
         }
 
-        $this->assertSame($propertyNames, $names, 'Properties should match');
+        static::assertSame($propertyNames, $names, 'Properties should match');
     }
 }
