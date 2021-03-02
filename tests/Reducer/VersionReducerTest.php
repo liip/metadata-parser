@@ -59,6 +59,6 @@ class VersionReducerTest extends TestCase
             $names[] = $property->getName();
         }
 
-        static::assertSame($propertyNames, $names, 'Properties should match');
+        $this->assertSame($propertyNames, $names, 'Properties should match');
     }
 }

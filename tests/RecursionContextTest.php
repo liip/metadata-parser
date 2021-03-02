@@ -18,9 +18,9 @@ class RecursionContextTest extends TestCase
         $context = new RecursionContext('Root');
 
         $s = (string) $context;
-        static::assertStringContainsString('Root', $s);
-        static::assertStringNotContainsString('property1', $s);
-        static::assertStringNotContainsString('property2', $s);
+        $this->assertStringContainsString('Root', $s);
+        $this->assertStringNotContainsString('property1', $s);
+        $this->assertStringNotContainsString('property2', $s);
     }
 
     public function testPush(): void
@@ -30,17 +30,17 @@ class RecursionContextTest extends TestCase
         $context = $context->push(new PropertyMetadata('property2', 'property2'));
 
         $s = (string) $context;
-        static::assertStringContainsString('Root', $s);
-        static::assertStringContainsString('property1', $s);
-        static::assertStringContainsString('property2', $s);
+        $this->assertStringContainsString('Root', $s);
+        $this->assertStringContainsString('property1', $s);
+        $this->assertStringContainsString('property2', $s);
     }
 
     public function testMatchesEmpty(): void
     {
         $context = new RecursionContext('Root');
 
-        static::assertFalse($context->matches([]));
-        static::assertFalse($context->matches(['foo', 'bar', 'baz']));
+        $this->assertFalse($context->matches([]));
+        $this->assertFalse($context->matches(['foo', 'bar', 'baz']));
     }
 
     public function testMatches(): void
@@ -49,12 +49,12 @@ class RecursionContextTest extends TestCase
         $context = $context->push(new PropertyMetadata('property1', 'property1'));
         $context = $context->push(new PropertyMetadata('property2', 'property2'));
 
-        static::assertFalse($context->matches(['Root', 'property2']));
-        static::assertFalse($context->matches(['property2', 'property1']));
-        static::assertTrue($context->matches(['Root', 'property1']));
-        static::assertTrue($context->matches(['Root', 'property1', 'property2']));
-        static::assertTrue($context->matches(['property1', 'property2']));
-        static::assertTrue($context->matches(['property2']));
+        $this->assertFalse($context->matches(['Root', 'property2']));
+        $this->assertFalse($context->matches(['property2', 'property1']));
+        $this->assertTrue($context->matches(['Root', 'property1']));
+        $this->assertTrue($context->matches(['Root', 'property1', 'property2']));
+        $this->assertTrue($context->matches(['property1', 'property2']));
+        $this->assertTrue($context->matches(['property2']));
     }
 
     public function testMatchesWildcard(): void
@@ -63,9 +63,9 @@ class RecursionContextTest extends TestCase
         $context = $context->push(new PropertyMetadata('property1', 'property1'));
         $context = $context->push(new PropertyMetadata('property2', 'property2'));
 
-        static::assertFalse($context->matches(['Root', '*', 'property1']));
-        static::assertFalse($context->matches(['*', 'property1']));
-        static::assertTrue($context->matches(['Root', '*']));
-        static::assertTrue($context->matches(['Root', '*', 'property2']));
+        $this->assertFalse($context->matches(['Root', '*', 'property1']));
+        $this->assertFalse($context->matches(['*', 'property1']));
+        $this->assertTrue($context->matches(['Root', '*']));
+        $this->assertTrue($context->matches(['Root', '*', 'property2']));
     }
 }

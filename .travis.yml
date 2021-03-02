@@ -31,6 +31,10 @@ matrix:
           env:
             - PHPSTAN=true
 
+        - php: '7.4'
+
+        - php: '8.0'
+
         - php: 'nightly'
 
     allow_failures:

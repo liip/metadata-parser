@@ -53,31 +53,31 @@ class BuilderTest extends TestCase
         $classMetadata = $this->builder->build(\get_class($c));
 
         $props = $classMetadata->getProperties();
-        static::assertCount(1, $props, 'Number of properties should match');
+        $this->assertCount(1, $props, 'Number of properties should match');
 
         $this->assertProperty('property', 'property', false, false, $props[0]);
         $this->assertPropertyType($props[0]->getType(), PropertyTypeClass::class, Nested::class, false);
 
         $type = $props[0]->getType();
-        static::assertInstanceOf(PropertyTypeClass::class, $type);
+        $this->assertInstanceOf(PropertyTypeClass::class, $type);
         $nestedMetadata = $type->getClassMetadata();
         $props = $nestedMetadata->getProperties();
-        static::assertCount(1, $props, 'Number of properties should match');
+        $this->assertCount(1, $props, 'Number of properties should match');
         $this->assertProperty('nestedProperty', 'nested_property', false, false, $props[0]);
     }
 
     private function assertProperty(string $name, string $serializedName, bool $public, bool $readOnly, PropertyMetadata $property): void
     {
-        static::assertSame($name, $property->getName(), 'Name of property should match');
-        static::assertSame($serializedName, $property->getSerializedName(), "Serialized name of property {$name} should match");
-        static::assertSame($public, $property->isPublic(), "Public flag of property {$name} should match");
-        static::assertSame($readOnly, $property->isReadOnly(), "Read only flag of property {$name} should match");
+        $this->assertSame($name, $property->getName(), 'Name of property should match');
+        $this->assertSame($serializedName, $property->getSerializedName(), "Serialized name of property {$name} should match");
+        $this->assertSame($public, $property->isPublic(), "Public flag of property {$name} should match");
+        $this->assertSame($readOnly, $property->isReadOnly(), "Read only flag of property {$name} should match");
     }
 
     private function assertPropertyType(PropertyType $type, string $propertyTypeClass, string $typeString, bool $nullable): void
     {
-        static::assertInstanceOf($propertyTypeClass, $type);
-        static::assertSame($nullable, $type->isNullable());
-        static::assertSame($typeString, (string) $type);
+        $this->assertInstanceOf($propertyTypeClass, $type);
+        $this->assertSame($nullable, $type->isNullable());
+        $this->assertSame($typeString, (string) $type);
     }
 }

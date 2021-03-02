@@ -37,7 +37,7 @@ class RecursionCheckerTest extends TestCase
 
         $metadata = $this->createChecker()->check($classMetadata);
 
-        static::assertCount(1, $metadata->getProperties());
+        $this->assertCount(1, $metadata->getProperties());
     }
 
     public function testRecursion(): void
@@ -145,8 +145,8 @@ class RecursionCheckerTest extends TestCase
 
         /** @var PropertyTypeClass $type */
         $type = $metadata->getProperties()[0]->getType();
-        static::assertInstanceOf(PropertyTypeClass::class, $type);
-        static::assertCount(0, $type->getClassMetadata()->getProperties());
+        $this->assertInstanceOf(PropertyTypeClass::class, $type);
+        $this->assertCount(0, $type->getClassMetadata()->getProperties());
     }
 
     public function testExpectedRecursionArray(): void
@@ -184,11 +184,11 @@ class RecursionCheckerTest extends TestCase
 
         /** @var PropertyTypeArray $type */
         $type = $metadata->getProperties()[0]->getType();
-        static::assertInstanceOf(PropertyTypeArray::class, $type);
+        $this->assertInstanceOf(PropertyTypeArray::class, $type);
         /** @var PropertyTypeClass $subType */
         $subType = $type->getLeafType();
-        static::assertInstanceOf(PropertyTypeClass::class, $subType);
-        static::assertCount(0, $subType->getClassMetadata()->getProperties());
+        $this->assertInstanceOf(PropertyTypeClass::class, $subType);
+        $this->assertCount(0, $subType->getClassMetadata()->getProperties());
     }
 
     private function createChecker(array $expectedRecursions = []): RecursionChecker

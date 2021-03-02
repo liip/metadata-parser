@@ -104,8 +104,8 @@ class PropertyTypeTest extends TestCase
     {
         $result = $typeA->merge($typeB);
 
-        static::assertSame($expectedType, (string) $result);
-        static::assertSame($expectedNullable, $result->isNullable(), 'Nullable flag should match');
+        $this->assertSame($expectedType, (string) $result);
+        $this->assertSame($expectedNullable, $result->isNullable(), 'Nullable flag should match');
     }
 
     /**
@@ -118,13 +118,13 @@ class PropertyTypeTest extends TestCase
 
         /** @var PropertyTypeArray $merged */
         $merged = $array->merge($hashmap);
-        static::assertInstanceOf(PropertyTypeArray::class, $merged);
-        static::assertTrue($merged->isNullable());
-        static::assertTrue($merged->isHashmap());
+        $this->assertInstanceOf(PropertyTypeArray::class, $merged);
+        $this->assertTrue($merged->isNullable());
+        $this->assertTrue($merged->isHashmap());
         /** @var PropertyTypePrimitive $inner */
         $inner = $merged->getSubType();
-        static::assertInstanceOf(PropertyTypePrimitive::class, $inner);
-        static::assertSame('bool', $inner->getTypeName());
+        $this->assertInstanceOf(PropertyTypePrimitive::class, $inner);
+        $this->assertSame('bool', $inner->getTypeName());
 
         $this->expectException(\UnexpectedValueException::class);
         $hashmap->merge($array);
@@ -144,7 +144,7 @@ class PropertyTypeTest extends TestCase
                     $typeA->merge($typeB);
                     static::fail(sprintf('Merge of %s into %s should not be possible', (string) $typeB, (string) $typeA));
                 } catch (\UnexpectedValueException $e) {
-                    static::assertStringContainsString('merge', $e->getMessage());
+                    $this->assertStringContainsString('merge', $e->getMessage());
                 }
             }
         }

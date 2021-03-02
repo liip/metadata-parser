@@ -15,38 +15,38 @@ class VersionRangeTest extends TestCase
     public function testFactoryMethod(): void
     {
         $versionRange = VersionRange::all();
-        static::assertNull($versionRange->getSince());
-        static::assertNull($versionRange->getUntil());
+        $this->assertNull($versionRange->getSince());
+        $this->assertNull($versionRange->getUntil());
     }
 
     public function testDefined(): void
     {
         $versionRange = new VersionRange(null, null);
-        static::assertFalse($versionRange->isDefined());
+        $this->assertFalse($versionRange->isDefined());
 
         $versionRange = new VersionRange('1', null);
-        static::assertTrue($versionRange->isDefined());
+        $this->assertTrue($versionRange->isDefined());
 
         $versionRange = new VersionRange(null, '1');
-        static::assertTrue($versionRange->isDefined());
+        $this->assertTrue($versionRange->isDefined());
     }
 
     public function testWithSince(): void
     {
         $version = new VersionRange('1', '2');
         $new = $version->withSince('2');
-        static::assertNotSame($version, $new);
-        static::assertSame('2', $new->getSince());
-        static::assertSame('1', $version->getSince());
+        $this->assertNotSame($version, $new);
+        $this->assertSame('2', $new->getSince());
+        $this->assertSame('1', $version->getSince());
     }
 
     public function testWithUntil(): void
     {
         $version = new VersionRange('1', '2');
         $new = $version->withUntil('3');
-        static::assertNotSame($version, $new);
-        static::assertSame('3', $new->getUntil());
-        static::assertSame('2', $version->getUntil());
+        $this->assertNotSame($version, $new);
+        $this->assertSame('3', $new->getUntil());
+        $this->assertSame('2', $version->getUntil());
     }
 
     public function provideVersionRanges()
@@ -90,7 +90,7 @@ class VersionRangeTest extends TestCase
      */
     public function testIsIncluded(VersionRange $versionRange, string $version, bool $expected): void
     {
-        static::assertSame($expected, $versionRange->isIncluded($version));
+        $this->assertSame($expected, $versionRange->isIncluded($version));
     }
 
     public function provideVersionRangesForLower()
@@ -134,7 +134,7 @@ class VersionRangeTest extends TestCase
      */
     public function testAllowsLowerThan(VersionRange $versionRange, VersionRange $other, bool $lower): void
     {
-        static::assertSame($lower, $versionRange->allowsLowerThan($other));
+        $this->assertSame($lower, $versionRange->allowsLowerThan($other));
     }
 
     public function provideVersionRangesForHigher()
@@ -178,6 +178,6 @@ class VersionRangeTest extends TestCase
      */
     public function testAllowsHigherThan(VersionRange $versionRange, VersionRange $other, bool $higher): void
     {
-        static::assertSame($higher, $versionRange->allowsHigherThan($other));
+        $this->assertSame($higher, $versionRange->allowsHigherThan($other));
     }
 }

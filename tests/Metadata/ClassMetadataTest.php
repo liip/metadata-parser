@@ -25,20 +25,20 @@ class ClassMetadataTest extends TestCase
         $properties = [new PropertyMetadata('test', 'testProperty')];
 
         $classMetadata = ClassMetadata::fromRawClassMetadata($rawClassMetadata, $properties);
-        static::assertSame('Foo', $classMetadata->getClassName());
+        $this->assertSame('Foo', $classMetadata->getClassName());
 
         $constructorParameters = $classMetadata->getConstructorParameters();
-        static::assertCount(3, $constructorParameters);
-        static::assertSame('arg', $constructorParameters[0]->getName());
-        static::assertSame('withDefault', $constructorParameters[1]->getName());
-        static::assertSame('optional', $constructorParameters[2]->getName());
+        $this->assertCount(3, $constructorParameters);
+        $this->assertSame('arg', $constructorParameters[0]->getName());
+        $this->assertSame('withDefault', $constructorParameters[1]->getName());
+        $this->assertSame('optional', $constructorParameters[2]->getName());
 
         $postDeserializeMethods = $classMetadata->getPostDeserializeMethods();
-        static::assertCount(1, $postDeserializeMethods);
-        static::assertSame('postDeserialize', $postDeserializeMethods[0]);
+        $this->assertCount(1, $postDeserializeMethods);
+        $this->assertSame('postDeserialize', $postDeserializeMethods[0]);
 
         $props = $classMetadata->getProperties();
-        static::assertCount(1, $props);
-        static::assertSame('testProperty', $props[0]->getName());
+        $this->assertCount(1, $props);
+        $this->assertSame('testProperty', $props[0]->getName());
     }
 }

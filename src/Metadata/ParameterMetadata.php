@@ -16,6 +16,9 @@ final class ParameterMetadata implements \JsonSerializable
      */
     private $required;
 
+    /**
+     * @var mixed
+     */
     private $defaultValue;
 
     public function __construct(string $name, bool $required, $defaultValue = null)
