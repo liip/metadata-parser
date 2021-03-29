@@ -108,7 +108,7 @@ abstract class AbstractPropertyMetadata implements \JsonSerializable
      *
      * @return mixed The information in whatever format it has been set
      */
-    public function getCustomInformation(string $key)
+    public function getCustomInformation(string $key): mixed
     {
         if (!\array_key_exists($key, $this->customInformation)) {
             throw new \InvalidArgumentException(sprintf('Property %s has no custom information %s', $this->name, $key));

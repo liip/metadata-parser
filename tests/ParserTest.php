@@ -149,14 +149,14 @@ class ParserTest extends TestCase
     private function assertPropertyCollection(string $serializedName, int $variations, PropertyCollection $prop): void
     {
         $this->assertSame($serializedName, $prop->getSerializedName(), 'Serialized name of property should match');
-        $this->assertCount($variations, $prop->getVariations(), "Number of variations of property ${serializedName} should match");
+        $this->assertCount($variations, $prop->getVariations(), "Number of variations of property {$serializedName} should match");
     }
 
     private function assertProperty(string $name, bool $public, bool $readOnly, PropertyVariationMetadata $property): void
     {
         $this->assertSame($name, $property->getName(), 'Name of property should match');
-        $this->assertSame($public, $property->isPublic(), "Public flag of property ${name} should match");
-        $this->assertSame($readOnly, $property->isReadOnly(), "Read only flag of property ${name} should match");
+        $this->assertSame($public, $property->isPublic(), "Public flag of property {$name} should match");
+        $this->assertSame($readOnly, $property->isReadOnly(), "Read only flag of property {$name} should match");
     }
 
     private function assertPropertyType(PropertyType $type, string $propertyTypeClass, string $typeString, bool $nullable): void
