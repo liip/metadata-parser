@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Liip\MetadataParser\ModelParser;
 
+use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Doctrine\Common\Annotations\AnnotationReader;
 use JMS\Serializer\Annotation as JMS;
 use Liip\MetadataParser\Exception\ParseException;
@@ -205,6 +206,9 @@ class JMSParserTest extends TestCase
 
     public function testInvalidNestedClass(): void
     {
+        if (!class_exists(NamedArgumentConstructor::class)) {
+            $this->markTestSkipped('Before doctrine/annotations 1.12, the exception message is different');
+        }
         $c = new class() {
             /**
              * @JMS\Type("__invalid__")
@@ -1031,6 +1035,9 @@ class JMSParserTest extends TestCase
 
     public function testVirtualPropertyInvalidType(): void
     {
+        if (!class_exists(NamedArgumentConstructor::class)) {
+            $this->markTestSkipped('Before doctrine/annotations 1.12, the exception message is different');
+        }
         $c = new class() {
             /**
              * @JMS\VirtualProperty

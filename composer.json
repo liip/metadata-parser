@@ -14,19 +14,22 @@
         "issues": "https://github.com/liip/metadata-parser/issues"
     },
     "require": {
-        "php": "^7.1|^8.0",
+        "php": "^7.2 || ^8.0",
         "ext-json": "*",
         "psr/log": "^1"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.1",
-        "jms/serializer": "^2|^3",
+        "friendsofphp/php-cs-fixer": "v2.18.4",
+        "jms/serializer": "^2.3 || ^3",
         "phpstan/phpstan": "^0.12.71",
         "phpstan/phpstan-phpunit": "^0.12",
-        "phpunit/phpunit": "^9.5"
+        "phpunit/phpunit": "^8.5.15 || ^9.5"
     },
     "suggest": {
-        "jms/serializer": "^2|^3"
+        "jms/serializer": "^2 || ^3"
+    },
+    "conflict": {
+        "doctrine/annotations": "< 1.11"
     },
     "autoload": {
         "psr-4": {

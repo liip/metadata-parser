@@ -142,7 +142,7 @@ class PropertyTypeTest extends TestCase
 
                 try {
                     $typeA->merge($typeB);
-                    static::fail(sprintf('Merge of %s into %s should not be possible', (string) $typeB, (string) $typeA));
+                    $this->fail(sprintf('Merge of %s into %s should not be possible', (string) $typeB, (string) $typeA));
                 } catch (\UnexpectedValueException $e) {
                     $this->assertStringContainsString('merge', $e->getMessage());
                 }

@@ -17,7 +17,7 @@ final class ParameterMetadata implements \JsonSerializable
     private $required;
 
     /**
-     * @var mixed
+     * @var mixed The default value can be of any type
      */
     private $defaultValue;
 

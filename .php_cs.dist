@@ -46,14 +46,6 @@ return PhpCsFixer\Config::create()
             // Sometimes we need to do non-strict comparison
             'strict_comparison' => false,
 
-            // Fix for BC break
-            'phpdoc_to_return_type' => false,
-
-            // Disable DocBlock rules to make fixer more consistent between versions
-            'no_superfluous_phpdoc_tags' => false,
-            'phpdoc_add_missing_param_annotation' => false,
-            'phpdoc_separation' => false,
-
             // The convention with phpunit has been to use assertions with the object context.
             'php_unit_test_case_static_method_calls' => false,
         ]
