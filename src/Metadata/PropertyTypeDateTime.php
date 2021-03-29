@@ -75,10 +75,10 @@ final class PropertyTypeDateTime extends AbstractPropertyType
             return new self($this->immutable, $nullable, $this->dateTimeOptions);
         }
         if (!$other instanceof self) {
-            throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be the same or unknown', \get_class($this), \get_class($other)));
+            throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be the same or unknown', static::class, \get_class($other)));
         }
         if ($this->isImmutable() !== $other->isImmutable()) {
-            throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be equal', \get_class($this), \get_class($other)));
+            throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be equal', static::class, \get_class($other)));
         }
 
         $options = $this->dateTimeOptions ?: $other->dateTimeOptions;

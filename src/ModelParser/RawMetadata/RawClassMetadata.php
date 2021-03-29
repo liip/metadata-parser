@@ -186,11 +186,7 @@ final class RawClassMetadata implements \JsonSerializable
     public function addPropertyCollection(PropertyCollection $property): void
     {
         if ($this->hasPropertyCollection($property->getSerializedName())) {
-            throw new \UnexpectedValueException(sprintf(
-                'Property "%s" is already defined on model %s, cannot add it twice',
-                (string) $property,
-                (string) $this
-            ));
+            throw new \UnexpectedValueException(sprintf('Property "%s" is already defined on model %s, cannot add it twice', (string) $property, (string) $this));
         }
 
         $this->properties[] = $property;

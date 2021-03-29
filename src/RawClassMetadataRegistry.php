@@ -16,10 +16,7 @@ final class RawClassMetadataRegistry
     public function add(RawClassMetadata $classMetadata): void
     {
         if ($this->contains($classMetadata->getClassName())) {
-            throw new \BadMethodCallException(sprintf(
-                'The model for "%s" is already in the registry',
-                $classMetadata->getClassName()
-            ));
+            throw new \BadMethodCallException(sprintf('The model for "%s" is already in the registry', $classMetadata->getClassName()));
         }
 
         $this->classMetadata[$classMetadata->getClassName()] = $classMetadata;

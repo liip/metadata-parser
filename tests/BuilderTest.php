@@ -69,9 +69,9 @@ class BuilderTest extends TestCase
     private function assertProperty(string $name, string $serializedName, bool $public, bool $readOnly, PropertyMetadata $property): void
     {
         $this->assertSame($name, $property->getName(), 'Name of property should match');
-        $this->assertSame($serializedName, $property->getSerializedName(), "Serialized name of property ${name} should match");
-        $this->assertSame($public, $property->isPublic(), "Public flag of property ${name} should match");
-        $this->assertSame($readOnly, $property->isReadOnly(), "Read only flag of property ${name} should match");
+        $this->assertSame($serializedName, $property->getSerializedName(), "Serialized name of property {$name} should match");
+        $this->assertSame($public, $property->isPublic(), "Public flag of property {$name} should match");
+        $this->assertSame($readOnly, $property->isReadOnly(), "Read only flag of property {$name} should match");
     }
 
     private function assertPropertyType(PropertyType $type, string $propertyTypeClass, string $typeString, bool $nullable): void

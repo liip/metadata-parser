@@ -125,10 +125,10 @@ final class PhpTypeParser
 
             $reflCurrentClass = $reflClass;
             do {
-              $imports = $this->useStatementsParser->parseClass($reflCurrentClass);
-              if (isset($imports[$lowerClassName])) {
-                  return $imports[$lowerClassName];
-              }
+                $imports = $this->useStatementsParser->parseClass($reflCurrentClass);
+                if (isset($imports[$lowerClassName])) {
+                    return $imports[$lowerClassName];
+                }
             } while (false !== ($reflCurrentClass = $reflCurrentClass->getParentClass()));
 
             foreach ($reflClass->getTraits() as $reflTrait) {

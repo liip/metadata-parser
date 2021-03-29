@@ -45,6 +45,9 @@ return PhpCsFixer\Config::create()
 
             // Sometimes we need to do non-strict comparison
             'strict_comparison' => false,
+
+            // The convention with phpunit has been to use assertions with the object context.
+            'php_unit_test_case_static_method_calls' => false,
         ]
     )
     ->setFinder($finder)

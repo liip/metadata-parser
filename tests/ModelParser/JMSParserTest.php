@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Liip\MetadataParser\ModelParser;
 
+use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Doctrine\Common\Annotations\AnnotationReader;
 use JMS\Serializer\Annotation as JMS;
 use Liip\MetadataParser\Exception\ParseException;
@@ -205,6 +206,9 @@ class JMSParserTest extends TestCase
 
     public function testInvalidNestedClass(): void
     {
+        if (!class_exists(NamedArgumentConstructor::class)) {
+            $this->markTestSkipped('Before doctrine/annotations 1.12, the exception message is different');
+        }
         $c = new class() {
             /**
              * @JMS\Type("__invalid__")
@@ -215,7 +219,7 @@ class JMSParserTest extends TestCase
         $classMetadata = new RawClassMetadata(\get_class($c));
 
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('__invalid__');
+        $this->expectExceptionMessage('unexpected "__" (T_UNKNOWN)');
         $this->parser->parse($classMetadata);
     }
 
@@ -1031,6 +1035,9 @@ class JMSParserTest extends TestCase
 
     public function testVirtualPropertyInvalidType(): void
     {
+        if (!class_exists(NamedArgumentConstructor::class)) {
+            $this->markTestSkipped('Before doctrine/annotations 1.12, the exception message is different');
+        }
         $c = new class() {
             /**
              * @JMS\VirtualProperty
@@ -1045,7 +1052,7 @@ class JMSParserTest extends TestCase
         $classMetadata = new RawClassMetadata(\get_class($c));
 
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('__invalid__');
+        $this->expectExceptionMessage('unexpected "__" (T_UNKNOWN)');
         $this->parser->parse($classMetadata);
     }
 
@@ -1299,14 +1306,14 @@ class JMSParserTest extends TestCase
     private function assertPropertyCollection(string $serializedName, int $variations, PropertyCollection $prop): void
     {
         $this->assertSame($serializedName, $prop->getSerializedName(), 'Serialized name of property should match');
-        $this->assertCount($variations, $prop->getVariations(), "Number of variations of property ${serializedName} should match");
+        $this->assertCount($variations, $prop->getVariations(), "Number of variations of property {$serializedName} should match");
     }
 
     private function assertPropertyVariation(string $name, bool $public, bool $readOnly, PropertyVariationMetadata $property): void
     {
         $this->assertSame($name, $property->getName(), 'Name of property should match');
-        $this->assertSame($public, $property->isPublic(), "Public flag of property ${name} should match");
-        $this->assertSame($readOnly, $property->isReadOnly(), "Read only flag of property ${name} should match");
+        $this->assertSame($public, $property->isPublic(), "Public flag of property {$name} should match");
+        $this->assertSame($readOnly, $property->isReadOnly(), "Read only flag of property {$name} should match");
     }
 
     private function assertPropertyType(string $propertyTypeClass, string $typeString, bool $nullable, PropertyType $type): void
