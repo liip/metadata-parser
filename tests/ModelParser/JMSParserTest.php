@@ -870,6 +870,7 @@ class JMSParserTest extends TestCase
              */
             public function getFoo()
             {
+                return fopen(__FILE__, 'rb');
             }
         };
 
