@@ -222,6 +222,9 @@ final class JMSParser implements ModelParserInterface
         foreach ($annotations as $annotation) {
             switch (true) {
                 case $annotation instanceof Type:
+                    if (null === $annotation->name) {
+                        throw ParseException::propertyTypeNameNull((string) $classMetadata, (string) $property);
+                    }
                     try {
                         $type = $this->jmsTypeParser->parse($annotation->name);
                     } catch (InvalidTypeException $e) {
