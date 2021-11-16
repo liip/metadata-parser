@@ -7,12 +7,16 @@ namespace Tests\Liip\MetadataParser\ModelParser;
 use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\ParameterMetadata;
 use Liip\MetadataParser\Metadata\PropertyType;
+use Liip\MetadataParser\Metadata\PropertyTypeClass;
+use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyCollection;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 use Liip\MetadataParser\ModelParser\ReflectionParser;
 use PHPUnit\Framework\TestCase;
+use Tests\Liip\MetadataParser\ModelParser\Fixtures\TypeDeclarationModel;
+use Tests\Liip\MetadataParser\ModelParser\Fixtures\UnionTypeDeclarationModel;
 use Tests\Liip\MetadataParser\ModelParser\Model\ReflectionBaseModel;
 
 /**
@@ -78,6 +82,57 @@ class ReflectionParserTest extends TestCase
         $property3 = $props[2]->getVariations()[0];
         $this->assertProperty('property3', true, false, $property3);
         $this->assertPropertyType($property3->getType(), PropertyTypeUnknown::class, 'mixed', true);
+    }
+
+    public function testTypedProperties(): void
+    {
+        if (version_compare(PHP_VERSION, '7.4.0', '<')) {
+            $this->markTestSkipped('Primitive property types are only supported in PHP 7.4 or newer');
+        }
+
+        $rawClassMetadata = new RawClassMetadata(TypeDeclarationModel::class);
+        $this->parser->parse($rawClassMetadata);
+
+        $props = $rawClassMetadata->getPropertyCollections();
+        $this->assertCount(3, $props, 'Number of class metadata properties should match');
+
+        $this->assertPropertyCollection('property1', 1, $props[0]);
+        $property1 = $props[0]->getVariations()[0];
+        $this->assertProperty('property1', false, false, $property1);
+        $this->assertPropertyType($property1->getType(), PropertyTypePrimitive::class, 'string', false);
+
+        $this->assertPropertyCollection('property2', 1, $props[1]);
+        $property2 = $props[1]->getVariations()[0];
+        $this->assertProperty('property2', true, false, $property2);
+        $this->assertPropertyType($property2->getType(), PropertyTypePrimitive::class, 'int|null', true);
+
+        $this->assertPropertyCollection('property3', 1, $props[2]);
+        $property3 = $props[2]->getVariations()[0];
+        $this->assertProperty('property3', false, false, $property3);
+        $this->assertPropertyType($property3->getType(), PropertyTypeClass::class, ReflectionParserTest::class, false);
+    }
+
+    public function testTypedPropertiesUnion(): void
+    {
+        if (version_compare(PHP_VERSION, '8.0.0', '<')) {
+            $this->markTestSkipped('Union property types are only supported in PHP 8.0 or newer');
+        }
+
+        $rawClassMetadata = new RawClassMetadata(UnionTypeDeclarationModel::class);
+        $this->parser->parse($rawClassMetadata);
+
+        $props = $rawClassMetadata->getPropertyCollections();
+        $this->assertCount(2, $props, 'Number of class metadata properties should match');
+
+        $this->assertPropertyCollection('property1', 1, $props[0]);
+        $property1 = $props[0]->getVariations()[0];
+        $this->assertProperty('property1', false, false, $property1);
+        $this->assertPropertyType($property1->getType(), PropertyTypeUnknown::class, 'mixed', true);
+
+        $this->assertPropertyCollection('property2', 1, $props[1]);
+        $property2 = $props[1]->getVariations()[0];
+        $this->assertProperty('property2', true, false, $property2);
+        $this->assertPropertyType($property2->getType(), PropertyTypeUnknown::class, 'mixed', true);
     }
 
     public function testPrefilledClassMetadata(): void
