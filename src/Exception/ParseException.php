@@ -10,6 +10,7 @@ final class ParseException extends SchemaException
     private const CLASS_ERROR = 'Class "%s" couldn\'t be parsed because of an error: %s';
     private const PROPERTY_ERROR = 'Property "%s::%s" couldn\'t be parsed because of an error: %s';
     private const PROPERTY_TYPE_ERROR = 'Property "%s::%s" has an invalid type which results in: %s';
+    private const PROPERTY_TYPE_NAME_NULL = 'Property "%s::%s" has an invalid type annotation. [Type Error] Attribute "name" of @JMS\Type may not be null.';
     private const PROPERTY_TYPE_CONFLICT = 'Property "%s::%s" has different type definitions which conflict: %s != %s';
     private const UNSUPPORTED_CLASS_ANNOTATION = 'Class "%s" has an unsupported annotation "%s"';
     private const UNSUPPORTED_PROPERTY_ANNOTATION = 'Property "%s::%s" has an unsupported annotation "%s"';
@@ -52,6 +53,11 @@ final class ParseException extends SchemaException
             $previousException->getCode(),
             $previousException
         );
+    }
+
+    public static function propertyTypeNameNull(string $className, string $propertyName): self
+    {
+        return new self(sprintf(self::PROPERTY_TYPE_NAME_NULL, $className, $propertyName));
     }
 
     public static function propertyTypeConflict(string $className, string $propertyName, string $typeA, string $typeB, \Exception $previousException): self
