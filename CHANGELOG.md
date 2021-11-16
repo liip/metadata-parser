@@ -1,8 +1,9 @@
 # Changelog
 
-# 0.4.2
+# 0.5.0
 
 * Support JMS Serializer `ReadOnlyProperty` in addition to `ReadOnly` to be compatible with serializer 3.14 and newer.
+* Support PHP 8.1 (which makes ReadOnly a reserved keyword)
 
 # 0.4.1
 

@@ -1,4 +1,8 @@
 parameters:
     level: 5
+    dynamicConstantNames:
+        - PHP_VERSION_ID
     paths:
         - src/
+    excludePaths:
+        - src/ModelParser/JMSParserLegacy.php
