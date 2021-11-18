@@ -7,6 +7,7 @@ namespace Liip\MetadataParser\ModelParser;
 use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
+use Liip\MetadataParser\ModelParser\RawMetadata\PropertyCollection;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 use Liip\MetadataParser\TypeParser\PhpTypeParser;
@@ -34,11 +35,21 @@ final class PhpDocParser implements ModelParserInterface
         $this->parseProperties($reflClass, $classMetadata);
     }
 
-    private function parseProperties(\ReflectionClass $reflClass, RawClassMetadata $classMetadata): void
+    /**
+     * @return string[] the property names that have been added
+     */
+    private function parseProperties(\ReflectionClass $reflClass, RawClassMetadata $classMetadata): array
     {
+        $existingProperties = array_map(static function (PropertyCollection $prop): string {
+            return (string) $prop;
+        }, $classMetadata->getPropertyCollections());
+
+        $addedProperties = [];
+        $parentProperties = [];
         if ($reflParentClass = $reflClass->getParentClass()) {
-            $this->parseProperties($reflParentClass, $classMetadata);
+            $parentProperties = $this->parseProperties($reflParentClass, $classMetadata);
         }
+        $parentPropertiesLookup = array_flip($parentProperties);
 
         foreach ($reflClass->getProperties() as $reflProperty) {
             if ($classMetadata->hasPropertyVariation($reflProperty->getName())) {
@@ -49,17 +60,30 @@ final class PhpDocParser implements ModelParserInterface
             }
 
             $docComment = $reflProperty->getDocComment();
-            if (false !== $docComment && $property->getType() instanceof PropertyTypeUnknown) {
+            if (false !== $docComment) {
                 try {
                     $type = $this->getPropertyTypeFromDocComment($docComment, $reflClass);
                 } catch (ParseException $e) {
                     throw ParseException::propertyTypeError((string) $classMetadata, (string) $property, $e);
                 }
-                if (null !== $type) {
-                    $property->setType($type);
+                if (null === $type) {
+                    continue;
                 }
+
+                if ($property->getType() instanceof PropertyTypeUnknown || \array_key_exists((string) $property, $parentPropertiesLookup)) {
+                    $property->setType($type);
+                } else {
+                    try {
+                        $property->setType($property->getType()->merge($type));
+                    } catch (\UnexpectedValueException $e) {
+                        throw ParseException::propertyTypeConflict((string) $classMetadata, (string) $property, (string) $property->getType(), (string) $type, $e);
+                    }
+                }
+                $addedProperties[] = (string) $property;
             }
         }
+
+        return array_values(array_diff(array_unique(array_merge($parentProperties, $addedProperties)), $existingProperties));
     }
 
     private function getPropertyTypeFromDocComment(string $docComment, \ReflectionClass $reflClass): ?PropertyType
