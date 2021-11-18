@@ -40,7 +40,7 @@ final class PhpTypeParser
     /**
      * @throws InvalidTypeException if an invalid type or multiple types were defined
      */
-    public function parseAnnotationType(string $rawType, \ReflectionClass $reflClass): PropertyType
+    public function parseAnnotationType(string $rawType, \ReflectionClass $declaringClass): PropertyType
     {
         if ('' === $rawType) {
             return new PropertyTypeUnknown(true);
@@ -63,7 +63,7 @@ final class PhpTypeParser
             throw new InvalidTypeException(sprintf('Multiple types are not supported (%s)', $rawType));
         }
 
-        return $this->createType($types[0], $nullable, $reflClass);
+        return $this->createType($types[0], $nullable, $declaringClass);
     }
 
     /**

@@ -62,7 +62,7 @@ final class PhpDocParser implements ModelParserInterface
             $docComment = $reflProperty->getDocComment();
             if (false !== $docComment) {
                 try {
-                    $type = $this->getPropertyTypeFromDocComment($docComment, $reflClass);
+                    $type = $this->getPropertyTypeFromDocComment($docComment, $reflProperty);
                 } catch (ParseException $e) {
                     throw ParseException::propertyTypeError((string) $classMetadata, (string) $property, $e);
                 }
@@ -86,11 +86,11 @@ final class PhpDocParser implements ModelParserInterface
         return array_values(array_diff(array_unique(array_merge($parentProperties, $addedProperties)), $existingProperties));
     }
 
-    private function getPropertyTypeFromDocComment(string $docComment, \ReflectionClass $reflClass): ?PropertyType
+    private function getPropertyTypeFromDocComment(string $docComment, \ReflectionProperty $reflProperty): ?PropertyType
     {
         foreach (explode("\n", $docComment) as $line) {
             if (1 === preg_match('/@var ([^ ]+)/', $line, $matches)) {
-                return $this->typeParser->parseAnnotationType($matches[1], $reflClass);
+                return $this->typeParser->parseAnnotationType($matches[1], $reflProperty->getDeclaringClass());
             }
         }
 

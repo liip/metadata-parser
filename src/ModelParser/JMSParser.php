@@ -324,7 +324,7 @@ final class JMSParser implements ModelParserInterface
         }
 
         try {
-            $docBlockType = $this->getReturnTypeOfMethod($reflMethod, $reflClass);
+            $docBlockType = $this->getReturnTypeOfMethod($reflMethod);
         } catch (InvalidTypeException $e) {
             throw ParseException::propertyTypeError($reflClass->getName(), (string) $property, $e);
         }
@@ -340,7 +340,7 @@ final class JMSParser implements ModelParserInterface
         }
     }
 
-    private function getReturnTypeOfMethod(\ReflectionMethod $reflMethod, \ReflectionClass $reflClass): ?PropertyType
+    private function getReturnTypeOfMethod(\ReflectionMethod $reflMethod): ?PropertyType
     {
         $docComment = $reflMethod->getDocComment();
         if (false === $docComment) {
@@ -349,7 +349,7 @@ final class JMSParser implements ModelParserInterface
 
         foreach (explode("\n", $docComment) as $line) {
             if (1 === preg_match('/@return ([^ ]+)/', $line, $matches)) {
-                return $this->phpTypeParser->parseAnnotationType($matches[1], $reflClass);
+                return $this->phpTypeParser->parseAnnotationType($matches[1], $reflMethod->getDeclaringClass());
             }
         }
 
