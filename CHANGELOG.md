@@ -1,3 +1,10 @@
+# 0.4.0
+
+* Handle property type declarations in reflection parser.
+* [Bugfix] Upgrade array type with `@var Type[]` annotation
+* [Bugfix] When extending class redefines a property, use phpdoc from extending class rather than base class
+* [Bugfix] Use correct context for relative class names in inherited properties/methods
+
 # 0.3.0
 
 * Support PHP 8, drop support for PHP 7.1
