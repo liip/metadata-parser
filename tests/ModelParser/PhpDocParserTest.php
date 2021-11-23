@@ -7,6 +7,7 @@ namespace Tests\Liip\MetadataParser\ModelParser;
 use Liip\MetadataParser\Exception\InvalidTypeException;
 use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\PropertyType;
+use Liip\MetadataParser\Metadata\PropertyTypeArray;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
@@ -176,6 +177,30 @@ class PhpDocParserTest extends TestCase
         $this->assertPropertyType(PropertyTypePrimitive::class, 'int', false, $property->getType());
     }
 
+    public function testUpgradeArrayOfUnknown(): void
+    {
+        $c = new class() {
+            /**
+             * @var string[]
+             */
+            private $property;
+        };
+
+        $classMetadata = new RawClassMetadata(\get_class($c));
+        $propertyMetadata = new PropertyVariationMetadata('property', false, true);
+        $propertyMetadata->setType(new PropertyTypeArray(new PropertyTypeUnknown(false), false, false));
+        $classMetadata->addPropertyVariation('property', $propertyMetadata);
+        $this->parser->parse($classMetadata);
+
+        $props = $classMetadata->getPropertyCollections();
+        $this->assertCount(1, $props, 'Number of properties should match');
+
+        $this->assertPropertyCollection('property', 1, $props[0]);
+        $property = $props[0]->getVariations()[0];
+        $this->assertProperty('property', true, false, $property);
+        $this->assertPropertyType(PropertyTypeArray::class, 'string[]', false, $property->getType());
+    }
+
     public function testInheritedProperty(): void
     {
         $c = new class() extends BaseModel {
@@ -204,7 +229,7 @@ class PhpDocParserTest extends TestCase
         $this->assertPropertyCollection('parent_property2', 1, $props[1]);
         $property = $props[1]->getVariations()[0];
         $this->assertProperty('parentProperty2', false, false, $property);
-        $this->assertPropertyType(PropertyTypePrimitive::class, 'bool', false, $property->getType());
+        $this->assertPropertyType(PropertyTypePrimitive::class, 'string', false, $property->getType());
 
         $this->assertPropertyCollection('property1', 1, $props[2]);
         $property = $props[2]->getVariations()[0];
