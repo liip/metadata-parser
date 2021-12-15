@@ -1,3 +1,7 @@
+# 0.4.1
+
+* Allow installation with psr/log 2 and 3, to allow installation with Symfony 6
+
 # 0.4.0
 
 * Handle property type declarations in reflection parser.
