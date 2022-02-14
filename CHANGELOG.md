@@ -1,3 +1,9 @@
+# Changelog
+
+# 0.4.2
+
+* Support JMS Serializer `ReadOnlyProperty` in addition to `ReadOnly` to be compatible with serializer 3.14 and newer.
+
 # 0.4.1
 
 * Allow installation with psr/log 2 and 3, to allow installation with Symfony 6
