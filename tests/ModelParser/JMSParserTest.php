@@ -25,13 +25,15 @@ use Tests\Liip\MetadataParser\ModelParser\Model\Nested;
 
 /**
  * @small
+ *
+ * We need 2 versions of this test to avoid parser errors about ReadOnly
  */
-class JMSParserTest extends TestCase
+abstract class AbstractJMSParserTest extends TestCase
 {
     /**
      * @var JMSParser
      */
-    private $parser;
+    protected $parser;
 
     protected function setUp(): void
     {
@@ -260,24 +262,7 @@ class JMSParserTest extends TestCase
         $this->assertPropertyType(PropertyTypePrimitive::class, 'string|null', true, $property->getType());
     }
 
-    public function testReadOnly(): void
-    {
-        $c = new class() {
-            /**
-             * @JMS\ReadOnly
-             */
-            private $property;
-        };
-
-        $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
-
-        $props = $classMetadata->getPropertyCollections();
-        $this->assertCount(1, $props, 'Number of properties should match');
-
-        $this->assertPropertyCollection('property', 1, $props[0]);
-        $this->assertPropertyVariation('property', false, true, $props[0]->getVariations()[0]);
-    }
+    abstract public function testReadOnlyProperty(): void;
 
     public function testSerializedName(): void
     {
@@ -1304,13 +1289,13 @@ class JMSParserTest extends TestCase
         $this->assertSame(['foo', 'bar'], $classMetadata->getPostDeserializeMethods());
     }
 
-    private function assertPropertyCollection(string $serializedName, int $variations, PropertyCollection $prop): void
+    protected function assertPropertyCollection(string $serializedName, int $variations, PropertyCollection $prop): void
     {
         $this->assertSame($serializedName, $prop->getSerializedName(), 'Serialized name of property should match');
         $this->assertCount($variations, $prop->getVariations(), "Number of variations of property {$serializedName} should match");
     }
 
-    private function assertPropertyVariation(string $name, bool $public, bool $readOnly, PropertyVariationMetadata $property): void
+    protected function assertPropertyVariation(string $name, bool $public, bool $readOnly, PropertyVariationMetadata $property): void
     {
         $this->assertSame($name, $property->getName(), 'Name of property should match');
         $this->assertSame($public, $property->isPublic(), "Public flag of property {$name} should match");
@@ -1329,4 +1314,10 @@ class JMSParserTest extends TestCase
         $this->assertSame($getterMethod, $accessor->getGetterMethod(), 'Getter method of property should match');
         $this->assertSame($setterMethod, $accessor->getSetterMethod(), 'Setter method of property should match');
     }
+}
+
+if (PHP_VERSION_ID > 80100) {
+    require 'JMSParserTest81.php';
+} else {
+    require 'JMSParserTestLegacy.php';
 }

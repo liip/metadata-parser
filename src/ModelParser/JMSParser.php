@@ -4,6 +4,13 @@ declare(strict_types=1);
 
 namespace Liip\MetadataParser\ModelParser;
 
+/*
+ * We need different class definitions for PHP 8.1 and newer, and one for versions older than 8.1.
+ * There was a JMS annotation "ReadOnly", but readonly became a reserved keyword in PHP 8.1.
+ * For PHP 8.0 and older, we must still support the ReadOnly annotation, even with older versions of JMS serializer where ReadOnly does not yet extend ReadOnlyProperty.
+ * For PHP 8.1, our code can not mention ReadOnly. If we do, we get a parse error.
+ */
+
 use Doctrine\Common\Annotations\AnnotationException;
 use Doctrine\Common\Annotations\Reader;
 use JMS\Serializer\Annotation\Accessor;
@@ -12,8 +19,6 @@ use JMS\Serializer\Annotation\Exclude;
 use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Groups;
 use JMS\Serializer\Annotation\PostDeserialize;
-use JMS\Serializer\Annotation\ReadOnly;
-use JMS\Serializer\Annotation\ReadOnlyProperty;
 use JMS\Serializer\Annotation\SerializedName;
 use JMS\Serializer\Annotation\Since;
 use JMS\Serializer\Annotation\Type;
@@ -41,8 +46,10 @@ use Liip\MetadataParser\TypeParser\PhpTypeParser;
  * Parse JMSSerializer annotations.
  *
  * Run this parser *after* the PHPDoc parser as JMS annotations are more precise.
+ *
+ * @internal
  */
-final class JMSParser implements ModelParserInterface
+abstract class BaseJMSParser implements ModelParserInterface
 {
     private const ACCESS_ORDER_CUSTOM = 'custom';
 
@@ -59,7 +66,7 @@ final class JMSParser implements ModelParserInterface
     /**
      * @var JMSTypeParser
      */
-    private $jmsTypeParser;
+    protected $jmsTypeParser;
 
     public function __construct(Reader $annotationsReader)
     {
@@ -218,9 +225,22 @@ final class JMSParser implements ModelParserInterface
         return $map;
     }
 
+    /**
+     * If the annotation is about readonly information, update the $property accordingly and return true.
+     *
+     * This check is extracted to have different implementations for PHP 8.1 and newer, and for older PHP versions.
+     * If the method returns true, we don't try to match the annotation type.
+     *
+     * @return bool whether $annotation was a readonly information
+     */
+    abstract protected function parsePropertyAnnotationsReadOnly(object $annotation, PropertyVariationMetadata $property): bool;
+
     private function parsePropertyAnnotations(RawClassMetadata $classMetadata, PropertyVariationMetadata $property, array $annotations): void
     {
         foreach ($annotations as $annotation) {
+            if ($this->parsePropertyAnnotationsReadOnly($annotation, $property)) {
+                continue;
+            }
             switch (true) {
                 case $annotation instanceof Type:
                     if (null === $annotation->name) {
@@ -264,11 +284,6 @@ final class JMSParser implements ModelParserInterface
 
                 case $annotation instanceof Until:
                     $property->setVersionRange($property->getVersionRange()->withUntil($annotation->version));
-                    break;
-
-                case $annotation instanceof ReadOnlyProperty:
-                case $annotation instanceof ReadOnly: // Deprecated since JMS serializer 3.14 - keep until we conflict with jms serializer < 3.14
-                    $property->setReadOnly($annotation->readOnly);
                     break;
 
                 case $annotation instanceof VirtualProperty:
@@ -407,4 +422,10 @@ final class JMSParser implements ModelParserInterface
 
         return $name;
     }
+}
+
+if (PHP_VERSION_ID > 80100) {
+    require 'JMSParser81.php';
+} else {
+    require 'JMSParserLegacy.php';
 }
