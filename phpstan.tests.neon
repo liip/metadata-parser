@@ -2,3 +2,7 @@ parameters:
     level: 1
     paths:
         - tests/
+    excludePaths:
+        - tests/ModelParser/JMSParserTestLegacy.php
+        # looks like phpstan php parser has not implemented union types yet
+        - tests/ModelParser/Fixtures/IntersectionTypeDeclarationModel.php

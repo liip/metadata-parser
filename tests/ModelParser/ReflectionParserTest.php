@@ -15,6 +15,7 @@ use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 use Liip\MetadataParser\ModelParser\ReflectionParser;
 use PHPUnit\Framework\TestCase;
+use Tests\Liip\MetadataParser\ModelParser\Fixtures\IntersectionTypeDeclarationModel;
 use Tests\Liip\MetadataParser\ModelParser\Fixtures\TypeDeclarationModel;
 use Tests\Liip\MetadataParser\ModelParser\Fixtures\UnionTypeDeclarationModel;
 use Tests\Liip\MetadataParser\ModelParser\Model\ReflectionBaseModel;
@@ -133,6 +134,25 @@ class ReflectionParserTest extends TestCase
         $property2 = $props[1]->getVariations()[0];
         $this->assertProperty('property2', true, false, $property2);
         $this->assertPropertyType($property2->getType(), PropertyTypeUnknown::class, 'mixed', true);
+    }
+
+    public function testTypedPropertiesIntersection(): void
+    {
+        if (PHP_VERSION_ID < 80100) {
+            $this->markTestSkipped('Intersection property types are only supported in PHP 8.1 or newer');
+        }
+
+        $rawClassMetadata = new RawClassMetadata(IntersectionTypeDeclarationModel::class);
+        $this->parser->parse($rawClassMetadata);
+
+        $props = $rawClassMetadata->getPropertyCollections();
+        $this->assertCount(1, $props, 'Number of class metadata properties should match');
+
+        $this->assertPropertyCollection('property1', 1, $props[0]);
+        $property1 = $props[0]->getVariations()[0];
+        $this->assertProperty('property1', false, false, $property1);
+        // For now, just make sure we don't crash on intersection types. In context of serializing, we can probably not do anything meaningful with a intersection type anyways.
+        $this->assertPropertyType($property1->getType(), PropertyTypeUnknown::class, 'mixed', true);
     }
 
     public function testPrefilledClassMetadata(): void
