@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Liip\MetadataParser\TypeParser;
 
 use Liip\MetadataParser\Exception\InvalidTypeException;
+use Liip\MetadataParser\Metadata\PropertyTypeArray;
 use Liip\MetadataParser\TypeParser\PhpTypeParser;
 use PHPUnit\Framework\TestCase;
 use Tests\Liip\MetadataParser\ModelParser\Model\BaseModel;
@@ -124,10 +125,27 @@ class PhpTypeParserTest extends TestCase
         ];
 
         yield [
+            'string[]|Collection|null',
+            'string[]|Collection|null',
+        ];
+
+        yield [
             '\stdClass[][string]',
             'stdClass[][string]',
         ];
     }
+
+    public function provideCollectionTypes(): iterable
+    {
+        yield [
+            'string[]|Collection',
+        ];
+
+        yield [
+            'string[]|ArrayCollection',
+        ];
+    }
+
 
     /**
      * @dataProvider provideTypes
@@ -140,6 +158,16 @@ class PhpTypeParserTest extends TestCase
         if (null !== $expectedNullable) {
             $this->assertSame($expectedNullable, $type->isNullable(), 'Nullable flag should match');
         }
+    }
+
+    /**
+     * @dataProvider provideCollectionTypes
+     */
+    public function testPropertyTypeArrayIsCollection(string $rawType): void
+    {
+        $type = $this->parser->parseAnnotationType($rawType, new \ReflectionClass($this));
+        self::assertInstanceOf(PropertyTypeArray::class, $type);
+        self::assertTrue($type->isCollection());
     }
 
     public function testMultiType(): void

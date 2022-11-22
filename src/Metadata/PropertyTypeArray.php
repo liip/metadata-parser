@@ -16,12 +16,18 @@ final class PropertyTypeArray extends AbstractPropertyType
      */
     private $hashmap;
 
-    public function __construct(PropertyType $subType, bool $hashmap, bool $nullable)
+    /**
+     * @var bool
+     */
+    private $isCollection;
+
+    public function __construct(PropertyType $subType, bool $hashmap, bool $nullable, bool $isCollection = false)
     {
         parent::__construct($nullable);
 
         $this->subType = $subType;
         $this->hashmap = $hashmap;
+        $this->isCollection = $isCollection;
     }
 
     public function __toString(): string
@@ -30,6 +36,9 @@ final class PropertyTypeArray extends AbstractPropertyType
             return 'array';
         }
         $array = $this->isHashmap() ? '[string]' : '[]';
+        if ($this->isCollection) {
+            $array .= '|Collection';
+        }
 
         return ((string) $this->subType).$array.parent::__toString();
     }
@@ -45,6 +54,11 @@ final class PropertyTypeArray extends AbstractPropertyType
     public function getSubType(): PropertyType
     {
         return $this->subType;
+    }
+
+    public function isCollection(): bool
+    {
+        return $this->isCollection;
     }
 
     /**
@@ -81,13 +95,14 @@ final class PropertyTypeArray extends AbstractPropertyType
         }
 
         $hashmap = $this->isHashmap() || $other->isHashmap();
+        $isCollection = $this->isCollection || $other->isCollection;
         if ($other->getSubType() instanceof PropertyTypeUnknown) {
-            return new self($this->getSubType(), $hashmap, $nullable);
+            return new self($this->getSubType(), $hashmap, $nullable, $isCollection);
         }
         if ($this->getSubType() instanceof PropertyTypeUnknown) {
-            return new self($other->getSubType(), $hashmap, $nullable);
+            return new self($other->getSubType(), $hashmap, $nullable, $isCollection);
         }
 
-        return new self($this->getSubType()->merge($other->getSubType()), $hashmap, $nullable);
+        return new self($this->getSubType()->merge($other->getSubType()), $hashmap, $nullable, $isCollection);
     }
 }

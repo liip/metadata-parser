@@ -17,6 +17,7 @@ use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
 final class JMSTypeParser
 {
     private const TYPE_ARRAY = 'array';
+    private const TYPE_ARRAY_COLLECTION = 'ArrayCollection';
 
     /**
      * @var Parser
@@ -65,12 +66,13 @@ final class JMSTypeParser
             return new PropertyTypeClass($typeInfo['name'], $nullable);
         }
 
-        if (self::TYPE_ARRAY === $typeInfo['name']) {
+        $isCollection = self::TYPE_ARRAY_COLLECTION === $typeInfo['name'];
+        if (self::TYPE_ARRAY === $typeInfo['name'] || $isCollection) {
             if (1 === \count($typeInfo['params'])) {
-                return new PropertyTypeArray($this->parseType($typeInfo['params'][0], true), false, $nullable);
+                return new PropertyTypeArray($this->parseType($typeInfo['params'][0], true), false, $nullable, $isCollection);
             }
             if (2 === \count($typeInfo['params'])) {
-                return new PropertyTypeArray($this->parseType($typeInfo['params'][1], true), true, $nullable);
+                return new PropertyTypeArray($this->parseType($typeInfo['params'][1], true), true, $nullable, $isCollection);
             }
 
             throw new InvalidTypeException(sprintf('JMS property type array can\'t have more than 2 parameters (%s)', var_export($typeInfo, true)));
