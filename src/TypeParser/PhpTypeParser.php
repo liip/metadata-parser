@@ -63,21 +63,23 @@ final class PhpTypeParser
         }
 
         $isCollection = false;
-        foreach ($types as $key => $type) {
+        $filteredTypes = [];
+        foreach ($types as $type) {
             if (in_array($type, self::TYPES_COLLECTION)) {
                 $isCollection = true;
-                unset($types[$key]);
+            } else {
+                $filteredTypes[] = $type;
             }
         }
 
-        if (0 === \count($types)) {
+        if (0 === \count($filteredTypes)) {
             return new PropertyTypeUnknown($nullable);
         }
-        if (\count($types) > 1) {
+        if (\count($filteredTypes) > 1) {
             throw new InvalidTypeException(sprintf('Multiple types are not supported (%s)', $rawType));
         }
 
-        return $this->createType($types[0], $nullable, $declaringClass, $isCollection);
+        return $this->createType($filteredTypes[0], $nullable, $declaringClass, $isCollection);
     }
 
     /**
