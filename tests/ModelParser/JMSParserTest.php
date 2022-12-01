@@ -37,6 +37,7 @@ abstract class AbstractJMSParserTest extends TestCase
 
     protected function setUp(): void
     {
+        PropertyCollection::useIdenticalNamingStrategy(false);
         $this->parser = new JMSParser(new AnnotationReader());
     }
 
@@ -281,6 +282,26 @@ abstract class AbstractJMSParserTest extends TestCase
 
         $this->assertPropertyCollection('foo', 1, $props[0]);
         $this->assertSame('property', $props[0]->getVariations()[0]->getName(), 'Name of property should match');
+    }
+
+    public function testIdenticalNamingStrategy(): void
+    {
+        $c = new class() {
+            private $myProperty;
+            private $mySecondProperty;
+        };
+
+        PropertyCollection::useIdenticalNamingStrategy();
+        $classMetadata = new RawClassMetadata(\get_class($c));
+        $this->parser->parse($classMetadata);
+
+        $props = $classMetadata->getPropertyCollections();
+        $this->assertCount(2, $props, 'Number of properties should match');
+
+        $this->assertPropertyCollection('myProperty', 1, $props[0]);
+        $this->assertPropertyCollection('mySecondProperty', 1, $props[1]);
+        $this->assertSame('myProperty', $props[0]->getVariations()[0]->getName(), 'Name of property should match');
+        $this->assertSame('mySecondProperty', $props[1]->getVariations()[0]->getName(), 'Name of property should match');
     }
 
     public function testSerializedNameTwice(): void
