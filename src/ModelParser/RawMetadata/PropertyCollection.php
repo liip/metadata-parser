@@ -6,6 +6,8 @@ namespace Liip\MetadataParser\ModelParser\RawMetadata;
 
 final class PropertyCollection implements \JsonSerializable
 {
+    private static $identicalNamingStrategy = false;
+
     /**
      * @var string
      */
@@ -28,7 +30,16 @@ final class PropertyCollection implements \JsonSerializable
 
     public static function serializedName(string $name): string
     {
+        if (self::$identicalNamingStrategy) {
+            return $name;
+        }
+
         return strtolower(preg_replace('/[A-Z]/', '_\\0', $name));
+    }
+
+    public static function useIdenticalNamingStrategy($value = true)
+    {
+        self::$identicalNamingStrategy = $value;
     }
 
     /**

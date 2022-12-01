@@ -88,6 +88,17 @@ another class, are of the type `PropertyTypeClass` that has the method
 `getClassMetadata()` to get the metadata of the nested class. This structure
 is validated to not contain any infinite recursion.
 
+### Property naming strategy
+
+By default, property names will be translated from a camelCased to a lower and 
+snake_cased name (e.g. `myProperty` becomes `my_property`). If you want to keep
+the property name as is, you can change the strategy to `identical` via the 
+following code:
+
+```php
+\Liip\MetadataParser\ModelParser\RawMetadata\PropertyCollection::useIdenticalNamingStrategy();
+```
+
 ### Handling Edge Cases with @Preferred
 
 This library provides its own annotation in `Liip\MetadataParser\Annotation\Preferred`
