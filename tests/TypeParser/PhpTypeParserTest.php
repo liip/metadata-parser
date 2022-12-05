@@ -125,8 +125,8 @@ class PhpTypeParserTest extends TestCase
         ];
 
         yield [
-            'string[]|Collection|null',
-            'string[]|Collection|null',
+            'string[]|\Doctrine\Common\Collections\Collection|null',
+            'string[]|\Doctrine\Common\Collections\Collection|null',
         ];
 
         yield [
@@ -138,14 +138,13 @@ class PhpTypeParserTest extends TestCase
     public function provideCollectionTypes(): iterable
     {
         yield [
-            'string[]|Collection',
+            'string[]|\Doctrine\Common\Collections\Collection',
         ];
 
         yield [
-            'string[]|ArrayCollection',
+            'string[]|\Doctrine\Common\Collections\ArrayCollection',
         ];
     }
-
 
     /**
      * @dataProvider provideTypes
@@ -202,6 +201,11 @@ class PhpTypeParserTest extends TestCase
         yield [
             'Nested[string][]',
             BaseModel::class.'[string][]',
+        ];
+
+        yield [
+            'Nested[]|Collection',
+            BaseModel::class.'[]|\Doctrine\Common\Collections\Collection'
         ];
     }
 

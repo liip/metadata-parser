@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Liip\MetadataParser\TypeParser;
 
 use Doctrine\Common\Annotations\PhpParser;
+use Doctrine\Common\Collections\Collection;
 use Liip\MetadataParser\Exception\InvalidTypeException;
 use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeArray;
@@ -20,17 +21,11 @@ final class PhpTypeParser
     private const TYPE_MIXED = 'mixed';
     private const TYPE_RESOURCE = 'resource';
     private const TYPE_ARRAY = 'array';
-    private const TYPE_ARRAY_COLLECTION = 'ArrayCollection';
-    private const TYPE_COLLECTION = 'Collection';
     private const TYPE_ARRAY_SUFFIX = '[]';
     private const TYPE_HASHMAP_SUFFIX = '[string]';
     private const TYPES_GENERIC = [
         'object',
         'mixed',
-    ];
-    private const TYPES_COLLECTION = [
-        self::TYPE_COLLECTION,
-        self::TYPE_ARRAY_COLLECTION,
     ];
 
     /**
@@ -65,7 +60,8 @@ final class PhpTypeParser
         $isCollection = false;
         $filteredTypes = [];
         foreach ($types as $type) {
-            if (in_array($type, self::TYPES_COLLECTION)) {
+            $resolvedClass = $this->resolveClass($type, $declaringClass);
+            if (Collection::class === $resolvedClass || is_subclass_of($resolvedClass, Collection::class)) {
                 $isCollection = true;
             } else {
                 $filteredTypes[] = $type;

@@ -177,7 +177,7 @@ abstract class AbstractJMSParserTest extends TestCase
             },
             PropertyTypeArray::class,
             true,
-            'string[]|Collection|null',
+            'string[]|\Doctrine\Common\Collections\Collection|null',
         ];
 
         yield [
@@ -189,7 +189,7 @@ abstract class AbstractJMSParserTest extends TestCase
             },
             PropertyTypeArray::class,
             true,
-            'string[]|Collection|null',
+            'string[]|\Doctrine\Common\Collections\Collection|null',
         ];
 
         yield [
@@ -201,7 +201,7 @@ abstract class AbstractJMSParserTest extends TestCase
             },
             PropertyTypeArray::class,
             true,
-            'int[string]|Collection|null',
+            'int[string]|\Doctrine\Common\Collections\Collection|null',
         ];
     }
 
