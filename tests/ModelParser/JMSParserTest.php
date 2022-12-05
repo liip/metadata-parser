@@ -1323,7 +1323,7 @@ abstract class AbstractJMSParserTest extends TestCase
         $this->assertSame($readOnly, $property->isReadOnly(), "Read only flag of property {$name} should match");
     }
 
-    private function assertPropertyType(string $propertyTypeClass, string $typeString, bool $nullable, PropertyType $type): void
+    protected function assertPropertyType(string $propertyTypeClass, string $typeString, bool $nullable, PropertyType $type): void
     {
         $this->assertInstanceOf($propertyTypeClass, $type);
         $this->assertSame($nullable, $type->isNullable(), 'Nullable flag should match');
