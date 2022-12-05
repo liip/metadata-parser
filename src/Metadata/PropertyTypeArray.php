@@ -33,8 +33,9 @@ final class PropertyTypeArray extends AbstractPropertyType
     public function __toString(): string
     {
         if ($this->subType instanceof PropertyTypeUnknown) {
-            return 'array';
+            return 'array' . $this->isCollection ? '|Collection' : '';
         }
+
         $array = $this->isHashmap() ? '[string]' : '[]';
         if ($this->isCollection) {
             $array .= '|Collection';
