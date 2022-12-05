@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Liip\MetadataParser\Metadata;
 
+use Doctrine\Common\Collections\Collection;
+
 final class PropertyTypeArray extends AbstractPropertyType
 {
     /**
@@ -33,12 +35,12 @@ final class PropertyTypeArray extends AbstractPropertyType
     public function __toString(): string
     {
         if ($this->subType instanceof PropertyTypeUnknown) {
-            return 'array' . $this->isCollection ? '|Collection' : '';
+            return 'array' . ($this->isCollection ? '|\\' . Collection::class : '');
         }
 
         $array = $this->isHashmap() ? '[string]' : '[]';
         if ($this->isCollection) {
-            $array .= '|Collection';
+            $array .= '|\\' . Collection::class;
         }
 
         return ((string) $this->subType).$array.parent::__toString();

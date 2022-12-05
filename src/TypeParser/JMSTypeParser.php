@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Liip\MetadataParser\TypeParser;
 
+use Doctrine\Common\Collections\Collection;
 use JMS\Serializer\Type\Parser;
 use Liip\MetadataParser\Exception\InvalidTypeException;
 use Liip\MetadataParser\Metadata\DateTimeOptions;
@@ -66,7 +67,7 @@ final class JMSTypeParser
             return new PropertyTypeClass($typeInfo['name'], $nullable);
         }
 
-        $isCollection = self::TYPE_ARRAY_COLLECTION === $typeInfo['name'];
+        $isCollection = $this->isCollection($typeInfo['name']);
         if (self::TYPE_ARRAY === $typeInfo['name'] || $isCollection) {
             if (1 === \count($typeInfo['params'])) {
                 return new PropertyTypeArray($this->parseType($typeInfo['params'][0], true), false, $nullable, $isCollection);
@@ -92,5 +93,14 @@ final class JMSTypeParser
         }
 
         throw new InvalidTypeException(sprintf('Unknown JMS property found (%s)', var_export($typeInfo, true)));
+    }
+
+    private function isCollection(string $name): bool
+    {
+        if (self::TYPE_ARRAY_COLLECTION === $name || Collection::class === $name) {
+            return true;
+        }
+
+        return is_subclass_of($name, Collection::class);
     }
 }

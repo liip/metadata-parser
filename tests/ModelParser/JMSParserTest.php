@@ -183,6 +183,18 @@ abstract class AbstractJMSParserTest extends TestCase
         yield [
             new class() {
                 /**
+                 * @JMS\Type("Doctrine\Common\Collections\ArrayCollection<string>")
+                 */
+                private $property;
+            },
+            PropertyTypeArray::class,
+            true,
+            'string[]|Collection|null',
+        ];
+
+        yield [
+            new class() {
+                /**
                  * @JMS\Type("ArrayCollection<string, int>")
                  */
                 private $property;
