@@ -61,7 +61,7 @@ final class PhpTypeParser
         $filteredTypes = [];
         foreach ($types as $type) {
             $resolvedClass = $this->resolveClass($type, $declaringClass);
-            if (Collection::class === $resolvedClass || is_subclass_of($resolvedClass, Collection::class)) {
+            if (is_a($resolvedClass, Collection::class, true)) {
                 $isCollection = true;
             } else {
                 $filteredTypes[] = $type;
