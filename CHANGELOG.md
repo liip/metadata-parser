@@ -1,5 +1,9 @@
 # Changelog
 
+# 0.6.0 (unreleased)
+
+* When running with PHP 8, process attributes in addition to the phpdoc annotations.
+
 # 0.5.0
 
 * Support JMS Serializer `ReadOnlyProperty` in addition to `ReadOnly` to be compatible with serializer 3.14 and newer.
