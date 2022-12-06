@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Liip\MetadataParser\TypeParser;
 
+use Doctrine\Common\Collections\Collection;
 use JMS\Serializer\Type\Parser;
 use Liip\MetadataParser\Exception\InvalidTypeException;
 use Liip\MetadataParser\Metadata\DateTimeOptions;
@@ -17,6 +18,7 @@ use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
 final class JMSTypeParser
 {
     private const TYPE_ARRAY = 'array';
+    private const TYPE_ARRAY_COLLECTION = 'ArrayCollection';
 
     /**
      * @var Parser
@@ -65,12 +67,13 @@ final class JMSTypeParser
             return new PropertyTypeClass($typeInfo['name'], $nullable);
         }
 
-        if (self::TYPE_ARRAY === $typeInfo['name']) {
+        $isCollection = $this->isCollection($typeInfo['name']);
+        if (self::TYPE_ARRAY === $typeInfo['name'] || $isCollection) {
             if (1 === \count($typeInfo['params'])) {
-                return new PropertyTypeArray($this->parseType($typeInfo['params'][0], true), false, $nullable);
+                return new PropertyTypeArray($this->parseType($typeInfo['params'][0], true), false, $nullable, $isCollection);
             }
             if (2 === \count($typeInfo['params'])) {
-                return new PropertyTypeArray($this->parseType($typeInfo['params'][1], true), true, $nullable);
+                return new PropertyTypeArray($this->parseType($typeInfo['params'][1], true), true, $nullable, $isCollection);
             }
 
             throw new InvalidTypeException(sprintf('JMS property type array can\'t have more than 2 parameters (%s)', var_export($typeInfo, true)));
@@ -90,5 +93,10 @@ final class JMSTypeParser
         }
 
         throw new InvalidTypeException(sprintf('Unknown JMS property found (%s)', var_export($typeInfo, true)));
+    }
+
+    private function isCollection(string $name): bool
+    {
+        return self::TYPE_ARRAY_COLLECTION === $name || is_a($name, Collection::class, true);
     }
 }

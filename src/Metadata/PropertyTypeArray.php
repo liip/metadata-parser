@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Liip\MetadataParser\Metadata;
 
+use Doctrine\Common\Collections\Collection;
+
 final class PropertyTypeArray extends AbstractPropertyType
 {
     /**
@@ -16,20 +18,31 @@ final class PropertyTypeArray extends AbstractPropertyType
      */
     private $hashmap;
 
-    public function __construct(PropertyType $subType, bool $hashmap, bool $nullable)
+    /**
+     * @var bool
+     */
+    private $isCollection;
+
+    public function __construct(PropertyType $subType, bool $hashmap, bool $nullable, bool $isCollection = false)
     {
         parent::__construct($nullable);
 
         $this->subType = $subType;
         $this->hashmap = $hashmap;
+        $this->isCollection = $isCollection;
     }
 
     public function __toString(): string
     {
         if ($this->subType instanceof PropertyTypeUnknown) {
-            return 'array';
+            return 'array' . ($this->isCollection ? '|\\' . Collection::class : '');
         }
+
         $array = $this->isHashmap() ? '[string]' : '[]';
+        if ($this->isCollection) {
+            $collectionType = $this->isHashmap() ? ', string' : '';
+            $array .= sprintf("|\\%s<%s%s>", Collection::class, $this->subType, $collectionType);
+        }
 
         return ((string) $this->subType).$array.parent::__toString();
     }
@@ -45,6 +58,11 @@ final class PropertyTypeArray extends AbstractPropertyType
     public function getSubType(): PropertyType
     {
         return $this->subType;
+    }
+
+    public function isCollection(): bool
+    {
+        return $this->isCollection;
     }
 
     /**
@@ -81,13 +99,14 @@ final class PropertyTypeArray extends AbstractPropertyType
         }
 
         $hashmap = $this->isHashmap() || $other->isHashmap();
+        $isCollection = $this->isCollection || $other->isCollection;
         if ($other->getSubType() instanceof PropertyTypeUnknown) {
-            return new self($this->getSubType(), $hashmap, $nullable);
+            return new self($this->getSubType(), $hashmap, $nullable, $isCollection);
         }
         if ($this->getSubType() instanceof PropertyTypeUnknown) {
-            return new self($other->getSubType(), $hashmap, $nullable);
+            return new self($other->getSubType(), $hashmap, $nullable, $isCollection);
         }
 
-        return new self($this->getSubType()->merge($other->getSubType()), $hashmap, $nullable);
+        return new self($this->getSubType()->merge($other->getSubType()), $hashmap, $nullable, $isCollection);
     }
 }

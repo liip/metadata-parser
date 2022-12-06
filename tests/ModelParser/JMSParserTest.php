@@ -167,6 +167,42 @@ abstract class AbstractJMSParserTest extends TestCase
             true,
             'string[]|null',
         ];
+
+        yield [
+            new class() {
+                /**
+                 * @JMS\Type("ArrayCollection<string>")
+                 */
+                private $property;
+            },
+            PropertyTypeArray::class,
+            true,
+            'string[]|\Doctrine\Common\Collections\Collection<string>|null',
+        ];
+
+        yield [
+            new class() {
+                /**
+                 * @JMS\Type("Doctrine\Common\Collections\ArrayCollection<string>")
+                 */
+                private $property;
+            },
+            PropertyTypeArray::class,
+            true,
+            'string[]|\Doctrine\Common\Collections\Collection<string>|null',
+        ];
+
+        yield [
+            new class() {
+                /**
+                 * @JMS\Type("ArrayCollection<string, int>")
+                 */
+                private $property;
+            },
+            PropertyTypeArray::class,
+            true,
+            'int[string]|\Doctrine\Common\Collections\Collection<int, string>|null',
+        ];
     }
 
     /**
