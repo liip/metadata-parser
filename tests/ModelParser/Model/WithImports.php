@@ -26,7 +26,7 @@ class WithImports
     private $aliasSameNamespace;
 
     /**
-     * @var Nested[]|Collection
+     * @var Collection<Nested>
      */
     private $collectionNamespace;
 }

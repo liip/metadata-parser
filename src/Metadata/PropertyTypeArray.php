@@ -40,7 +40,8 @@ final class PropertyTypeArray extends AbstractPropertyType
 
         $array = $this->isHashmap() ? '[string]' : '[]';
         if ($this->isCollection) {
-            $array .= '|\\' . Collection::class;
+            $collectionType = $this->isHashmap() ? ', string' : '';
+            $array .= sprintf("|\\%s<%s%s>", Collection::class, $this->subType, $collectionType);
         }
 
         return ((string) $this->subType).$array.parent::__toString();

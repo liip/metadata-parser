@@ -126,7 +126,7 @@ class PhpTypeParserTest extends TestCase
 
         yield [
             'string[]|\Doctrine\Common\Collections\Collection|null',
-            'string[]|\Doctrine\Common\Collections\Collection|null',
+            'string[]|\Doctrine\Common\Collections\Collection<string>|null',
         ];
 
         yield [
@@ -205,7 +205,7 @@ class PhpTypeParserTest extends TestCase
 
         yield [
             'Nested[]|Collection',
-            BaseModel::class.'[]|\Doctrine\Common\Collections\Collection'
+            BaseModel::class.'[]|\Doctrine\Common\Collections\Collection<' . BaseModel::class . '>'
         ];
     }
 
