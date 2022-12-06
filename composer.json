@@ -19,6 +19,7 @@
         "psr/log": "^1|^2|^3"
     },
     "require-dev": {
+        "doctrine/collections": "^1.6",
         "friendsofphp/php-cs-fixer": "v2.18.7",
         "jms/serializer": "^2.3 || ^3",
         "phpstan/phpstan": "^0.12.71",
