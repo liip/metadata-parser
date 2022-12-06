@@ -30,6 +30,7 @@ use JMS\Serializer\Annotation\XmlList;
 use JMS\Serializer\Annotation\XmlMap;
 use JMS\Serializer\Annotation\XmlRoot;
 use JMS\Serializer\Annotation\XmlValue;
+use JMS\Serializer\Metadata\Driver\AttributeDriver\AttributeReader;
 use JMS\Serializer\Type\Exception\SyntaxError;
 use Liip\MetadataParser\Exception\InvalidTypeException;
 use Liip\MetadataParser\Exception\ParseException;
@@ -70,6 +71,10 @@ abstract class BaseJMSParser implements ModelParserInterface
 
     public function __construct(Reader $annotationsReader)
     {
+        if (PHP_VERSION_ID >= 80000 && class_exists(AttributeReader::class)) {
+            $annotationsReader = new AttributeReader($annotationsReader);
+        }
+
         $this->annotationsReader = $annotationsReader;
         $this->phpTypeParser = new PhpTypeParser();
         $this->jmsTypeParser = new JMSTypeParser();
