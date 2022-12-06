@@ -97,10 +97,6 @@ final class JMSTypeParser
 
     private function isCollection(string $name): bool
     {
-        if (self::TYPE_ARRAY_COLLECTION === $name || Collection::class === $name) {
-            return true;
-        }
-
-        return is_subclass_of($name, Collection::class);
+        return self::TYPE_ARRAY_COLLECTION === $name || is_a($name, Collection::class, true);
     }
 }
