@@ -30,7 +30,8 @@
         "jms/serializer": "^2.3 || ^3"
     },
     "conflict": {
-        "doctrine/annotations": "< 1.11"
+        "doctrine/annotations": "< 1.11",
+        "jms/serializer": "< 2.3"
     },
     "autoload": {
         "psr-4": {
