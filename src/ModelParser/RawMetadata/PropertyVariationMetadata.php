@@ -87,6 +87,16 @@ final class PropertyVariationMetadata extends AbstractPropertyMetadata
         parent::setVersionRange($version);
     }
 
+    public function getMaxDepth(): ?int
+    {
+        return parent::getMaxDepth();
+    }
+
+    public function setMaxDepth(?int $maxDepth)
+    {
+        parent::setMaxDepth($maxDepth);
+    }
+
     /**
      * The value can be anything that the consumer understands.
      *

@@ -31,7 +31,8 @@ final class PropertyMetadata extends AbstractPropertyMetadata
         VersionRange $versionRange = null,
         array $groups = [],
         PropertyAccessor $accessor = null,
-        array $customInformation = []
+        array $customInformation = [],
+        ?int $maxDepth = null
     ) {
         parent::__construct($name, $readOnly, $public);
         $this->serializedName = $serializedName;
@@ -44,6 +45,8 @@ final class PropertyMetadata extends AbstractPropertyMetadata
         foreach ($customInformation as $key => $value) {
             $this->setCustomInformation((string) $key, $value);
         }
+
+        $this->setMaxDepth($maxDepth);
     }
 
     public function __toString(): string
@@ -62,7 +65,8 @@ final class PropertyMetadata extends AbstractPropertyMetadata
             $property->getVersionRange(),
             $property->getGroups(),
             $property->getAccessor(),
-            $property->getAllCustomInformation()
+            $property->getAllCustomInformation(),
+            $property->getMaxDepth()
         );
     }
 
@@ -74,6 +78,11 @@ final class PropertyMetadata extends AbstractPropertyMetadata
     public function getSerializedName(): string
     {
         return $this->serializedName;
+    }
+
+    public function getMaxDepth(): ?int
+    {
+        return parent::getMaxDepth();
     }
 
     public function jsonSerialize(): array
