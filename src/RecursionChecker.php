@@ -96,12 +96,14 @@ final class RecursionChecker
                     }
                 }
 
-                /*
-                 * Future feature idea: Instead of 2, we could use a configurable maximum recursion depth.
-                 * One could then allow to unroll a recursion up to a certain number and stop it after that.
-                 */
-                if ($propertyContext->countClassNames($propertyClassMetadata->getClassName()) > 2) {
+                $maxDepth = $property->getMaxDepth();
+                $stackCount = $propertyContext->countClassNames($classMetadata->getClassName());
+                if (null === $maxDepth && $stackCount > 2) {
                     throw RecursionException::forClass($propertyClassMetadata->getClassName(), $propertyContext);
+                }
+
+                if (null !== $maxDepth && $stackCount > $maxDepth) {
+                    return $classMetadata;
                 }
 
                 $type->setClassMetadata($this->checkClassMetadata($propertyClassMetadata, $propertyContext));
