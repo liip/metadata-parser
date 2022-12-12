@@ -5,6 +5,7 @@
 * When running with PHP 8, process attributes in addition to the phpdoc annotations.
 * Support doctrine collections
 * Support `identical` property naming strategy
+* Add support for the `MaxDepth` annotation from JMS
 
 # 0.5.0
 
