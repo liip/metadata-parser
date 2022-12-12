@@ -677,7 +677,7 @@ abstract class AbstractJMSParserTest extends TestCase
         $c = new class() {
             /**
              * @JMS\Type("string")
-             * @JMS\MaxDepth(1)
+             * @JMS\Inline()
              */
             private $property;
         };

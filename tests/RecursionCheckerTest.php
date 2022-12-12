@@ -59,6 +59,36 @@ class RecursionCheckerTest extends TestCase
         $this->createChecker()->check($classMetadata);
     }
 
+    public function testRecursionWithMaxDepth(): void
+    {
+        $customClassType = new PropertyTypeClass(Recursion::class, true);
+        $classMetadata = new ClassMetadata(
+            Recursion::class,
+            [
+                new PropertyMetadata(
+                    'property',
+                    'property',
+                    $customClassType,
+                    true,
+                    false,
+                    null,
+                    [],
+                    null,
+                    [],
+                    2
+                ),
+            ]
+        );
+        $customClassType->setClassMetadata($classMetadata);
+
+        $metadata = $this->createChecker()->check($classMetadata);
+
+        /** @var PropertyTypeClass $type */
+        $type = $metadata->getProperties()[0]->getType();
+        $this->assertInstanceOf(PropertyTypeClass::class, $type);
+        $this->assertCount(1, $type->getClassMetadata()->getProperties());
+    }
+
     public function testRecursionOnArray(): void
     {
         $customClassType = new PropertyTypeClass(Recursion::class, true);
