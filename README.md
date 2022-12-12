@@ -130,6 +130,29 @@ class Product
 
 ### Expected Recursion: Working with Flawed Models
 
+#### JMS annotation
+
+If you are using JMS annotations, you can add the `MaxDepth` annotation to 
+properties that might be recursive. 
+
+The following example will tell the metadata parser that the recursion is 
+expected up to a maximum depth of `3`.
+
+```php
+use JMS\Serializer\Annotation as JMS;
+
+class RecursionModel 
+{
+    /**
+     * @JMS\MaxDepth(3)
+     * @JMS\Type("RecursionModel")
+     */
+    public $recursion;
+}
+```
+
+#### Pure PHP 
+
 The RecursionChecker accepts a second parameter to specify places where to
 break recursion. This is useful if your model tree looks like it has recursions
 but actually does not have them. JMSSerializer always acts on the actual data
