@@ -40,6 +40,11 @@ abstract class AbstractPropertyMetadata implements \JsonSerializable
     private $versionRange;
 
     /**
+     * @var int|null
+     */
+    private $maxDepth = null;
+
+    /**
      * Hashmap of custom information about this property.
      *
      * @var mixed[]
@@ -133,6 +138,7 @@ abstract class AbstractPropertyMetadata implements \JsonSerializable
             'name' => $this->name,
             'is_public' => $this->public,
             'is_read_only' => $this->readOnly,
+            'max_depth' => $this->maxDepth,
         ];
 
         if (\count($this->groups) > 0) {
@@ -193,5 +199,15 @@ abstract class AbstractPropertyMetadata implements \JsonSerializable
     protected function setCustomInformation(string $key, $value): void
     {
         $this->customInformation[$key] = $value;
+    }
+
+    protected function getMaxDepth(): ?int
+    {
+        return $this->maxDepth;
+    }
+
+    protected function setMaxDepth(?int $maxDepth)
+    {
+        $this->maxDepth = $maxDepth;
     }
 }

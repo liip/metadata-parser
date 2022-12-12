@@ -18,6 +18,7 @@ use JMS\Serializer\Annotation\AccessorOrder;
 use JMS\Serializer\Annotation\Exclude;
 use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\MaxDepth;
 use JMS\Serializer\Annotation\PostDeserialize;
 use JMS\Serializer\Annotation\SerializedName;
 use JMS\Serializer\Annotation\Since;
@@ -289,6 +290,10 @@ abstract class BaseJMSParser implements ModelParserInterface
 
                 case $annotation instanceof Until:
                     $property->setVersionRange($property->getVersionRange()->withUntil($annotation->version));
+                    break;
+
+                case $annotation instanceof MaxDepth:
+                    $property->setMaxDepth($annotation->depth);
                     break;
 
                 case $annotation instanceof VirtualProperty:
