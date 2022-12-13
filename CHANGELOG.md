@@ -1,6 +1,6 @@
 # Changelog
 
-# 0.6.0 (unreleased)
+# 0.6.0
 
 * When running with PHP 8, process attributes in addition to the phpdoc annotations.
 * Support doctrine collections
