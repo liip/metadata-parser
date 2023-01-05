@@ -103,4 +103,27 @@ class JMSParserTest extends AbstractJMSParserTest
         $this->assertPropertyVariation('annotationsProperty', true, false, $property);
         $this->assertPropertyType(PropertyTypeArray::class, 'string[]|null', true, $property->getType());
     }
+
+    public function testVirtualPropertyWithoutDocblock(): void
+    {
+        $c = new class() {
+            #[JMS\VirtualProperty]
+            public function foo(): string
+            {
+                return 'bar';
+            }
+        };
+
+        $classMetadata = new RawClassMetadata(\get_class($c));
+        $this->parser->parse($classMetadata);
+
+        $props = $classMetadata->getPropertyCollections();
+        $this->assertCount(1, $props, 'Number of properties should match');
+
+        $this->assertPropertyCollection('foo', 1, $props[0]);
+        $property = $props[0]->getVariations()[0];
+        $this->assertPropertyVariation('foo', true, true, $property);
+        $this->assertPropertyType(PropertyTypePrimitive::class, 'string', false, $property->getType());
+        $this->assertPropertyAccessor('foo', null, $property->getAccessor());
+    }
 }

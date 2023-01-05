@@ -123,10 +123,6 @@ abstract class BaseJMSParser implements ModelParserInterface
         }
 
         foreach ($reflClass->getMethods() as $reflMethod) {
-            if (false === $reflMethod->getDocComment()) {
-                continue;
-            }
-
             try {
                 $annotations = $this->annotationsReader->getMethodAnnotations($reflMethod);
             } catch (AnnotationException $e) {
