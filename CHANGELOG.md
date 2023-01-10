@@ -1,5 +1,9 @@
 # Changelog
 
+# 0.6.1
+
+* Do not ignore methods that have no phpdoc but do have a PHP 8.1 attribute to make them virtual properties.
+
 # 0.6.0
 
 * When running with PHP 8, process attributes in addition to the phpdoc annotations.
