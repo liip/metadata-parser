@@ -1366,7 +1366,7 @@ abstract class AbstractJMSParserTest extends TestCase
         $this->assertSame($typeString, (string) $type);
     }
 
-    private function assertPropertyAccessor(?string $getterMethod, ?string $setterMethod, PropertyAccessor $accessor): void
+    protected function assertPropertyAccessor(?string $getterMethod, ?string $setterMethod, PropertyAccessor $accessor): void
     {
         $this->assertSame($getterMethod, $accessor->getGetterMethod(), 'Getter method of property should match');
         $this->assertSame($setterMethod, $accessor->getSetterMethod(), 'Setter method of property should match');
