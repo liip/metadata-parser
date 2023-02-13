@@ -1,5 +1,9 @@
 # Changelog
 
+# 1.0.0
+
+No changes since 0.6.1.
+
 # 0.6.1
 
 * Do not ignore methods that have no phpdoc but do have a PHP 8.1 attribute to make them virtual properties.
