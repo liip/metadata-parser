@@ -2,11 +2,16 @@
 
 declare(strict_types=1);
 
-$finder = PhpCsFixer\Finder::create()
-    ->in(__DIR__)
-;
+$config = new PhpCsFixer\Config();
 
-return PhpCsFixer\Config::create()
+$config->setFinder(
+    PhpCsFixer\Finder::create()
+        ->in([
+            __DIR__,
+        ]),
+);
+
+$config
     ->setRiskyAllowed(true)
     ->setRules(
         [
@@ -50,5 +55,6 @@ return PhpCsFixer\Config::create()
             'php_unit_test_case_static_method_calls' => false,
         ]
     )
-    ->setFinder($finder)
 ;
+
+return $config;
