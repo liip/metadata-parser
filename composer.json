@@ -16,6 +16,7 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "ext-json": "*",
+        "doctrine/annotations": "^1.13 || ^2.0.1",
         "psr/log": "^1|^2|^3"
     },
     "require-dev": {
@@ -45,7 +46,7 @@
     },
     "scripts": {
         "fix-cs": "vendor/bin/php-cs-fixer fix -v",
-        "cs-fixer": "vendor/bin/php-cs-fixer fix --dry-run --diff --diff-format udiff -v",
+        "cs-fixer": "vendor/bin/php-cs-fixer fix --dry-run --diff -v",
         "phpstan": "vendor/bin/phpstan analyse",
         "phpstan-tests": "vendor/bin/phpstan analyse -c phpstan.tests.neon",
         "phpstan-all": [

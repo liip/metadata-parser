@@ -53,6 +53,9 @@ $config
 
             // The convention with phpunit has been to use assertions with the object context.
             'php_unit_test_case_static_method_calls' => false,
+
+            // Not supported in PHP 7
+            'get_class_to_class_keyword' => false,
         ]
     )
 ;
