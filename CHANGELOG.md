@@ -1,5 +1,10 @@
 # Changelog
 
+# 1.1.0 (unreleased)
+
+* Drop support for PHP 7.2 and PHP 7.3
+* Support doctrine annotations `2.x`
+
 # 1.0.0
 
 No changes since 0.6.1.
