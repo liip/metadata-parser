@@ -68,10 +68,10 @@ final class PropertyTypeClass extends AbstractPropertyType
             return new self($this->className, $nullable);
         }
         if (!$other instanceof self) {
-            throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be the same or unknown', static::class, \get_class($other)));
+            throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be the same or unknown', self::class, \get_class($other)));
         }
         if ($this->getClassName() !== $other->getClassName()) {
-            throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be equal', static::class, \get_class($other)));
+            throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be equal', self::class, \get_class($other)));
         }
 
         return new self($this->className, $nullable);

@@ -27,9 +27,9 @@ final class Parser
     }
 
     /**
-     * @throws ParseException
-     *
      * @return RawClassMetadata[]
+     *
+     * @throws ParseException
      */
     public function parse(string $className): array
     {

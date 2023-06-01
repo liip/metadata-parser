@@ -32,7 +32,7 @@ final class PropertyMetadata extends AbstractPropertyMetadata
         array $groups = [],
         PropertyAccessor $accessor = null,
         array $customInformation = [],
-        ?int $maxDepth = null
+        int $maxDepth = null
     ) {
         parent::__construct($name, $readOnly, $public);
         $this->serializedName = $serializedName;

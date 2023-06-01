@@ -2,11 +2,17 @@
 
 declare(strict_types=1);
 
-$finder = PhpCsFixer\Finder::create()
-    ->in(__DIR__)
-;
+$config = new PhpCsFixer\Config();
 
-return PhpCsFixer\Config::create()
+$config->setFinder(
+    PhpCsFixer\Finder::create()
+        ->in([
+            __DIR__,
+        ])
+        ->notPath('src/ModelParser/JMSParserLegacy.php')
+);
+
+$config
     ->setRiskyAllowed(true)
     ->setRules(
         [
@@ -48,7 +54,12 @@ return PhpCsFixer\Config::create()
 
             // The convention with phpunit has been to use assertions with the object context.
             'php_unit_test_case_static_method_calls' => false,
+
+            // Not supported in PHP 7
+            'get_class_to_class_keyword' => false,
+            'modernize_strpos' => false,
         ]
     )
-    ->setFinder($finder)
 ;
+
+return $config;
