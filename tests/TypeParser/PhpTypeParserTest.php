@@ -205,7 +205,7 @@ class PhpTypeParserTest extends TestCase
 
         yield [
             'Nested[]|Collection',
-            BaseModel::class.'[]|\Doctrine\Common\Collections\Collection<' . BaseModel::class . '>'
+            BaseModel::class.'[]|\Doctrine\Common\Collections\Collection<'.BaseModel::class.'>',
         ];
     }
 

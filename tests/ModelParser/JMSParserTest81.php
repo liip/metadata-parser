@@ -12,7 +12,7 @@ use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 /**
  * @small
  */
-class JMSParserTest extends AbstractJMSParserTest
+class JMSParserTest81 extends JMSParserTestCase
 {
     public function testReadOnlyProperty(): void
     {
@@ -33,7 +33,7 @@ class JMSParserTest extends AbstractJMSParserTest
         $this->assertPropertyVariation('property', false, true, $props[0]->getVariations()[0]);
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $c = new class() {
             #[JMS\Type('string')]
@@ -49,7 +49,6 @@ class JMSParserTest extends AbstractJMSParserTest
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(2, $props, 'Number of properties should match');
 
-
         $this->assertPropertyCollection('property1', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
         $this->assertPropertyVariation('property1', false, false, $property);
@@ -61,11 +60,12 @@ class JMSParserTest extends AbstractJMSParserTest
         $this->assertPropertyType(PropertyTypePrimitive::class, 'bool|null', true, $property->getType());
     }
 
-    public function testAttributesMixedWithAnnotations()
+    public function testAttributesMixedWithAnnotations(): void
     {
         $c = new class() {
             /**
              * @JMS\SerializedName("property_mixed")
+             *
              * @JMS\Groups({"group1"})
              */
             #[JMS\Type('string')]

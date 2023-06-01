@@ -19,7 +19,7 @@ final class PropertyTypeUnknown extends AbstractPropertyType
     public function merge(PropertyType $other): PropertyType
     {
         if (!$other instanceof self) {
-            throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be the same', static::class, \get_class($other)));
+            throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be the same', self::class, \get_class($other)));
         }
 
         return new self($this->isNullable() && $other->isNullable());

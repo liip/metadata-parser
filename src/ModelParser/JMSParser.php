@@ -20,6 +20,7 @@ use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Groups;
 use JMS\Serializer\Annotation\MaxDepth;
 use JMS\Serializer\Annotation\PostDeserialize;
+use JMS\Serializer\Annotation\ReadOnlyProperty;
 use JMS\Serializer\Annotation\SerializedName;
 use JMS\Serializer\Annotation\Since;
 use JMS\Serializer\Annotation\Type;
@@ -72,7 +73,7 @@ abstract class BaseJMSParser implements ModelParserInterface
 
     public function __construct(Reader $annotationsReader)
     {
-        if (PHP_VERSION_ID >= 80000 && class_exists(AttributeReader::class)) {
+        if (\PHP_VERSION_ID >= 80000 && class_exists(AttributeReader::class)) {
             $annotationsReader = new AttributeReader($annotationsReader);
         }
 
@@ -198,7 +199,7 @@ abstract class BaseJMSParser implements ModelParserInterface
                     break;
 
                 default:
-                    if (0 === strncmp('JMS\Serializer\\', \get_class($annotation), \mb_strlen('JMS\Serializer\\'))) {
+                    if (0 === strncmp('JMS\Serializer\\', \get_class($annotation), mb_strlen('JMS\Serializer\\'))) {
                         // if there are annotations we can safely ignore, we need to explicitly ignore them
                         throw ParseException::unsupportedClassAnnotation((string) $classMetadata, \get_class($annotation));
                     }
@@ -209,9 +210,9 @@ abstract class BaseJMSParser implements ModelParserInterface
     /**
      * Find the annotations we care about by looking through all ancestors of $reflectionClass.
      *
-     * @throws AnnotationException
-     *
      * @return object[] Hashmap of annotation class => annotation object
+     *
+     * @throws AnnotationException
      */
     private function gatherClassAnnotations(\ReflectionClass $reflectionClass): array
     {
@@ -305,7 +306,7 @@ abstract class BaseJMSParser implements ModelParserInterface
                     break;
 
                 default:
-                    if (0 === strncmp('JMS\Serializer\\', \get_class($annotation), \mb_strlen('JMS\Serializer\\'))) {
+                    if (0 === strncmp('JMS\Serializer\\', \get_class($annotation), mb_strlen('JMS\Serializer\\'))) {
                         // if there are annotations we can safely ignore, we need to explicitly ignore them
                         throw ParseException::unsupportedPropertyAnnotation((string) $classMetadata, (string) $property, \get_class($annotation));
                     }
@@ -430,8 +431,23 @@ abstract class BaseJMSParser implements ModelParserInterface
     }
 }
 
-if (PHP_VERSION_ID > 80100) {
-    require 'JMSParser81.php';
+if (\PHP_VERSION_ID > 80100) {
+    /**
+     * Version for PHP 8.1+ without the ReadOnly annotation.
+     */
+    final class JMSParser extends BaseJMSParser
+    {
+        protected function parsePropertyAnnotationsReadOnly(object $annotation, PropertyVariationMetadata $property): bool
+        {
+            if ($annotation instanceof ReadOnlyProperty) {
+                $property->setReadOnly($annotation->readOnly);
+
+                return true;
+            }
+
+            return false;
+        }
+    }
 } else {
     require 'JMSParserLegacy.php';
 }
