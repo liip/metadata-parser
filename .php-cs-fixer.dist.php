@@ -8,7 +8,8 @@ $config->setFinder(
     PhpCsFixer\Finder::create()
         ->in([
             __DIR__,
-        ]),
+        ])
+        ->notPath('src/ModelParser/JMSParserLegacy.php')
 );
 
 $config
@@ -56,6 +57,7 @@ $config
 
             // Not supported in PHP 7
             'get_class_to_class_keyword' => false,
+            'modernize_strpos' => false,
         ]
     )
 ;

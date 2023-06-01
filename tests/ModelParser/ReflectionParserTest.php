@@ -87,7 +87,7 @@ class ReflectionParserTest extends TestCase
 
     public function testTypedProperties(): void
     {
-        if (version_compare(PHP_VERSION, '7.4.0', '<')) {
+        if (version_compare(\PHP_VERSION, '7.4.0', '<')) {
             $this->markTestSkipped('Primitive property types are only supported in PHP 7.4 or newer');
         }
 
@@ -110,12 +110,12 @@ class ReflectionParserTest extends TestCase
         $this->assertPropertyCollection('property3', 1, $props[2]);
         $property3 = $props[2]->getVariations()[0];
         $this->assertProperty('property3', false, false, $property3);
-        $this->assertPropertyType($property3->getType(), PropertyTypeClass::class, ReflectionParserTest::class, false);
+        $this->assertPropertyType($property3->getType(), PropertyTypeClass::class, self::class, false);
     }
 
     public function testTypedPropertiesUnion(): void
     {
-        if (version_compare(PHP_VERSION, '8.0.0', '<')) {
+        if (version_compare(\PHP_VERSION, '8.0.0', '<')) {
             $this->markTestSkipped('Union property types are only supported in PHP 8.0 or newer');
         }
 
@@ -138,7 +138,7 @@ class ReflectionParserTest extends TestCase
 
     public function testTypedPropertiesIntersection(): void
     {
-        if (PHP_VERSION_ID < 80100) {
+        if (\PHP_VERSION_ID < 80100) {
             $this->markTestSkipped('Intersection property types are only supported in PHP 8.1 or newer');
         }
 

@@ -99,7 +99,7 @@ final class LiipMetadataAnnotationParser implements ModelParserInterface
                     break;
 
                 default:
-                    if (0 === strncmp('Liip\MetadataParser\\', \get_class($annotation), \mb_strlen('Liip\MetadataParser\\'))) {
+                    if (0 === strncmp('Liip\MetadataParser\\', \get_class($annotation), mb_strlen('Liip\MetadataParser\\'))) {
                         // if there are annotations we can safely ignore, we need to explicitly ignore them
                         throw ParseException::unsupportedPropertyAnnotation((string) $classMetadata, (string) $property, \get_class($annotation));
                     }

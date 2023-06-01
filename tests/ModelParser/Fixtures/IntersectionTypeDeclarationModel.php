@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Liip\MetadataParser\ModelParser\Fixtures;
 
 use Liip\MetadataParser\ModelParser\ReflectionParser;

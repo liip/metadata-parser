@@ -42,7 +42,7 @@ abstract class AbstractPropertyMetadata implements \JsonSerializable
     /**
      * @var int|null
      */
-    private $maxDepth = null;
+    private $maxDepth;
 
     /**
      * Hashmap of custom information about this property.
@@ -109,11 +109,11 @@ abstract class AbstractPropertyMetadata implements \JsonSerializable
     /**
      * Get the value stored as custom information, if it exists.
      *
-     * @throws \InvalidArgumentException if no such custom value is available for this property
-     *
      * @return mixed The information in whatever format it has been set
+     *
+     * @throws \InvalidArgumentException if no such custom value is available for this property
      */
-    public function getCustomInformation(string $key)
+    public function getCustomInformation(string $key): mixed
     {
         if (!\array_key_exists($key, $this->customInformation)) {
             throw new \InvalidArgumentException(sprintf('Property %s has no custom information %s', $this->name, $key));
@@ -206,7 +206,7 @@ abstract class AbstractPropertyMetadata implements \JsonSerializable
         return $this->maxDepth;
     }
 
-    protected function setMaxDepth(?int $maxDepth)
+    protected function setMaxDepth(?int $maxDepth): void
     {
         $this->maxDepth = $maxDepth;
     }

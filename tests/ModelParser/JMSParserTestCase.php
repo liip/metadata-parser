@@ -28,7 +28,7 @@ use Tests\Liip\MetadataParser\ModelParser\Model\Nested;
  *
  * We need 2 versions of this test to avoid parser errors about ReadOnly
  */
-abstract class AbstractJMSParserTest extends TestCase
+abstract class JMSParserTestCase extends TestCase
 {
     /**
      * @var JMSParser
@@ -272,6 +272,7 @@ abstract class AbstractJMSParserTest extends TestCase
 
             /**
              * @var bool
+             *
              * @JMS\Type("bool")
              */
             public $parentProperty2;
@@ -370,7 +371,9 @@ abstract class AbstractJMSParserTest extends TestCase
         $c = new class() {
             /**
              * @JMS\SerializedName("links")
+             *
              * @JMS\Until("2")
+             *
              * @JMS\Accessor(getter="getLinks")
              */
             private $property;
@@ -417,7 +420,9 @@ abstract class AbstractJMSParserTest extends TestCase
         $c = new class() {
             /**
              * @JMS\SerializedName("links")
+             *
              * @JMS\Until("2")
+             *
              * @JMS\Accessor(getter="getLinks")
              */
             private $fakeLinks;
@@ -492,6 +497,7 @@ abstract class AbstractJMSParserTest extends TestCase
 
             /**
              * @JMS\Exclude
+             *
              * @JMS\SerializedName("foo")
              */
             private $property2;
@@ -600,6 +606,7 @@ abstract class AbstractJMSParserTest extends TestCase
 
             /**
              * @JMS\Since("4.0")
+             *
              * @JMS\Until("8.1")
              */
             private $property4;
@@ -655,10 +662,15 @@ abstract class AbstractJMSParserTest extends TestCase
         $c = new class() {
             /**
              * @JMS\Type("string")
+             *
              * @JMS\XmlAttribute
+             *
              * @JMS\XmlKeyValuePairs
+             *
              * @JMS\XmlList
+             *
              * @JMS\XmlMap
+             *
              * @JMS\XmlValue
              */
             private $property;
@@ -677,6 +689,7 @@ abstract class AbstractJMSParserTest extends TestCase
         $c = new class() {
             /**
              * @JMS\Type("string")
+             *
              * @JMS\Inline()
              */
             private $property;
@@ -912,7 +925,7 @@ abstract class AbstractJMSParserTest extends TestCase
              */
             public function getFoo()
             {
-                return fopen(__FILE__, 'rb');
+                return fopen(__FILE__, 'r');
             }
         };
 
@@ -928,6 +941,7 @@ abstract class AbstractJMSParserTest extends TestCase
         $c = new class() {
             /**
              * @JMS\VirtualProperty
+             *
              * @JMS\Type("string")
              */
             public function foo(): string
@@ -954,6 +968,7 @@ abstract class AbstractJMSParserTest extends TestCase
         $c = new class() {
             /**
              * @JMS\VirtualProperty
+             *
              * @JMS\Type("integer")
              */
             public function foo(): string
@@ -974,6 +989,7 @@ abstract class AbstractJMSParserTest extends TestCase
         $c = new class() {
             /**
              * @JMS\VirtualProperty
+             *
              * @JMS\Type("integer")
              *
              * @return string[]
@@ -996,6 +1012,7 @@ abstract class AbstractJMSParserTest extends TestCase
         $c = new class() {
             /**
              * @JMS\VirtualProperty
+             *
              * @JMS\Type("string")
              */
             public function foo(): ?string
@@ -1021,6 +1038,7 @@ abstract class AbstractJMSParserTest extends TestCase
         $c = new class() {
             /**
              * @JMS\VirtualProperty
+             *
              * @JMS\Type("DateTime<'Y-m-d H:i:s', 'Europe/Zurich', 'Y-m-d'>")
              */
             public function foo(): ?\DateTime
@@ -1051,6 +1069,7 @@ abstract class AbstractJMSParserTest extends TestCase
         $c = new class() {
             /**
              * @JMS\VirtualProperty
+             *
              * @JMS\Type("DateTime<'Y-m-d H:i:s', 'Europe/Zurich', 'Y-m-d'>")
              */
             public function foo()
@@ -1084,6 +1103,7 @@ abstract class AbstractJMSParserTest extends TestCase
         $c = new class() {
             /**
              * @JMS\VirtualProperty
+             *
              * @JMS\Type("__invalid__")
              */
             public function foo()
@@ -1104,6 +1124,7 @@ abstract class AbstractJMSParserTest extends TestCase
         $c = new class() {
             /**
              * @JMS\VirtualProperty
+             *
              * @JMS\Type
              */
             public function getFoo(): int
@@ -1143,6 +1164,7 @@ abstract class AbstractJMSParserTest extends TestCase
         $c = new class() {
             /**
              * @JMS\VirtualProperty
+             *
              * @JMS\Exclude
              */
             public function getFoo()
@@ -1163,6 +1185,7 @@ abstract class AbstractJMSParserTest extends TestCase
         $c = new class() {
             /**
              * @JMS\VirtualProperty
+             *
              * @JMS\Groups({"group1", "group2"})
              */
             public function getFoo()
@@ -1186,7 +1209,9 @@ abstract class AbstractJMSParserTest extends TestCase
         $c = new class() {
             /**
              * @JMS\VirtualProperty
+             *
              * @JMS\Since("1.2")
+             *
              * @JMS\Until("3.9")
              */
             public function getFoo()
@@ -1252,6 +1277,7 @@ abstract class AbstractJMSParserTest extends TestCase
 
             /**
              * @JMS\VirtualProperty
+             *
              * @JMS\SerializedName("foo")
              */
             public function getBar(): int
@@ -1282,10 +1308,15 @@ abstract class AbstractJMSParserTest extends TestCase
         $c = new class() {
             /**
              * @JMS\VirtualProperty
+             *
              * @JMS\XmlAttribute
+             *
              * @JMS\XmlKeyValuePairs
+             *
              * @JMS\XmlList
+             *
              * @JMS\XmlMap
+             *
              * @JMS\XmlValue
              */
             public function foo(): string
@@ -1307,6 +1338,7 @@ abstract class AbstractJMSParserTest extends TestCase
         $c = new class() {
             /**
              * @JMS\VirtualProperty
+             *
              * @JMS\PreSerialize
              */
             public function foo(): string
@@ -1373,7 +1405,7 @@ abstract class AbstractJMSParserTest extends TestCase
     }
 }
 
-if (PHP_VERSION_ID > 80100) {
+if (\PHP_VERSION_ID > 80100) {
     require 'JMSParserTest81.php';
 } else {
     require 'JMSParserTestLegacy.php';

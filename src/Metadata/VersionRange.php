@@ -49,7 +49,7 @@ final class VersionRange implements \JsonSerializable
             return true;
         }
 
-        return \version_compare($this->since, $other->since, '<');
+        return version_compare($this->since, $other->since, '<');
     }
 
     /**
@@ -66,7 +66,7 @@ final class VersionRange implements \JsonSerializable
             return true;
         }
 
-        return \version_compare($this->until, $other->until, '>');
+        return version_compare($this->until, $other->until, '>');
     }
 
     /**
@@ -115,7 +115,7 @@ final class VersionRange implements \JsonSerializable
 
     public function jsonSerialize(): array
     {
-        return \array_filter([
+        return array_filter([
             'since' => $this->since,
             'until' => $this->until,
         ]);
