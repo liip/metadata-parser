@@ -27,7 +27,7 @@ final class ReflectionParser implements ModelParserInterface
     public function __construct()
     {
         $this->typeParser = new PhpTypeParser();
-        $this->reflectionSupportsPropertyType = version_compare(PHP_VERSION, '7.4', '>=');
+        $this->reflectionSupportsPropertyType = version_compare(\PHP_VERSION, '7.4', '>=');
     }
 
     public function parse(RawClassMetadata $classMetadata): void

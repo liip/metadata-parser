@@ -14,16 +14,17 @@
         "issues": "https://github.com/liip/metadata-parser/issues"
     },
     "require": {
-        "php": "^7.2 || ^8.0",
+        "php": "^7.4 || ^8.0",
         "ext-json": "*",
+        "doctrine/annotations": "^1.13 || ^2.0.1",
         "psr/log": "^1|^2|^3"
     },
     "require-dev": {
         "doctrine/collections": "^1.6",
-        "friendsofphp/php-cs-fixer": "v2.18.7",
+        "friendsofphp/php-cs-fixer": "v3.17.0",
         "jms/serializer": "^2.3 || ^3",
-        "phpstan/phpstan": "^0.12.71",
-        "phpstan/phpstan-phpunit": "^0.12",
+        "phpstan/phpstan": "^1.0",
+        "phpstan/phpstan-phpunit": "^1.0",
         "phpunit/phpunit": "^8.5.15 || ^9.5"
     },
     "suggest": {
@@ -45,7 +46,7 @@
     },
     "scripts": {
         "fix-cs": "vendor/bin/php-cs-fixer fix -v",
-        "cs-fixer": "vendor/bin/php-cs-fixer fix --dry-run --diff --diff-format udiff -v",
+        "cs-fixer": "vendor/bin/php-cs-fixer fix --dry-run --diff -v",
         "phpstan": "vendor/bin/phpstan analyse",
         "phpstan-tests": "vendor/bin/phpstan analyse -c phpstan.tests.neon",
         "phpstan-all": [

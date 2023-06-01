@@ -10,7 +10,7 @@ use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 /**
  * @small
  */
-class JMSParserTest extends AbstractJMSParserTest
+class JMSParserTestLegacy extends JMSParserTestCase
 {
     public function testReadOnlyProperty(): void
     {

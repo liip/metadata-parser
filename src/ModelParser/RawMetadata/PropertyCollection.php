@@ -37,7 +37,7 @@ final class PropertyCollection implements \JsonSerializable
         return strtolower(preg_replace('/[A-Z]/', '_\\0', $name));
     }
 
-    public static function useIdenticalNamingStrategy($value = true)
+    public static function useIdenticalNamingStrategy($value = true): void
     {
         self::$identicalNamingStrategy = $value;
     }
@@ -60,7 +60,7 @@ final class PropertyCollection implements \JsonSerializable
     public function getPosition(array $order): ?int
     {
         foreach ($this->variations as $variation) {
-            $pos = \array_search($variation->getName(), $order, true);
+            $pos = array_search($variation->getName(), $order, true);
             if (false !== $pos) {
                 return $pos;
             }
