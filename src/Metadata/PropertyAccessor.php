@@ -6,15 +6,9 @@ namespace Liip\MetadataParser\Metadata;
 
 final class PropertyAccessor implements \JsonSerializable
 {
-    /**
-     * @var string|null
-     */
-    private $getterMethod;
+    private ?string $getterMethod;
 
-    /**
-     * @var string|null
-     */
-    private $setterMethod;
+    private ?string $setterMethod;
 
     public function __construct(?string $getterMethod, ?string $setterMethod)
     {
@@ -29,7 +23,7 @@ final class PropertyAccessor implements \JsonSerializable
 
     public function isDefined(): bool
     {
-        return $this->hasGetterMethod() || $this->hasGetterMethod();
+        return $this->hasGetterMethod() || $this->hasSetterMethod();
     }
 
     public function hasGetterMethod(): bool
