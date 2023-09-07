@@ -109,7 +109,7 @@ abstract class JMSParserTestCase extends TestCase
         $this->assertPropertyCollection('property', 1, $props[0]);
     }
 
-    public function providePropertyType(): iterable
+    public function providePropertyTypeCases(): iterable
     {
         yield [
             new class() {
@@ -206,7 +206,7 @@ abstract class JMSParserTestCase extends TestCase
     }
 
     /**
-     * @dataProvider providePropertyType
+     * @dataProvider providePropertyTypeCases
      */
     public function testPropertyType($c, string $propertyTypeClass, bool $nullable, string $type): void
     {

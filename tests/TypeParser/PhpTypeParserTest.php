@@ -28,7 +28,7 @@ class PhpTypeParserTest extends TestCase
         $this->parser = new PhpTypeParser();
     }
 
-    public function provideTypes(): iterable
+    public function providePropertyTypeCases(): iterable
     {
         yield [
             '',
@@ -135,7 +135,7 @@ class PhpTypeParserTest extends TestCase
         ];
     }
 
-    public function provideCollectionTypes(): iterable
+    public function providePropertyTypeArrayIsCollectionCases(): iterable
     {
         yield [
             'string[]|\Doctrine\Common\Collections\Collection',
@@ -147,7 +147,7 @@ class PhpTypeParserTest extends TestCase
     }
 
     /**
-     * @dataProvider provideTypes
+     * @dataProvider providePropertyTypeCases
      */
     public function testPropertyType(string $rawType, string $expectedType, bool $expectedNullable = null): void
     {
@@ -160,7 +160,7 @@ class PhpTypeParserTest extends TestCase
     }
 
     /**
-     * @dataProvider provideCollectionTypes
+     * @dataProvider providePropertyTypeArrayIsCollectionCases
      */
     public function testPropertyTypeArrayIsCollection(string $rawType): void
     {
@@ -181,7 +181,7 @@ class PhpTypeParserTest extends TestCase
         $this->parser->parseAnnotationType('resource', new \ReflectionClass($this));
     }
 
-    public function provideLocalClassTypes()
+    public function provideNamespaceResolutionCases(): iterable
     {
         yield [
             'ReflectionAbstractModel',
@@ -210,7 +210,7 @@ class PhpTypeParserTest extends TestCase
     }
 
     /**
-     * @dataProvider provideLocalClassTypes
+     * @dataProvider provideNamespaceResolutionCases
      */
     public function testNamespaceResolution(string $rawType, string $expectedType): void
     {
@@ -219,7 +219,7 @@ class PhpTypeParserTest extends TestCase
         $this->assertSame($expectedType, (string) $type, 'Type should match');
     }
 
-    public function provideReflectionTypes(): iterable
+    public function provideReflectionTypeCases(): iterable
     {
         $c = new class() {
             private function method1(): string
@@ -257,7 +257,7 @@ class PhpTypeParserTest extends TestCase
     }
 
     /**
-     * @dataProvider provideReflectionTypes
+     * @dataProvider provideReflectionTypeCases
      */
     public function testReflectionType(\ReflectionType $reflType, string $expectedType, bool $expectedNullable = null): void
     {
