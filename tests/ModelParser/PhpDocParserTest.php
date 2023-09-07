@@ -71,7 +71,7 @@ class PhpDocParserTest extends TestCase
         $this->parser->parse($classMetadata);
     }
 
-    public function provideProperty(): iterable
+    public function providePropertyCases(): iterable
     {
         yield [
             new class() {
@@ -129,7 +129,7 @@ class PhpDocParserTest extends TestCase
     }
 
     /**
-     * @dataProvider provideProperty
+     * @dataProvider providePropertyCases
      */
     public function testProperty($c, string $propertyTypeClass, bool $nullable, string $type): void
     {
