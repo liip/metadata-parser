@@ -49,7 +49,7 @@ class VersionRangeTest extends TestCase
         $this->assertSame('2', $version->getUntil());
     }
 
-    public function provideVersionRanges()
+    public function provideIsIncludedCases(): iterable
     {
         return [
             'null is lowest and highest' => [
@@ -86,14 +86,14 @@ class VersionRangeTest extends TestCase
     }
 
     /**
-     * @dataProvider provideVersionRanges
+     * @dataProvider provideIsIncludedCases
      */
     public function testIsIncluded(VersionRange $versionRange, string $version, bool $expected): void
     {
         $this->assertSame($expected, $versionRange->isIncluded($version));
     }
 
-    public function provideVersionRangesForLower()
+    public function provideAllowsLowerThanCases(): iterable
     {
         return [
             'same null' => [
@@ -130,14 +130,14 @@ class VersionRangeTest extends TestCase
     }
 
     /**
-     * @dataProvider provideVersionRangesForLower
+     * @dataProvider provideAllowsLowerThanCases
      */
     public function testAllowsLowerThan(VersionRange $versionRange, VersionRange $other, bool $lower): void
     {
         $this->assertSame($lower, $versionRange->allowsLowerThan($other));
     }
 
-    public function provideVersionRangesForHigher()
+    public function provideAllowsHigherThanCases(): iterable
     {
         return [
             'same null' => [
@@ -174,7 +174,7 @@ class VersionRangeTest extends TestCase
     }
 
     /**
-     * @dataProvider provideVersionRangesForHigher
+     * @dataProvider provideAllowsHigherThanCases
      */
     public function testAllowsHigherThan(VersionRange $versionRange, VersionRange $other, bool $higher): void
     {

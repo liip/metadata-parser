@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
  */
 class PropertyTypeTest extends TestCase
 {
-    public function provideTypesToMerge(): iterable
+    public function provideMergeCases(): iterable
     {
         yield [
             new PropertyTypeUnknown(true),
@@ -98,7 +98,7 @@ class PropertyTypeTest extends TestCase
     }
 
     /**
-     * @dataProvider provideTypesToMerge
+     * @dataProvider provideMergeCases
      */
     public function testMerge(PropertyType $typeA, PropertyType $typeB, string $expectedType, bool $expectedNullable): void
     {
