@@ -19,25 +19,32 @@ class VisibilityAwarePropertyAccessGuesser implements ModelParserInterface
             throw ParseException::classNotFound($classMetadata->getClassName(), $e);
         }
 
-        foreach ($classMetadata->getPropertyCollections() as $propertyCollection) {
-            foreach ($propertyCollection->getVariations() as $variation) {
-                $name = $variation->getName();
+        $this->parseProperties($reflClass, $classMetadata);
+    }
 
-                if (!$reflClass->hasProperty($name) || $reflClass->getProperty($name)->isPublic()) {
-                    continue;
-                }
+    public function parseProperties(ReflectionClass $reflClass, RawClassMetadata $classMetadata): void
+    {
+        if ($reflParentClass = $reflClass->getParentClass()) {
+            $this->parseProperties($reflParentClass, $classMetadata);
+        }
 
-                $currentAccessor = $variation->getAccessor();
+        foreach ($reflClass->getProperties() as $property) {
+            if ($property->isPublic() || !$classMetadata->hasPropertyVariation($property->getName())) {
+                continue;
+            }
 
-                if (!($currentAccessor->getSetterMethod() && $currentAccessor->hasSetterMethod())) {
-                    $variation->setAccessor(new PropertyAccessor(
-                        $currentAccessor->getGetterMethod() ?: $this->guessGetter($reflClass, $variation),
-                        $currentAccessor->getSetterMethod() ?: $this->guessSetter($reflClass, $variation),
-                    ));
-                }
+            $variation = $classMetadata->getPropertyVariation($property->getName());
+            $currentAccessor = $variation->getAccessor();
+
+            if (!($currentAccessor->getSetterMethod() && $currentAccessor->hasSetterMethod())) {
+                $variation->setAccessor(new PropertyAccessor(
+                    $currentAccessor->getGetterMethod() ?: $this->guessGetter($reflClass, $variation),
+                    $currentAccessor->getSetterMethod() ?: $this->guessSetter($reflClass, $variation),
+                ));
             }
         }
     }
+
     private function guessGetter(ReflectionClass $reflClass, PropertyVariationMetadata $variation): ?string
     {
         foreach (['get', 'is', ''] as $prefix) {
