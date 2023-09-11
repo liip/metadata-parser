@@ -71,7 +71,7 @@ class VisibilityAwarePropertyAccessGuesser implements ModelParserInterface
 
             $reflMethod = $reflClass->getMethod($method);
 
-            if ($reflMethod->isPublic() && ($reflMethod->getNumberOfParameters() >= 1)) {
+            if ($reflMethod->isPublic() && ($reflMethod->getNumberOfRequiredParameters() == 1)) {
                 return $method;
             }
         }
