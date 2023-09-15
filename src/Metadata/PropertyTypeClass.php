@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Liip\MetadataParser\Metadata;
 
+use Doctrine\Common\Collections\Collection;
 use Liip\MetadataParser\Exception\InvalidTypeException;
 
 final class PropertyTypeClass extends AbstractPropertyType
@@ -66,6 +67,9 @@ final class PropertyTypeClass extends AbstractPropertyType
 
         if ($other instanceof PropertyTypeUnknown) {
             return new self($this->className, $nullable);
+        }
+        if (is_a($this->getClassName(), Collection::class, true) && (($other instanceof PropertyTypeArray) && $other->isCollection())) {
+            return $other->merge($this);
         }
         if (!$other instanceof self) {
             throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be the same or unknown', self::class, \get_class($other)));

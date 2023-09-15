@@ -58,11 +58,13 @@ final class PhpTypeParser
         }
 
         $isCollection = false;
+        $collectionClass = null;
         $filteredTypes = [];
         foreach ($types as $type) {
             $resolvedClass = $this->resolveClass($type, $declaringClass);
             if (is_a($resolvedClass, Collection::class, true)) {
                 $isCollection = true;
+                $collectionClass = $resolvedClass;
             } else {
                 $filteredTypes[] = $type;
             }
@@ -75,7 +77,7 @@ final class PhpTypeParser
             throw new InvalidTypeException(sprintf('Multiple types are not supported (%s)', $rawType));
         }
 
-        return $this->createType($filteredTypes[0], $nullable, $declaringClass, $isCollection);
+        return $this->createType($filteredTypes[0], $nullable, $declaringClass, $collectionClass);
     }
 
     /**
@@ -90,7 +92,7 @@ final class PhpTypeParser
         throw new InvalidTypeException(sprintf('No type information found, got %s but expected %s', \ReflectionType::class, \ReflectionNamedType::class));
     }
 
-    private function createType(string $rawType, bool $nullable, \ReflectionClass $reflClass = null, bool $isCollection = false): PropertyType
+    private function createType(string $rawType, bool $nullable, \ReflectionClass $reflClass = null, ?string $collectionClass = null): PropertyType
     {
         if (self::TYPE_ARRAY === $rawType) {
             return new PropertyTypeArray(new PropertyTypeUnknown(false), false, $nullable);
@@ -99,12 +101,12 @@ final class PhpTypeParser
         if (self::TYPE_ARRAY_SUFFIX === substr($rawType, -\strlen(self::TYPE_ARRAY_SUFFIX))) {
             $rawSubType = substr($rawType, 0, \strlen($rawType) - \strlen(self::TYPE_ARRAY_SUFFIX));
 
-            return new PropertyTypeArray($this->createType($rawSubType, false, $reflClass), false, $nullable, $isCollection);
+            return new PropertyTypeArray($this->createType($rawSubType, false, $reflClass), false, $nullable, $collectionClass);
         }
         if (self::TYPE_HASHMAP_SUFFIX === substr($rawType, -\strlen(self::TYPE_HASHMAP_SUFFIX))) {
             $rawSubType = substr($rawType, 0, \strlen($rawType) - \strlen(self::TYPE_HASHMAP_SUFFIX));
 
-            return new PropertyTypeArray($this->createType($rawSubType, false, $reflClass), true, $nullable, $isCollection);
+            return new PropertyTypeArray($this->createType($rawSubType, false, $reflClass), true, $nullable, $collectionClass);
         }
 
         if (self::TYPE_RESOURCE === $rawType) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Liip\MetadataParser\TypeParser;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use JMS\Serializer\Type\Parser;
 use Liip\MetadataParser\Exception\InvalidTypeException;
@@ -70,10 +71,10 @@ final class JMSTypeParser
         $isCollection = $this->isCollection($typeInfo['name']);
         if (self::TYPE_ARRAY === $typeInfo['name'] || $isCollection) {
             if (1 === \count($typeInfo['params'])) {
-                return new PropertyTypeArray($this->parseType($typeInfo['params'][0], true), false, $nullable, $isCollection);
+                return new PropertyTypeArray($this->parseType($typeInfo['params'][0], true), false, $nullable, $this->getCollectionClass($typeInfo['name']));
             }
             if (2 === \count($typeInfo['params'])) {
-                return new PropertyTypeArray($this->parseType($typeInfo['params'][1], true), true, $nullable, $isCollection);
+                return new PropertyTypeArray($this->parseType($typeInfo['params'][1], true), true, $nullable, $this->getCollectionClass($typeInfo['name']));
             }
 
             throw new InvalidTypeException(sprintf('JMS property type array can\'t have more than 2 parameters (%s)', var_export($typeInfo, true)));
@@ -98,5 +99,15 @@ final class JMSTypeParser
     private function isCollection(string $name): bool
     {
         return self::TYPE_ARRAY_COLLECTION === $name || is_a($name, Collection::class, true);
+    }
+
+    private function getCollectionClass(string $name)
+    {
+        switch ($name) {
+            case self::TYPE_ARRAY_COLLECTION:
+                return ArrayCollection::class;
+            default:
+                return is_a($name, Collection::class, true) ? $name : null;
+        }
     }
 }
