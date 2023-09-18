@@ -1,5 +1,7 @@
 # Changelog
 
+# Version 1.x
+
 # 1.1.0
 
 * Drop support for PHP 7.2 and PHP 7.3
