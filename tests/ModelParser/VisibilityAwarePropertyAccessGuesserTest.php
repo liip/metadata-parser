@@ -16,14 +16,14 @@ class VisibilityAwarePropertyAccessGuesserTest extends TestCase
     /**
      * @dataProvider provideClassesTests
      */
-    public function testSimpleClasses($class, array $parsers, int $expectedPropertyCount, ?array $accessType)
+    public function testSimpleClasses($class, array $parsers, int $expectedPropertyCount, ?array $accessType): void
     {
         $classMetadata = $this->parseClass($class, $parsers);
 
         $this->assertSame(\get_class($class), $classMetadata->getClassName());
         $this->assertCount($expectedPropertyCount, $classMetadata->getPropertyCollections(), 'Number of properties should match');
 
-        if ($accessType !== null) {
+        if (null !== $accessType) {
             ['public' => $public, 'hasGetter' => $hasGetter, 'hasSetter' => $hasSetter] = $accessType;
 
             foreach ($classMetadata->getPropertyVariations() as $propertyVariation) {
@@ -40,13 +40,12 @@ class VisibilityAwarePropertyAccessGuesserTest extends TestCase
     }
 
     /**
-     * @param class-string|object $class
+     * @param class-string|object    $class
      * @param ModelParserInterface[] $parsers
-     * @return RawClassMetadata
      */
     public function parseClass($class, array $parsers): RawClassMetadata
     {
-        $class = is_object($class) ? \get_class($class) : $class;
+        $class = \is_object($class) ? \get_class($class) : $class;
         $classMetadata = new RawClassMetadata($class);
 
         foreach ($parsers as $parser) {
@@ -68,7 +67,7 @@ class VisibilityAwarePropertyAccessGuesserTest extends TestCase
      *  },
      * }>
      */
-    public static function provideClassesTests(): Generator
+    public static function provideClassesTests(): \Generator
     {
         yield 'NoPredecessor' => [
             'class' => new class() {
@@ -90,7 +89,7 @@ class VisibilityAwarePropertyAccessGuesserTest extends TestCase
             'expectedPropertyCount' => 0,
             'accessType' => null,
         ];
-        yield 'SinglePublic' =>  [
+        yield 'SinglePublic' => [
             'class' => new class() {
                 public ?string $name = 'php';
             },
@@ -105,15 +104,17 @@ class VisibilityAwarePropertyAccessGuesserTest extends TestCase
                 'hasSetter' => null,
             ],
         ];
-        yield 'SinglePrivate' =>  [
+        yield 'SinglePrivate' => [
             'class' => new class() {
                 private ?string $name = 'php';
 
-                public function getName(): ?string {
+                public function getName(): ?string
+                {
                     return $this->name;
                 }
 
-                public function setName(?string $name): void {
+                public function setName(?string $name): void
+                {
                     $this->name = $name;
                 }
             },
@@ -128,11 +129,12 @@ class VisibilityAwarePropertyAccessGuesserTest extends TestCase
                 'hasSetter' => true,
             ],
         ];
-        yield 'MissingGetter' =>  [
+        yield 'MissingGetter' => [
             'class' => new class() {
                 private ?string $name = 'php';
 
-                public function setName(?string $name): void {
+                public function setName(?string $name): void
+                {
                     $this->name = $name;
                 }
             },
@@ -147,11 +149,12 @@ class VisibilityAwarePropertyAccessGuesserTest extends TestCase
                 'hasSetter' => true,
             ],
         ];
-        yield 'MissingSetter' =>  [
+        yield 'MissingSetter' => [
             'class' => new class() {
                 private ?string $name = 'php';
 
-                public function getName(): ?string {
+                public function getName(): ?string
+                {
                     return $this->name;
                 }
             },

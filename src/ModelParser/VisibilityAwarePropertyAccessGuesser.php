@@ -1,28 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Liip\MetadataParser\ModelParser;
 
 use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\PropertyAccessor;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
-use ReflectionClass;
-use ReflectionException;
 
+/**
+ * Run this after all properties have been added by other parsers. This parser will modify existing property metadata
+ * referring to private properties by adding accessors if there are none. Said accessors are guessed from common
+ * getter/setter naming schemes such as `get{$property}`, `set{$property}`
+ */
 class VisibilityAwarePropertyAccessGuesser implements ModelParserInterface
 {
     public function parse(RawClassMetadata $classMetadata): void
     {
         try {
-            $reflClass = new ReflectionClass($classMetadata->getClassName());
-        } catch (ReflectionException $e) {
+            $reflClass = new \ReflectionClass($classMetadata->getClassName());
+        } catch (\ReflectionException $e) {
             throw ParseException::classNotFound($classMetadata->getClassName(), $e);
         }
 
         $this->parseProperties($reflClass, $classMetadata);
     }
 
-    public function parseProperties(ReflectionClass $reflClass, RawClassMetadata $classMetadata): void
+    public function parseProperties(\ReflectionClass $reflClass, RawClassMetadata $classMetadata): void
     {
         if ($reflParentClass = $reflClass->getParentClass()) {
             $this->parseProperties($reflParentClass, $classMetadata);
@@ -45,16 +50,21 @@ class VisibilityAwarePropertyAccessGuesser implements ModelParserInterface
         }
     }
 
-    private function guessGetter(ReflectionClass $reflClass, PropertyVariationMetadata $variation): ?string
+    /**
+     * Find a getter method for property, using prefixes `get`, `is`, or simply no prefix
+     */
+    private function guessGetter(\ReflectionClass $reflClass, PropertyVariationMetadata $variation): ?string
     {
         foreach (['get', 'is', ''] as $prefix) {
-            $method = "$prefix{$variation->getName()}";
+            $method = "{$prefix}{$variation->getName()}";
 
-            if (!$reflClass->hasMethod($method)) continue;
+            if (!$reflClass->hasMethod($method)) {
+                continue;
+            }
 
             $reflMethod = $reflClass->getMethod($method);
 
-            if ($reflMethod->isPublic() && ($reflMethod->getNumberOfRequiredParameters() === 0)) {
+            if ($reflMethod->isPublic() && (0 === $reflMethod->getNumberOfRequiredParameters())) {
                 return $method;
             }
         }
@@ -62,12 +72,17 @@ class VisibilityAwarePropertyAccessGuesser implements ModelParserInterface
         return null;
     }
 
-    private function guessSetter(ReflectionClass $reflClass, PropertyVariationMetadata $variation): ?string
+    /**
+     * Find a setter method for property, using prefix `set`, or simply no prefix
+     */
+    private function guessSetter(\ReflectionClass $reflClass, PropertyVariationMetadata $variation): ?string
     {
         foreach (['set', ''] as $prefix) {
-            $method = "$prefix{$variation->getName()}";
+            $method = "{$prefix}{$variation->getName()}";
 
-            if (!$reflClass->hasMethod($method)) continue;
+            if (!$reflClass->hasMethod($method)) {
+                continue;
+            }
 
             $reflMethod = $reflClass->getMethod($method);
 
