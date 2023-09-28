@@ -57,13 +57,11 @@ final class PhpTypeParser
             }
         }
 
-        $isCollection = false;
         $collectionClass = null;
         $filteredTypes = [];
         foreach ($types as $type) {
             $resolvedClass = $this->resolveClass($type, $declaringClass);
             if (is_a($resolvedClass, Collection::class, true)) {
-                $isCollection = true;
                 $collectionClass = $resolvedClass;
             } else {
                 $filteredTypes[] = $type;
@@ -101,12 +99,12 @@ final class PhpTypeParser
         if (self::TYPE_ARRAY_SUFFIX === substr($rawType, -\strlen(self::TYPE_ARRAY_SUFFIX))) {
             $rawSubType = substr($rawType, 0, \strlen($rawType) - \strlen(self::TYPE_ARRAY_SUFFIX));
 
-            return new PropertyTypeArray($this->createType($rawSubType, false, $reflClass), false, $nullable, $collectionClass);
+            return new PropertyTypeArray($this->createType($rawSubType, false, $reflClass), false, $nullable, (bool)$collectionClass, $collectionClass);
         }
         if (self::TYPE_HASHMAP_SUFFIX === substr($rawType, -\strlen(self::TYPE_HASHMAP_SUFFIX))) {
             $rawSubType = substr($rawType, 0, \strlen($rawType) - \strlen(self::TYPE_HASHMAP_SUFFIX));
 
-            return new PropertyTypeArray($this->createType($rawSubType, false, $reflClass), true, $nullable, $collectionClass);
+            return new PropertyTypeArray($this->createType($rawSubType, false, $reflClass), true, $nullable, (bool)$collectionClass, $collectionClass);
         }
 
         if (self::TYPE_RESOURCE === $rawType) {
