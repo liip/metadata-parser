@@ -6,6 +6,9 @@ namespace Liip\MetadataParser\Metadata;
 
 use Doctrine\Common\Collections\Collection;
 
+/**
+ * @todo rename to PropertyTypeIterable
+ */
 final class PropertyTypeArray extends AbstractPropertyType
 {
     /**
@@ -23,12 +26,16 @@ final class PropertyTypeArray extends AbstractPropertyType
      */
     private $collectionClass;
 
-    public function __construct(PropertyType $subType, bool $hashmap, bool $nullable, ?string $collectionClass = null)
+    /**
+     * @todo deprecate $isCollection, prefer using $collectionClass to specify the collection class/interface
+     */
+    public function __construct(PropertyType $subType, bool $hashmap, bool $nullable, bool $isCollection = false, string $collectionClass = null)
     {
         parent::__construct($nullable);
 
         $this->subType = $subType;
         $this->hashmap = $hashmap;
+        $collectionClass ??= $isCollection ? Collection::class : $collectionClass;
         $this->collectionClass = $collectionClass;
     }
 
@@ -86,7 +93,7 @@ final class PropertyTypeArray extends AbstractPropertyType
             return new self($this->subType, $this->isHashmap(), $nullable);
         }
         if ($this->isCollection() && (($other instanceof PropertyTypeClass) && is_a($other->getClassName(), Collection::class, true))) {
-            return new self($this->getSubType(), $this->isHashmap(), $nullable, collectionClass: $this->findCommonCollectionClass($this->collectionClass, $other->getClassName()));
+            return new self($this->getSubType(), $this->isHashmap(), $nullable, true, $this->findCommonCollectionClass($this->collectionClass, $other->getClassName()));
         }
         if (!$other instanceof self) {
             throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be the same or unknown', self::class, \get_class($other)));
@@ -106,29 +113,31 @@ final class PropertyTypeArray extends AbstractPropertyType
         $commonClass = $this->findCommonCollectionClass($this->collectionClass, $other->collectionClass);
 
         if ($other->getSubType() instanceof PropertyTypeUnknown) {
-            return new self($this->getSubType(), $hashmap, $nullable, $commonClass);
+            return new self($this->getSubType(), $hashmap, $nullable, $isCollection, $commonClass);
         }
         if ($this->getSubType() instanceof PropertyTypeUnknown) {
-            return new self($other->getSubType(), $hashmap, $nullable, $commonClass);
+            return new self($other->getSubType(), $hashmap, $nullable, $isCollection, $commonClass);
         }
 
-        return new self($this->getSubType()->merge($other->getSubType()), $hashmap, $nullable, $commonClass);
+        return new self($this->getSubType()->merge($other->getSubType()), $hashmap, $nullable, $isCollection, $commonClass);
     }
 
     public function findCommonCollectionClass(?string $left, ?string $right): ?string
     {
         if (null === $right) {
             return $left;
-        } else if (null === $left) {
+        }
+        if (null === $left) {
             return $right;
         }
 
         if (is_a($left, $right, true)) {
             return $left;
-        } else if (is_a($right, $left, true)) {
+        }
+        if (is_a($right, $left, true)) {
             return $right;
         }
 
-        throw new \UnexpectedValueException("Collection classes '$left' and '$right' do not match.");
+        throw new \UnexpectedValueException("Collection classes '{$left}' and '{$right}' do not match.");
     }
 }
