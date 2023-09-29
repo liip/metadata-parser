@@ -67,9 +67,14 @@ final class PropertyTypeArray extends AbstractPropertyType
         return $this->subType;
     }
 
+    public function getCollectionClass(): ?string
+    {
+        return $this->collectionClass;
+    }
+
     public function isCollection(): bool
     {
-        return null != $this->collectionClass;
+        return null != $this->getCollectionClass();
     }
 
     /**
@@ -122,7 +127,7 @@ final class PropertyTypeArray extends AbstractPropertyType
         return new self($this->getSubType()->merge($other->getSubType()), $hashmap, $nullable, $isCollection, $commonClass);
     }
 
-    public function findCommonCollectionClass(?string $left, ?string $right): ?string
+    protected function findCommonCollectionClass(?string $left, ?string $right): ?string
     {
         if (null === $right) {
             return $left;
