@@ -1,5 +1,9 @@
 # Changelog
 
+# 1.2.0
+
+* new model parser VisibilityAwarePropertyAccessGuesser to fill in missing accessors for private properties
+
 # 1.1.0
 
 * Drop support for PHP 7.2 and PHP 7.3
