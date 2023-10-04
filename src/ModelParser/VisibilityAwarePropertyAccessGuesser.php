@@ -41,7 +41,7 @@ class VisibilityAwarePropertyAccessGuesser implements ModelParserInterface
             $variation = $classMetadata->getPropertyVariation($property->getName());
             $currentAccessor = $variation->getAccessor();
 
-            if (!($currentAccessor->getSetterMethod() && $currentAccessor->hasSetterMethod())) {
+            if (!($currentAccessor->hasGetterMethod() && $currentAccessor->hasSetterMethod())) {
                 $variation->setAccessor(new PropertyAccessor(
                     $currentAccessor->getGetterMethod() ?: $this->guessGetter($reflClass, $variation),
                     $currentAccessor->getSetterMethod() ?: $this->guessSetter($reflClass, $variation),
