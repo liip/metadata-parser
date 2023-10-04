@@ -1,5 +1,7 @@
 # Changelog
 
+# Version 1.x
+
 # 1.2.0
 
 * new model parser VisibilityAwarePropertyAccessGuesser to fill in missing accessors for private properties
