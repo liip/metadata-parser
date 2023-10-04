@@ -90,7 +90,7 @@ final class PhpTypeParser
         throw new InvalidTypeException(sprintf('No type information found, got %s but expected %s', \ReflectionType::class, \ReflectionNamedType::class));
     }
 
-    private function createType(string $rawType, bool $nullable, \ReflectionClass $reflClass = null, ?string $collectionClass = null): PropertyType
+    private function createType(string $rawType, bool $nullable, \ReflectionClass $reflClass = null, string $collectionClass = null): PropertyType
     {
         if (self::TYPE_ARRAY === $rawType) {
             return new PropertyTypeIterable(new PropertyTypeUnknown(false), false, $nullable);
