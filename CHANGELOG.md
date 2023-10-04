@@ -2,7 +2,7 @@
 
 # Version 1.x
 
-# 1.2.0
+# 1.2.0 (unreleased)
 
 * Added a model parser `VisibilityAwarePropertyAccessGuesser` that tries to guess getter and setter methods for non-public properties.
 

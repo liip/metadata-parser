@@ -10,9 +10,14 @@ use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 
 /**
- * Run this after all properties have been added by other parsers. This parser will modify existing property metadata
- * referring to private properties by adding accessors if there are none. Said accessors are guessed from common
- * getter/setter naming schemes such as `get{$property}`, `set{$property}`
+ * This guesser complements the other parsers by looking for accessor methods for non-public properties.
+ *
+ * Configure this parser to run after all properties have been added by other parsers. This parser goes through the
+ * properties found by other parsers. For each private or protected property that does not already have a getter and
+ * setter, it uses reflection to try to find a getter and setter method following common naming schemes.
+ *
+ * Currently we guess the getters `get{$property}`, `is{$property}` or just `$property` with no arguments. As setter we
+ * look for `set{$property}` or `{$property}` with exactly one argument.
  */
 class VisibilityAwarePropertyAccessGuesser implements ModelParserInterface
 {
@@ -41,7 +46,7 @@ class VisibilityAwarePropertyAccessGuesser implements ModelParserInterface
             $variation = $classMetadata->getPropertyVariation($property->getName());
             $currentAccessor = $variation->getAccessor();
 
-            if (!($currentAccessor->getSetterMethod() && $currentAccessor->hasSetterMethod())) {
+            if (!($currentAccessor->hasGetterMethod() && $currentAccessor->hasSetterMethod())) {
                 $variation->setAccessor(new PropertyAccessor(
                     $currentAccessor->getGetterMethod() ?: $this->guessGetter($reflClass, $variation),
                     $currentAccessor->getSetterMethod() ?: $this->guessSetter($reflClass, $variation),
@@ -86,7 +91,7 @@ class VisibilityAwarePropertyAccessGuesser implements ModelParserInterface
 
             $reflMethod = $reflClass->getMethod($method);
 
-            if ($reflMethod->isPublic() && ($reflMethod->getNumberOfRequiredParameters() == 1)) {
+            if ($reflMethod->isPublic() && (1 === $reflMethod->getNumberOfRequiredParameters())) {
                 return $method;
             }
         }

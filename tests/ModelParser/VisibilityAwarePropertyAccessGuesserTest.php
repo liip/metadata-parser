@@ -131,7 +131,7 @@ class VisibilityAwarePropertyAccessGuesserTest extends TestCase
         ];
         yield 'MissingGetter' => [
             'class' => new class() {
-                private ?string $name = 'php';
+                private ?string $name;
 
                 public function setName(?string $name): void
                 {
