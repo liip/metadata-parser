@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Tests\Liip\MetadataParser\Metadata;
 
 use Liip\MetadataParser\Metadata\PropertyType;
-use Liip\MetadataParser\Metadata\PropertyTypeArray;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
 use Liip\MetadataParser\Metadata\PropertyTypeDateTime;
+use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
 use PHPUnit\Framework\TestCase;
@@ -48,7 +48,7 @@ class PropertyTypeTest extends TestCase
         ];
 
         yield [
-            new PropertyTypeArray(new PropertyTypePrimitive('bool', false), false, true),
+            new PropertyTypeIterable(new PropertyTypePrimitive('bool', false), false, true),
             new PropertyTypeUnknown(false),
             'bool[]',
             false,
@@ -76,22 +76,22 @@ class PropertyTypeTest extends TestCase
         ];
 
         yield [
-            new PropertyTypeArray(new PropertyTypePrimitive('bool', false), false, true),
-            new PropertyTypeArray(new PropertyTypePrimitive('bool', false), false, false),
+            new PropertyTypeIterable(new PropertyTypePrimitive('bool', false), false, true),
+            new PropertyTypeIterable(new PropertyTypePrimitive('bool', false), false, false),
             'bool[]',
             false,
         ];
 
         yield [
-            new PropertyTypeArray(new PropertyTypePrimitive('bool', false), false, true),
-            new PropertyTypeArray(new PropertyTypeUnknown(false), false, false),
+            new PropertyTypeIterable(new PropertyTypePrimitive('bool', false), false, true),
+            new PropertyTypeIterable(new PropertyTypeUnknown(false), false, false),
             'bool[]',
             false,
         ];
 
         yield [
-            new PropertyTypeArray(new PropertyTypeUnknown(false), false, false),
-            new PropertyTypeArray(new PropertyTypePrimitive('bool', false), false, true),
+            new PropertyTypeIterable(new PropertyTypeUnknown(false), false, false),
+            new PropertyTypeIterable(new PropertyTypePrimitive('bool', false), false, true),
             'bool[]',
             false,
         ];
@@ -113,12 +113,12 @@ class PropertyTypeTest extends TestCase
      */
     public function testUpgradeToHashmap(): void
     {
-        $array = new PropertyTypeArray(new PropertyTypePrimitive('bool', false), false, true);
-        $hashmap = new PropertyTypeArray(new PropertyTypePrimitive('bool', false), true, true);
+        $array = new PropertyTypeIterable(new PropertyTypePrimitive('bool', false), false, true);
+        $hashmap = new PropertyTypeIterable(new PropertyTypePrimitive('bool', false), true, true);
 
-        /** @var PropertyTypeArray $merged */
+        /** @var PropertyTypeIterable $merged */
         $merged = $array->merge($hashmap);
-        $this->assertInstanceOf(PropertyTypeArray::class, $merged);
+        $this->assertInstanceOf(PropertyTypeIterable::class, $merged);
         $this->assertTrue($merged->isNullable());
         $this->assertTrue($merged->isHashmap());
         /** @var PropertyTypePrimitive $inner */
@@ -162,9 +162,9 @@ class PropertyTypeTest extends TestCase
             new PropertyTypeDateTime(false, true),
             new PropertyTypeDateTime(true, true),
             new PropertyTypeClass(\stdClass::class, true),
-            new PropertyTypeArray(new PropertyTypePrimitive('bool', false), false, true),
-            new PropertyTypeArray(new PropertyTypePrimitive('int', false), false, true),
-            new PropertyTypeArray(new PropertyTypePrimitive('string', false), true, true),
+            new PropertyTypeIterable(new PropertyTypePrimitive('bool', false), false, true),
+            new PropertyTypeIterable(new PropertyTypePrimitive('int', false), false, true),
+            new PropertyTypeIterable(new PropertyTypePrimitive('string', false), true, true),
         ];
     }
 }

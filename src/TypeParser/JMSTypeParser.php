@@ -10,9 +10,9 @@ use JMS\Serializer\Type\Parser;
 use Liip\MetadataParser\Exception\InvalidTypeException;
 use Liip\MetadataParser\Metadata\DateTimeOptions;
 use Liip\MetadataParser\Metadata\PropertyType;
-use Liip\MetadataParser\Metadata\PropertyTypeArray;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
 use Liip\MetadataParser\Metadata\PropertyTypeDateTime;
+use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
 
@@ -55,7 +55,7 @@ final class JMSTypeParser
 
         if (0 === \count($typeInfo['params'])) {
             if (self::TYPE_ARRAY === $typeInfo['name']) {
-                return new PropertyTypeArray(new PropertyTypeUnknown(false), false, $nullable);
+                return new PropertyTypeIterable(new PropertyTypeUnknown(false), false, $nullable);
             }
 
             if (PropertyTypePrimitive::isTypePrimitive($typeInfo['name'])) {
@@ -71,10 +71,10 @@ final class JMSTypeParser
         $collectionClass = $this->getCollectionClass($typeInfo['name']);
         if (self::TYPE_ARRAY === $typeInfo['name'] || $collectionClass) {
             if (1 === \count($typeInfo['params'])) {
-                return new PropertyTypeArray($this->parseType($typeInfo['params'][0], true), false, $nullable, (bool) $collectionClass, $collectionClass);
+                return new PropertyTypeIterable($this->parseType($typeInfo['params'][0], true), false, $nullable, $collectionClass);
             }
             if (2 === \count($typeInfo['params'])) {
-                return new PropertyTypeArray($this->parseType($typeInfo['params'][1], true), true, $nullable, (bool) $collectionClass, $collectionClass);
+                return new PropertyTypeIterable($this->parseType($typeInfo['params'][1], true), true, $nullable, $collectionClass);
             }
 
             throw new InvalidTypeException(sprintf('JMS property type array can\'t have more than 2 parameters (%s)', var_export($typeInfo, true)));

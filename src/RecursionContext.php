@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Liip\MetadataParser;
 
 use Liip\MetadataParser\Metadata\PropertyMetadata;
-use Liip\MetadataParser\Metadata\PropertyTypeArray;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
+use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 
 final class RecursionContext
 {
@@ -93,7 +93,7 @@ final class RecursionContext
         }
         foreach ($this->stack as $property) {
             $type = $property->getType();
-            if ($type instanceof PropertyTypeArray) {
+            if ($type instanceof PropertyTypeIterable) {
                 $type = $type->getLeafType();
             }
             if ($type instanceof PropertyTypeClass && $type->getClassName() === $className) {

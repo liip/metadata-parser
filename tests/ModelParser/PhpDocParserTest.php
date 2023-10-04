@@ -7,8 +7,8 @@ namespace Tests\Liip\MetadataParser\ModelParser;
 use Liip\MetadataParser\Exception\InvalidTypeException;
 use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\PropertyType;
-use Liip\MetadataParser\Metadata\PropertyTypeArray;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
+use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
 use Liip\MetadataParser\ModelParser\PhpDocParser;
@@ -188,7 +188,7 @@ class PhpDocParserTest extends TestCase
 
         $classMetadata = new RawClassMetadata(\get_class($c));
         $propertyMetadata = new PropertyVariationMetadata('property', false, true);
-        $propertyMetadata->setType(new PropertyTypeArray(new PropertyTypeUnknown(false), false, false));
+        $propertyMetadata->setType(new PropertyTypeIterable(new PropertyTypeUnknown(false), false, false));
         $classMetadata->addPropertyVariation('property', $propertyMetadata);
         $this->parser->parse($classMetadata);
 
@@ -198,7 +198,7 @@ class PhpDocParserTest extends TestCase
         $this->assertPropertyCollection('property', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
         $this->assertProperty('property', true, false, $property);
-        $this->assertPropertyType(PropertyTypeArray::class, 'string[]', false, $property->getType());
+        $this->assertPropertyType(PropertyTypeIterable::class, 'string[]', false, $property->getType());
     }
 
     public function testInheritedProperty(): void
