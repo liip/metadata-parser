@@ -6,6 +6,12 @@ namespace Liip\MetadataParser\Metadata;
 
 use Doctrine\Common\Collections\Collection;
 
+/**
+ * This property type can be merged with PropertyTypeClass<T>, provided that T is, inherits from, or is a parent class of $this->collectionClass
+ * This property type can be merged with PropertyTypeIterable, if :
+ *  - we're not merging a plain array PropertyTypeIterable into a hashmap one,
+ *  - and the collection classes of each are either not present on both sides, or are the same, or parent-child of one another
+ */
 class PropertyTypeIterable extends AbstractPropertyType
 {
     /**
