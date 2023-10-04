@@ -7,8 +7,8 @@ namespace Tests\Liip\MetadataParser;
 use Liip\MetadataParser\Exception\RecursionException;
 use Liip\MetadataParser\Metadata\ClassMetadata;
 use Liip\MetadataParser\Metadata\PropertyMetadata;
-use Liip\MetadataParser\Metadata\PropertyTypeArray;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
+use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\RecursionChecker;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -98,7 +98,7 @@ class RecursionCheckerTest extends TestCase
                 new PropertyMetadata(
                     'property',
                     'property',
-                    new PropertyTypeArray($customClassType, false, true)
+                    new PropertyTypeIterable($customClassType, false, true)
                 ),
             ]
         );
@@ -202,7 +202,7 @@ class RecursionCheckerTest extends TestCase
                 new PropertyMetadata(
                     'property',
                     'property',
-                    new PropertyTypeArray($outerCustomClassType, false, true)
+                    new PropertyTypeIterable($outerCustomClassType, false, true)
                 ),
             ]
         );
@@ -212,9 +212,9 @@ class RecursionCheckerTest extends TestCase
         ]);
         $metadata = $checker->check($classMetadata);
 
-        /** @var PropertyTypeArray $type */
+        /** @var PropertyTypeIterable $type */
         $type = $metadata->getProperties()[0]->getType();
-        $this->assertInstanceOf(PropertyTypeArray::class, $type);
+        $this->assertInstanceOf(PropertyTypeIterable::class, $type);
         /** @var PropertyTypeClass $subType */
         $subType = $type->getLeafType();
         $this->assertInstanceOf(PropertyTypeClass::class, $subType);

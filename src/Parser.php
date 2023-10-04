@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Liip\MetadataParser;
 
 use Liip\MetadataParser\Exception\ParseException;
-use Liip\MetadataParser\Metadata\PropertyTypeArray;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
+use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\ModelParser\ModelParserInterface;
 use Liip\MetadataParser\ModelParser\ParserContext;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
@@ -54,7 +54,7 @@ final class Parser
 
         foreach ($rawClassMetadata->getPropertyVariations() as $property) {
             $type = $property->getType();
-            if ($type instanceof PropertyTypeArray) {
+            if ($type instanceof PropertyTypeIterable) {
                 $type = $type->getLeafType();
             }
             if ($type instanceof PropertyTypeClass) {

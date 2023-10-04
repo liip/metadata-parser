@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Liip\MetadataParser\ModelParser;
 
 use JMS\Serializer\Annotation as JMS;
-use Liip\MetadataParser\Metadata\PropertyTypeArray;
+use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 
@@ -101,7 +101,7 @@ class JMSParserTest81 extends JMSParserTestCase
         $this->assertPropertyCollection('annotations_property', 1, $props[2]);
         $property = $props[2]->getVariations()[0];
         $this->assertPropertyVariation('annotationsProperty', true, false, $property);
-        $this->assertPropertyType(PropertyTypeArray::class, 'string[]|null', true, $property->getType());
+        $this->assertPropertyType(PropertyTypeIterable::class, 'string[]|null', true, $property->getType());
     }
 
     public function testVirtualPropertyWithoutDocblock(): void

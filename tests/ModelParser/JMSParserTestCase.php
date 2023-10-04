@@ -10,9 +10,9 @@ use JMS\Serializer\Annotation as JMS;
 use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\PropertyAccessor;
 use Liip\MetadataParser\Metadata\PropertyType;
-use Liip\MetadataParser\Metadata\PropertyTypeArray;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
 use Liip\MetadataParser\Metadata\PropertyTypeDateTime;
+use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
 use Liip\MetadataParser\ModelParser\JMSParser;
@@ -163,7 +163,7 @@ abstract class JMSParserTestCase extends TestCase
                  */
                 private $property;
             },
-            PropertyTypeArray::class,
+            PropertyTypeIterable::class,
             true,
             'string[]|null',
         ];
@@ -175,7 +175,7 @@ abstract class JMSParserTestCase extends TestCase
                  */
                 private $property;
             },
-            PropertyTypeArray::class,
+            PropertyTypeIterable::class,
             true,
             'string[]|\Doctrine\Common\Collections\Collection<string>|null',
         ];
@@ -187,7 +187,7 @@ abstract class JMSParserTestCase extends TestCase
                  */
                 private $property;
             },
-            PropertyTypeArray::class,
+            PropertyTypeIterable::class,
             true,
             'string[]|\Doctrine\Common\Collections\Collection<string>|null',
         ];
@@ -199,7 +199,7 @@ abstract class JMSParserTestCase extends TestCase
                  */
                 private $property;
             },
-            PropertyTypeArray::class,
+            PropertyTypeIterable::class,
             true,
             'int[string]|\Doctrine\Common\Collections\Collection<int, string>|null',
         ];
@@ -891,7 +891,7 @@ abstract class JMSParserTestCase extends TestCase
 
         $this->assertPropertyCollection('foo', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
-        $this->assertPropertyType(PropertyTypeArray::class, 'string[]', false, $property->getType());
+        $this->assertPropertyType(PropertyTypeIterable::class, 'string[]', false, $property->getType());
     }
 
     public function testVirtualPropertyWithConflictingReturnDocBlock(): void

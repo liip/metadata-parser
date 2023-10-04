@@ -6,8 +6,8 @@ namespace Liip\MetadataParser;
 
 use Liip\MetadataParser\Exception\RecursionException;
 use Liip\MetadataParser\Metadata\ClassMetadata;
-use Liip\MetadataParser\Metadata\PropertyTypeArray;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
+use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -65,7 +65,7 @@ final class RecursionChecker
 
         foreach ($classMetadata->getProperties() as $property) {
             $type = $property->getType();
-            if ($type instanceof PropertyTypeArray) {
+            if ($type instanceof PropertyTypeIterable) {
                 $type = $type->getLeafType();
             }
 

@@ -8,9 +8,9 @@ use Doctrine\Common\Annotations\PhpParser;
 use Doctrine\Common\Collections\Collection;
 use Liip\MetadataParser\Exception\InvalidTypeException;
 use Liip\MetadataParser\Metadata\PropertyType;
-use Liip\MetadataParser\Metadata\PropertyTypeArray;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
 use Liip\MetadataParser\Metadata\PropertyTypeDateTime;
+use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
 
@@ -93,18 +93,18 @@ final class PhpTypeParser
     private function createType(string $rawType, bool $nullable, \ReflectionClass $reflClass = null, ?string $collectionClass = null): PropertyType
     {
         if (self::TYPE_ARRAY === $rawType) {
-            return new PropertyTypeArray(new PropertyTypeUnknown(false), false, $nullable);
+            return new PropertyTypeIterable(new PropertyTypeUnknown(false), false, $nullable);
         }
 
         if (self::TYPE_ARRAY_SUFFIX === substr($rawType, -\strlen(self::TYPE_ARRAY_SUFFIX))) {
             $rawSubType = substr($rawType, 0, \strlen($rawType) - \strlen(self::TYPE_ARRAY_SUFFIX));
 
-            return new PropertyTypeArray($this->createType($rawSubType, false, $reflClass), false, $nullable, (bool)$collectionClass, $collectionClass);
+            return new PropertyTypeIterable($this->createType($rawSubType, false, $reflClass), false, $nullable, $collectionClass);
         }
         if (self::TYPE_HASHMAP_SUFFIX === substr($rawType, -\strlen(self::TYPE_HASHMAP_SUFFIX))) {
             $rawSubType = substr($rawType, 0, \strlen($rawType) - \strlen(self::TYPE_HASHMAP_SUFFIX));
 
-            return new PropertyTypeArray($this->createType($rawSubType, false, $reflClass), true, $nullable, (bool)$collectionClass, $collectionClass);
+            return new PropertyTypeIterable($this->createType($rawSubType, false, $reflClass), true, $nullable, $collectionClass);
         }
 
         if (self::TYPE_RESOURCE === $rawType) {
