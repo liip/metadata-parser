@@ -30,12 +30,9 @@ class PropertyTypeIterable extends AbstractPropertyType
     private $collectionClass;
 
     /**
-     * @param PropertyType $subType
-     * @param bool $hashmap
-     * @param bool $nullable
-     * @param class-string<iterable>|null $collectionClass
+     * @param class-string<\Traversable>|null $collectionClass
      */
-    public function __construct(PropertyType $subType, bool $hashmap, bool $nullable, ?string $collectionClass = null)
+    public function __construct(PropertyType $subType, bool $hashmap, bool $nullable, string $collectionClass = null)
     {
         parent::__construct($nullable);
 
@@ -46,18 +43,20 @@ class PropertyTypeIterable extends AbstractPropertyType
 
     /**
      * @internal This only exists as a bridge to deprecated class PropertyTypeArray
+     *
      * @deprecated Please remove this and just directly construct a PropertyTypeIterable
-     * @return static
      */
-    protected function create(PropertyType $subType, bool $hashmap, bool $nullable, ?string $collectionClass = null)
+    protected function create(PropertyType $subType, bool $hashmap, bool $nullable, string $collectionClass = null)
     {
-        if (static::class === PropertyTypeArray::class) {
-            $self = new static($subType, $hashmap, $nullable, !empty($collectionClass));
+        /* @todo remove this if, and inline the last return everywhere this function is called */
+        if (PropertyTypeArray::class === static::class) {
+            $self = new PropertyTypeArray($subType, $hashmap, $nullable, !empty($collectionClass));
             $self->collectionClass = $collectionClass;
+
             return $self;
         }
 
-        return new static($subType, $hashmap, $nullable, $collectionClass);
+        return new self($subType, $hashmap, $nullable, $collectionClass);
     }
 
     public function __toString(): string
@@ -116,10 +115,10 @@ class PropertyTypeIterable extends AbstractPropertyType
         $nullable = $this->isNullable() && $other->isNullable();
 
         if ($other instanceof PropertyTypeUnknown) {
-            return new self($this->subType, $this->isHashmap(), $nullable);
+            return static::create($this->subType, $this->isHashmap(), $nullable, $this->getCollectionClass());
         }
         if ($this->isCollection() && (($other instanceof PropertyTypeClass) && is_a($other->getClassName(), Collection::class, true))) {
-            return new self($this->getSubType(), $this->isHashmap(), $nullable, $this->findCommonCollectionClass($this->collectionClass, $other->getClassName()));
+            return static::create($this->getSubType(), $this->isHashmap(), $nullable, $this->findCommonCollectionClass($this->getCollectionClass(), $other->getClassName()));
         }
         if (!$other instanceof self) {
             throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be the same or unknown', self::class, \get_class($other)));
@@ -135,18 +134,22 @@ class PropertyTypeIterable extends AbstractPropertyType
         }
 
         $hashmap = $this->isHashmap() || $other->isHashmap();
-        $commonClass = $this->findCommonCollectionClass($this->collectionClass, $other->collectionClass);
+        $commonClass = $this->findCommonCollectionClass($this->getCollectionClass(), $other->getCollectionClass());
 
         if ($other->getSubType() instanceof PropertyTypeUnknown) {
-            return new self($this->getSubType(), $hashmap, $nullable, $commonClass);
+            return static::create($this->getSubType(), $hashmap, $nullable, $commonClass);
         }
         if ($this->getSubType() instanceof PropertyTypeUnknown) {
-            return new self($other->getSubType(), $hashmap, $nullable, $commonClass);
+            return static::create($other->getSubType(), $hashmap, $nullable, $commonClass);
         }
 
-        return new self($this->getSubType()->merge($other->getSubType()), $hashmap, $nullable, $commonClass);
+        return static::create($this->getSubType()->merge($other->getSubType()), $hashmap, $nullable, $commonClass);
     }
 
+    /**
+     * Find the most derived class that doesn't deny both class hints, meaning the most derived
+     * between left and right if one is a child of the other
+     */
     protected function findCommonCollectionClass(?string $left, ?string $right): ?string
     {
         if (null === $right) {
