@@ -72,7 +72,7 @@ class PropertyTypeIterableTest extends TestCase
         $defaultCollection = new PropertyTypeArray($subType, false, false, true);
 
         $result = $defaultCollection->merge($typeHintedCollection);
-        $this->assertInstanceOf(PropertyTypeIterable::class, $result);
+        $this->assertInstanceOf(PropertyTypeArray::class, $result);
         /* @var PropertyTypeIterable $result */
         $this->assertTrue($result->isCollection());
         $this->assertSame((string) $defaultCollection->getSubType(), (string) $result->getSubType());
@@ -114,11 +114,11 @@ class PropertyTypeIterableTest extends TestCase
         $explicitCollection = new PropertyTypeIterable($subType, false, false, ArrayCollection::class);
 
         $result = $defaultCollection->merge($explicitCollection);
-        $this->assertInstanceOf(PropertyTypeIterable::class, $result);
+        $this->assertInstanceOf(PropertyTypeArray::class, $result);
         /* @var PropertyTypeIterable $result */
         $this->assertTrue($result->isCollection());
         $this->assertSame((string) $explicitCollection->getSubType(), (string) $result->getSubType());
-        $this->assertSame(ArrayCollection::class, $result->getCollectionClass());
+        $this->assertSame(Collection::class, $result->getCollectionClass());
     }
 
     public function testMergeClassCollectionWithExplicitCollectionList(): void

@@ -12,18 +12,8 @@ use Doctrine\Common\Collections\Collection;
  *  - we're not merging a plain array PropertyTypeIterable into a hashmap one,
  *  - and the collection classes of each are either not present on both sides, or are the same, or parent-child of one another
  */
-class PropertyTypeIterable extends AbstractPropertyType
+final class PropertyTypeIterable extends PropertyTypeArray
 {
-    /**
-     * @var PropertyType
-     */
-    private $subType;
-
-    /**
-     * @var bool
-     */
-    private $hashmap;
-
     /**
      * @var string
      */
@@ -34,10 +24,8 @@ class PropertyTypeIterable extends AbstractPropertyType
      */
     public function __construct(PropertyType $subType, bool $hashmap, bool $nullable, string $collectionClass = null)
     {
-        parent::__construct($nullable);
+        parent::__construct($subType, $hashmap, $nullable, null != $collectionClass);
 
-        $this->subType = $subType;
-        $this->hashmap = $hashmap;
         $this->collectionClass = $collectionClass;
     }
 
@@ -71,20 +59,7 @@ class PropertyTypeIterable extends AbstractPropertyType
             $array .= sprintf('|\\%s<%s%s>', $this->collectionClass, $this->subType, $collectionType);
         }
 
-        return ((string) $this->subType).$array.parent::__toString();
-    }
-
-    public function isHashmap(): bool
-    {
-        return $this->hashmap;
-    }
-
-    /**
-     * Returns the type of the next level, which could be an array or hashmap or another type.
-     */
-    public function getSubType(): PropertyType
-    {
-        return $this->subType;
+        return ((string) $this->subType).$array.AbstractPropertyType::__toString();
     }
 
     public function getCollectionClass(): ?string
@@ -97,30 +72,17 @@ class PropertyTypeIterable extends AbstractPropertyType
         return null != $this->getCollectionClass();
     }
 
-    /**
-     * Goes down the type until it is not an array or hashmap anymore.
-     */
-    public function getLeafType(): PropertyType
-    {
-        $type = $this->getSubType();
-        while ($type instanceof self) {
-            $type = $type->getSubType();
-        }
-
-        return $type;
-    }
-
     public function merge(PropertyType $other): PropertyType
     {
         $nullable = $this->isNullable() && $other->isNullable();
 
         if ($other instanceof PropertyTypeUnknown) {
-            return static::create($this->subType, $this->isHashmap(), $nullable, $this->getCollectionClass());
+            return new self($this->subType, $this->isHashmap(), $nullable, $this->getCollectionClass());
         }
         if ($this->isCollection() && (($other instanceof PropertyTypeClass) && is_a($other->getClassName(), Collection::class, true))) {
-            return static::create($this->getSubType(), $this->isHashmap(), $nullable, $this->findCommonCollectionClass($this->getCollectionClass(), $other->getClassName()));
+            return new self($this->getSubType(), $this->isHashmap(), $nullable, $this->findCommonCollectionClass($this->getCollectionClass(), $other->getClassName()));
         }
-        if (!$other instanceof self) {
+        if (!$other instanceof parent) {
             throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be the same or unknown', self::class, \get_class($other)));
         }
 
@@ -133,17 +95,22 @@ class PropertyTypeIterable extends AbstractPropertyType
             throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, can\'t change hashmap into plain array', self::class, \get_class($other)));
         }
 
+        if ($other->isCollection()) {
+            $otherCollectionClass = ($other instanceof self) ? $other->getCollectionClass() : Collection::class;
+        } else {
+            $otherCollectionClass = null;
+        }
         $hashmap = $this->isHashmap() || $other->isHashmap();
-        $commonClass = $this->findCommonCollectionClass($this->getCollectionClass(), $other->getCollectionClass());
+        $commonClass = $this->findCommonCollectionClass($this->getCollectionClass(), $otherCollectionClass);
 
         if ($other->getSubType() instanceof PropertyTypeUnknown) {
-            return static::create($this->getSubType(), $hashmap, $nullable, $commonClass);
+            return new self($this->getSubType(), $hashmap, $nullable, $commonClass);
         }
         if ($this->getSubType() instanceof PropertyTypeUnknown) {
-            return static::create($other->getSubType(), $hashmap, $nullable, $commonClass);
+            return new self($other->getSubType(), $hashmap, $nullable, $commonClass);
         }
 
-        return static::create($this->getSubType()->merge($other->getSubType()), $hashmap, $nullable, $commonClass);
+        return new self($this->getSubType()->merge($other->getSubType()), $hashmap, $nullable, $commonClass);
     }
 
     /**
