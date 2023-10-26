@@ -29,24 +29,6 @@ final class PropertyTypeIterable extends PropertyTypeArray
         $this->collectionClass = $collectionClass;
     }
 
-    /**
-     * @internal This only exists as a bridge to deprecated class PropertyTypeArray
-     *
-     * @deprecated Please remove this and just directly construct a PropertyTypeIterable
-     */
-    protected function create(PropertyType $subType, bool $hashmap, bool $nullable, string $collectionClass = null)
-    {
-        /* @todo remove this if, and inline the last return everywhere this function is called */
-        if (PropertyTypeArray::class === static::class) {
-            $self = new PropertyTypeArray($subType, $hashmap, $nullable, !empty($collectionClass));
-            $self->collectionClass = $collectionClass;
-
-            return $self;
-        }
-
-        return new self($subType, $hashmap, $nullable, $collectionClass);
-    }
-
     public function __toString(): string
     {
         if ($this->subType instanceof PropertyTypeUnknown) {
