@@ -7,8 +7,8 @@ namespace Liip\MetadataParser;
 use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\ClassMetadata;
 use Liip\MetadataParser\Metadata\PropertyType;
-use Liip\MetadataParser\Metadata\PropertyTypeArray;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
+use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\Reducer\PropertyReducerInterface;
 
 /**
@@ -85,7 +85,7 @@ final class Builder
             return;
         }
 
-        if ($type instanceof PropertyTypeArray) {
+        if ($type instanceof PropertyTypeIterable) {
             $this->setTypeClassMetadata($type->getLeafType(), $classMetadataList);
         }
     }

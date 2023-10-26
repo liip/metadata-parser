@@ -6,22 +6,25 @@ namespace Liip\MetadataParser\Metadata;
 
 use Doctrine\Common\Collections\Collection;
 
-final class PropertyTypeArray extends AbstractPropertyType
+/**
+ * @deprecated Please use {@see PropertyTypeIterable} instead
+ */
+class PropertyTypeArray extends AbstractPropertyType
 {
     /**
      * @var PropertyType
      */
-    private $subType;
+    protected $subType;
 
     /**
      * @var bool
      */
-    private $hashmap;
+    protected $hashmap;
 
     /**
      * @var bool
      */
-    private $isCollection;
+    protected $isCollection;
 
     public function __construct(PropertyType $subType, bool $hashmap, bool $nullable, bool $isCollection = false)
     {
@@ -65,6 +68,11 @@ final class PropertyTypeArray extends AbstractPropertyType
         return $this->isCollection;
     }
 
+    public function getCollectionClass(): ?string
+    {
+        return $this->isCollection() ? Collection::class : null;
+    }
+
     /**
      * Goes down the type until it is not an array or hashmap anymore.
      */
@@ -84,6 +92,9 @@ final class PropertyTypeArray extends AbstractPropertyType
 
         if ($other instanceof PropertyTypeUnknown) {
             return new self($this->subType, $this->isHashmap(), $nullable);
+        }
+        if ($this->isCollection() && (($other instanceof PropertyTypeClass) && is_a($other->getClassName(), Collection::class, true))) {
+            return new self($this->getSubType(), $this->isHashmap(), $nullable, true);
         }
         if (!$other instanceof self) {
             throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be the same or unknown', self::class, \get_class($other)));
