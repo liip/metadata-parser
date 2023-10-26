@@ -6,8 +6,8 @@ namespace Tests\Liip\MetadataParser;
 
 use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\PropertyType;
-use Liip\MetadataParser\Metadata\PropertyTypeArray;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
+use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
 use Liip\MetadataParser\ModelParser\PhpDocParser;
@@ -132,7 +132,7 @@ class ParserTest extends TestCase
         $this->assertPropertyCollection('property', 1, $props[0]);
         $property = $props[0]->getVariations()[0];
         $this->assertProperty('property', false, false, $property);
-        $this->assertPropertyType($property->getType(), PropertyTypeArray::class, Nested::class.'[]', false);
+        $this->assertPropertyType($property->getType(), PropertyTypeIterable::class, Nested::class.'[]', false);
         $this->assertPropertyType($property->getType()->getSubType(), PropertyTypeClass::class, Nested::class, false);
 
         // Second class

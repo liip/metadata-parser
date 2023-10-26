@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Liip\MetadataParser\TypeParser;
 
 use Liip\MetadataParser\Exception\InvalidTypeException;
-use Liip\MetadataParser\Metadata\PropertyTypeArray;
+use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\TypeParser\PhpTypeParser;
 use PHPUnit\Framework\TestCase;
 use Tests\Liip\MetadataParser\ModelParser\Model\BaseModel;
@@ -165,7 +165,7 @@ class PhpTypeParserTest extends TestCase
     public function testPropertyTypeArrayIsCollection(string $rawType): void
     {
         $type = $this->parser->parseAnnotationType($rawType, new \ReflectionClass($this));
-        self::assertInstanceOf(PropertyTypeArray::class, $type);
+        self::assertInstanceOf(PropertyTypeIterable::class, $type);
         self::assertTrue($type->isCollection());
     }
 

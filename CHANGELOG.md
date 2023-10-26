@@ -2,6 +2,11 @@
 
 # Version 1.x
 
+# 1.3.0 (unreleased)
+
+* Added `PropertyTypeIterable`, which generalizes `PropertyTypeArray` to allow merging Collection informations like one would with arrays, including between interfaces and concrete classes
+* Deprecated `PropertyTypeArray`, please prefer using `PropertyTypeIterable` instead
+
 # 1.2.0 (unreleased)
 
 * Added a model parser `VisibilityAwarePropertyAccessGuesser` that tries to guess getter and setter methods for non-public properties.
