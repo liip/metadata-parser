@@ -6,7 +6,6 @@ namespace Tests\Liip\MetadataParser\Metadata;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Liip\MetadataParser\Metadata\PropertyTypeArray;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
 use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
@@ -31,34 +30,10 @@ class PropertyTypeIterableTest extends TestCase
         $subType = new PropertyTypePrimitive('int', false);
         $list = new PropertyTypeIterable($subType, false, false);
 
-        $this->assertFalse($list->isTraversable());
+        $this->assertFalse($list->isTraversable()); 
     }
 
-    /**
-     * @deprecated This only checks the behaviour of deprecated class {@see PropertyTypeArray}
-     */
-    public function testDefaultTraversableClassIsTraversableInterface(): void
-    {
-        $subType = new PropertyTypePrimitive('int', false);
-        $collection = new PropertyTypeArray($subType, false, false, true);
-
-        $this->assertTrue($collection->isTraversable());
-        $this->assertSame(\Traversable::class, $collection->getTraversableClass());
-    }
-
-    /**
-     * @deprecated This only checks the behaviour of deprecated class {@see PropertyTypeArray}
-     */
-    public function testDefaultCollectionClassIsCollectionInterface(): void
-    {
-        $subType = new PropertyTypePrimitive('int', false);
-        $collection = new PropertyTypeArray($subType, false, false, true);
-
-        $this->assertTrue($collection->isCollection());
-        $this->assertSame(Collection::class, $collection->getCollectionClass());
-    }
-
-    public function testExplicitCollectionClassIsKept(): void
+    public function testConcreteCollectionClassIsKept(): void
     {
         $subType = new PropertyTypePrimitive('int', false);
         $collection = new PropertyTypeIterable($subType, false, false, ArrayCollection::class);
@@ -77,63 +52,21 @@ class PropertyTypeIterableTest extends TestCase
         $list->merge(new PropertyTypeClass(Collection::class, true));
     }
 
-    public function testMergeDefaultCollectionListWithClassCollection(): void
+    public function testMergeInterfaceCollectionListWithClassCollection(): void
     {
         $subType = new PropertyTypePrimitive('int', false);
         $typeHintedCollection = new PropertyTypeClass(Collection::class, true);
-        $defaultCollection = new PropertyTypeArray($subType, false, false, true);
+        $defaultCollection = new PropertyTypeIterable($subType, false, false, Collection::class);
 
         $result = $defaultCollection->merge($typeHintedCollection);
-        $this->assertInstanceOf(PropertyTypeArray::class, $result);
+        $this->assertInstanceOf(PropertyTypeIterable::class, $result);
         /* @var PropertyTypeIterable $result */
         $this->assertTrue($result->isTraversable());
         $this->assertSame((string) $defaultCollection->getSubType(), (string) $result->getSubType());
         $this->assertSame(\Traversable::class, $result->getTraversableClass());
     }
 
-    public function testMergeExplicitCollectionListWithClassCollection(): void
-    {
-        $subType = new PropertyTypePrimitive('int', false);
-        $typeHintedCollection = new PropertyTypeClass(Collection::class, true);
-        $explicitCollection = new PropertyTypeIterable($subType, false, false, ArrayCollection::class);
-
-        $result = $explicitCollection->merge($typeHintedCollection);
-        $this->assertInstanceOf(PropertyTypeIterable::class, $result);
-        /* @var PropertyTypeIterable $result */
-        $this->assertTrue($result->isTraversable());
-        $this->assertSame((string) $explicitCollection->getSubType(), (string) $result->getSubType());
-        $this->assertSame(ArrayCollection::class, $result->getTraversableClass());
-    }
-
-    public function testMergeExplicitCollectionListWithDefaultCollection(): void
-    {
-        $subType = new PropertyTypePrimitive('int', false);
-        $defaultCollection = new PropertyTypeArray($subType, false, false, true);
-        $explicitCollection = new PropertyTypeIterable($subType, false, false, ArrayCollection::class);
-
-        $result = $explicitCollection->merge($defaultCollection);
-        $this->assertInstanceOf(PropertyTypeIterable::class, $result);
-        /* @var PropertyTypeIterable $result */
-        $this->assertTrue($result->isTraversable());
-        $this->assertSame((string) $explicitCollection->getSubType(), (string) $result->getSubType());
-        $this->assertSame(ArrayCollection::class, $result->getTraversableClass());
-    }
-
-    public function testMergeDefaultCollectionListWithExplicitCollection(): void
-    {
-        $subType = new PropertyTypePrimitive('int', false);
-        $defaultCollection = new PropertyTypeArray($subType, false, false, true);
-        $explicitCollection = new PropertyTypeIterable($subType, false, false, ArrayCollection::class);
-
-        $result = $defaultCollection->merge($explicitCollection);
-        $this->assertInstanceOf(PropertyTypeArray::class, $result);
-        /* @var PropertyTypeIterable $result */
-        $this->assertTrue($result->isTraversable());
-        $this->assertSame((string) $explicitCollection->getSubType(), (string) $result->getSubType());
-        $this->assertSame(Collection::class, $result->getCollectionClass());
-    }
-
-    public function testMergeClassCollectionWithExplicitCollectionList(): void
+    public function testMergeClassInterfaceCollectionWithConcreteCollectionList(): void
     {
         $subType = new PropertyTypePrimitive('int', false);
         $typeHintedCollection = new PropertyTypeClass(Collection::class, true);
@@ -147,7 +80,49 @@ class PropertyTypeIterableTest extends TestCase
         $this->assertSame(ArrayCollection::class, $result->getTraversableClass());
     }
 
-    public function testMergeListAndCollection(): void
+    public function testMergeConcreteCollectionListWithClassInterfaceCollection(): void
+    {
+        $subType = new PropertyTypePrimitive('int', false);
+        $typeHintedCollection = new PropertyTypeClass(Collection::class, true);
+        $explicitCollection = new PropertyTypeIterable($subType, false, false, ArrayCollection::class);
+
+        $result = $explicitCollection->merge($typeHintedCollection);
+        $this->assertInstanceOf(PropertyTypeIterable::class, $result);
+        /* @var PropertyTypeIterable $result */
+        $this->assertTrue($result->isTraversable());
+        $this->assertSame((string) $explicitCollection->getSubType(), (string) $result->getSubType());
+        $this->assertSame(ArrayCollection::class, $result->getTraversableClass());
+    }
+
+    public function testMergeConcreteCollectionListWithInterfaceCollectionList(): void
+    {
+        $subType = new PropertyTypePrimitive('int', false);
+        $defaultCollection = new PropertyTypeIterable($subType, false, false, Collection::class);
+        $explicitCollection = new PropertyTypeIterable($subType, false, false, ArrayCollection::class);
+
+        $result = $explicitCollection->merge($defaultCollection);
+        $this->assertInstanceOf(PropertyTypeIterable::class, $result);
+        /* @var PropertyTypeIterable $result */
+        $this->assertTrue($result->isTraversable());
+        $this->assertSame((string) $explicitCollection->getSubType(), (string) $result->getSubType());
+        $this->assertSame(ArrayCollection::class, $result->getTraversableClass());
+    }
+
+    public function testMergeDefaultCollectionListWithConcreteCollectionList(): void
+    {
+        $subType = new PropertyTypePrimitive('int', false);
+        $defaultCollection = new PropertyTypeIterable($subType, false, false, Collection::class);
+        $explicitCollection = new PropertyTypeIterable($subType, false, false, ArrayCollection::class);
+
+        $result = $defaultCollection->merge($explicitCollection);
+        $this->assertInstanceOf(PropertyTypeIterable::class, $result);
+        /* @var PropertyTypeIterable $result */
+        $this->assertTrue($result->isTraversable());
+        $this->assertSame((string) $explicitCollection->getSubType(), (string) $result->getSubType());
+        $this->assertSame(ArrayCollection::class, $result->getTraversableClass());
+    }
+
+    public function testMergeListAndInterfaceCollectionList(): void
     {
         $subType = new PropertyTypePrimitive('int', false);
         $list = new PropertyTypeIterable($subType, false, false);
@@ -162,7 +137,7 @@ class PropertyTypeIterableTest extends TestCase
         }
     }
 
-    public function testMergeListWithExplicitCollectionClass(): void
+    public function testMergeListWithConcreteCollectionList(): void
     {
         $subType = new PropertyTypePrimitive('int', false);
         $list = new PropertyTypeIterable($subType, false, false);
