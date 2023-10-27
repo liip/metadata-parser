@@ -17,12 +17,12 @@ final class PropertyTypeIterable extends AbstractPropertyType
     /**
      * @var PropertyType
      */
-    protected $subType;
+    private $subType;
 
     /**
      * @var bool
      */
-    protected $hashmap;
+    private $hashmap;
 
     /**
      * @var string
