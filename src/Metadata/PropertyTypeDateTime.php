@@ -67,6 +67,15 @@ final class PropertyTypeDateTime extends AbstractPropertyType
         return null;
     }
 
+    public function getDeserializeFormats(): ?array
+    {
+        if ($this->dateTimeOptions) {
+            return $this->dateTimeOptions->getDeserializeFormats();
+        }
+
+        return null;
+    }
+
     public function merge(PropertyType $other): PropertyType
     {
         $nullable = $this->isNullable() && $other->isNullable();

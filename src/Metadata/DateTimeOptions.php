@@ -20,17 +20,18 @@ final class DateTimeOptions implements \JsonSerializable
     private $zone;
 
     /**
-     * Use if a different format should be used for parsing dates than for generating dates.
+     * Use if different formats should be used for parsing dates than for generating dates.
      *
-     * @var string|null
+     * @var string[]|null
      */
-    private $deserializeFormat;
+    private $deserializeFormats;
 
-    public function __construct(?string $format, ?string $zone, ?string $deserializeFormat)
+    public function __construct(?string $format, ?string $zone, ?string $deserializeFormat, ?array $allDeserializeFormats = [])
     {
         $this->format = $format;
         $this->zone = $zone;
-        $this->deserializeFormat = $deserializeFormat;
+        $deserializeFormat = is_string($deserializeFormat) ? [$deserializeFormat] : $deserializeFormat;
+        $this->deserializeFormats = $allDeserializeFormats ?: array_filter([$deserializeFormat ?? $format]);
     }
 
     public function getFormat(): ?string
@@ -45,7 +46,16 @@ final class DateTimeOptions implements \JsonSerializable
 
     public function getDeserializeFormat(): ?string
     {
-        return $this->deserializeFormat;
+        foreach ($this->deserializeFormats as $format) {
+            return $format;
+        }
+
+        return null;
+    }
+
+    public function getDeserializeFormats(): ?array
+    {
+        return $this->deserializeFormats;
     }
 
     public function jsonSerialize(): array
@@ -53,7 +63,8 @@ final class DateTimeOptions implements \JsonSerializable
         return array_filter([
             'format' => $this->format,
             'zone' => $this->zone,
-            'deserialize_format' => $this->deserializeFormat,
+            'deserialize_format' => $this->getDeserializeFormat(),
+            'deserialize_formats' => $this->deserializeFormats,
         ]);
     }
 }
