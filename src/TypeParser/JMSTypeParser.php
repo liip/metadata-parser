@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Liip\MetadataParser\TypeParser;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use JMS\Serializer\Type\Parser;
 use Liip\MetadataParser\Exception\InvalidTypeException;
 use Liip\MetadataParser\Metadata\DateTimeOptions;
@@ -20,6 +19,9 @@ final class JMSTypeParser
 {
     private const TYPE_ARRAY = 'array';
     private const TYPE_ARRAY_COLLECTION = 'ArrayCollection';
+    private const TYPE_GENERATOR = 'Generator';
+    private const TYPE_ARRAY_ITERATOR = 'ArrayIterator';
+    private const TYPE_ITERATOR = 'Iterator';
     private const TYPE_DATETIME_INTERFACE = 'DateTimeInterface';
 
     /**
@@ -69,13 +71,13 @@ final class JMSTypeParser
             return new PropertyTypeClass($typeInfo['name'], $nullable);
         }
 
-        $collectionClass = $this->getCollectionClass($typeInfo['name']);
-        if (self::TYPE_ARRAY === $typeInfo['name'] || $collectionClass) {
+        $traversableClass = $this->getTraversableClass($typeInfo['name']);
+        if (self::TYPE_ARRAY === $typeInfo['name'] || $traversableClass) {
             if (1 === \count($typeInfo['params'])) {
-                return new PropertyTypeIterable($this->parseType($typeInfo['params'][0], true), false, $nullable, $collectionClass);
+                return new PropertyTypeIterable($this->parseType($typeInfo['params'][0], true), false, $nullable, $traversableClass);
             }
             if (2 === \count($typeInfo['params'])) {
-                return new PropertyTypeIterable($this->parseType($typeInfo['params'][1], true), true, $nullable, $collectionClass);
+                return new PropertyTypeIterable($this->parseType($typeInfo['params'][1], true), true, $nullable, $traversableClass);
             }
 
             throw new InvalidTypeException(sprintf('JMS property type array can\'t have more than 2 parameters (%s)', var_export($typeInfo, true)));
@@ -105,13 +107,18 @@ final class JMSTypeParser
         throw new InvalidTypeException(sprintf('Unknown JMS property found (%s)', var_export($typeInfo, true)));
     }
 
-    private function getCollectionClass(string $name): ?string
+    public function getTraversableClass(string $name): ?string
     {
         switch ($name) {
             case self::TYPE_ARRAY_COLLECTION:
                 return ArrayCollection::class;
+            case self::TYPE_GENERATOR:
+                return \Generator::class;
+            case self::TYPE_ARRAY_ITERATOR:
+            case self::TYPE_ITERATOR:
+                return \ArrayIterator::class;
             default:
-                return is_a($name, Collection::class, true) ? $name : null;
+                return is_a($name, \Traversable::class, true) ? $name : null;
         }
     }
 }

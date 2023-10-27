@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Liip\MetadataParser\TypeParser;
 
 use Doctrine\Common\Annotations\PhpParser;
-use Doctrine\Common\Collections\Collection;
 use Liip\MetadataParser\Exception\InvalidTypeException;
 use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
@@ -57,12 +56,12 @@ final class PhpTypeParser
             }
         }
 
-        $collectionClass = null;
+        $traversableClass = null;
         $filteredTypes = [];
         foreach ($types as $type) {
             $resolvedClass = $this->resolveClass($type, $declaringClass);
-            if (is_a($resolvedClass, Collection::class, true)) {
-                $collectionClass = $resolvedClass;
+            if (is_a($resolvedClass, \Traversable::class, true)) {
+                $traversableClass = $resolvedClass;
             } else {
                 $filteredTypes[] = $type;
             }
@@ -75,7 +74,7 @@ final class PhpTypeParser
             throw new InvalidTypeException(sprintf('Multiple types are not supported (%s)', $rawType));
         }
 
-        return $this->createType($filteredTypes[0], $nullable, $declaringClass, $collectionClass);
+        return $this->createType($filteredTypes[0], $nullable, $declaringClass, $traversableClass);
     }
 
     /**
@@ -90,7 +89,7 @@ final class PhpTypeParser
         throw new InvalidTypeException(sprintf('No type information found, got %s but expected %s', \ReflectionType::class, \ReflectionNamedType::class));
     }
 
-    private function createType(string $rawType, bool $nullable, \ReflectionClass $reflClass = null, string $collectionClass = null): PropertyType
+    private function createType(string $rawType, bool $nullable, \ReflectionClass $reflClass = null, string $traversableClass = null): PropertyType
     {
         if (self::TYPE_ARRAY === $rawType) {
             return new PropertyTypeIterable(new PropertyTypeUnknown(false), false, $nullable);
@@ -99,12 +98,12 @@ final class PhpTypeParser
         if (self::TYPE_ARRAY_SUFFIX === substr($rawType, -\strlen(self::TYPE_ARRAY_SUFFIX))) {
             $rawSubType = substr($rawType, 0, \strlen($rawType) - \strlen(self::TYPE_ARRAY_SUFFIX));
 
-            return new PropertyTypeIterable($this->createType($rawSubType, false, $reflClass), false, $nullable, $collectionClass);
+            return new PropertyTypeIterable($this->createType($rawSubType, false, $reflClass), false, $nullable, $traversableClass);
         }
         if (self::TYPE_HASHMAP_SUFFIX === substr($rawType, -\strlen(self::TYPE_HASHMAP_SUFFIX))) {
             $rawSubType = substr($rawType, 0, \strlen($rawType) - \strlen(self::TYPE_HASHMAP_SUFFIX));
 
-            return new PropertyTypeIterable($this->createType($rawSubType, false, $reflClass), true, $nullable, $collectionClass);
+            return new PropertyTypeIterable($this->createType($rawSubType, false, $reflClass), true, $nullable, $traversableClass);
         }
 
         if (self::TYPE_RESOURCE === $rawType) {

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Liip\MetadataParser\Metadata;
 
-use Doctrine\Common\Collections\Collection;
+use Traversable;
 
 /**
- * This property type can be merged with PropertyTypeClass<T>, provided that T is, inherits from, or is a parent class of $this->collectionClass
+ * This property type can be merged with PropertyTypeClass<T>, provided that T is, inherits from, or is a parent class of {@see PropertyTypeIterable::traversableClass}
  * This property type can be merged with PropertyTypeIterable, if :
  *  - we're not merging a plain array PropertyTypeIterable into a hashmap one,
- *  - and the collection classes of each are either not present on both sides, or are the same, or parent-child of one another
+ *  - and the traversable classes of each are either not present on either sides, or are the same, or parent-child of one another
  */
 final class PropertyTypeIterable extends AbstractPropertyType
 {
@@ -105,7 +105,7 @@ final class PropertyTypeIterable extends AbstractPropertyType
         $thisTraversableClass = $this->isTraversable() ? $this->getTraversableClass() : null;
 
         if ($other instanceof PropertyTypeUnknown) {
-            return new self($this->subType, $this->isHashmap(), $nullable, $thisTraversableClass);
+            return new self($this->getSubType(), $this->isHashmap(), $nullable, $thisTraversableClass);
         }
         if ($this->isTraversable() && (($other instanceof PropertyTypeClass) && is_a($other->getClassName(), \Traversable::class, true))) {
             return new self($this->getSubType(), $this->isHashmap(), $nullable, $this->findCommonTraversableClass($thisTraversableClass, $other->getClassName()));

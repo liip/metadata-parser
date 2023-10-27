@@ -30,7 +30,7 @@ class PropertyTypeIterableTest extends TestCase
         $subType = new PropertyTypePrimitive('int', false);
         $list = new PropertyTypeIterable($subType, false, false);
 
-        $this->assertFalse($list->isTraversable()); 
+        $this->assertFalse($list->isTraversable());
     }
 
     public function testConcreteCollectionClassIsKept(): void
@@ -39,7 +39,6 @@ class PropertyTypeIterableTest extends TestCase
         $collection = new PropertyTypeIterable($subType, false, false, ArrayCollection::class);
 
         $this->assertTrue($collection->isTraversable());
-        $this->assertNotSame(\Traversable::class, $collection->getTraversableClass());
         $this->assertSame(ArrayCollection::class, $collection->getTraversableClass());
     }
 
@@ -63,7 +62,7 @@ class PropertyTypeIterableTest extends TestCase
         /* @var PropertyTypeIterable $result */
         $this->assertTrue($result->isTraversable());
         $this->assertSame((string) $defaultCollection->getSubType(), (string) $result->getSubType());
-        $this->assertSame(\Traversable::class, $result->getTraversableClass());
+        $this->assertSame(Collection::class, $result->getTraversableClass());
     }
 
     public function testMergeClassInterfaceCollectionWithConcreteCollectionList(): void
