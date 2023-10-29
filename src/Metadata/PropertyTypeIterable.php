@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Liip\MetadataParser\Metadata;
 
-use Traversable;
-
 /**
  * This property type can be merged with PropertyTypeClass<T>, provided that T is, inherits from, or is a parent class of {@see PropertyTypeIterable::traversableClass}
  * This property type can be merged with PropertyTypeIterable, if :

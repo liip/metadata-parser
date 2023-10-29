@@ -107,7 +107,7 @@ final class JMSTypeParser
         throw new InvalidTypeException(sprintf('Unknown JMS property found (%s)', var_export($typeInfo, true)));
     }
 
-    public function getTraversableClass(string $name): ?string
+    private function getTraversableClass(string $name): ?string
     {
         switch ($name) {
             case self::TYPE_ARRAY_COLLECTION:
