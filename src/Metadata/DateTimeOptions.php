@@ -30,7 +30,7 @@ final class DateTimeOptions implements \JsonSerializable
     {
         $this->format = $format;
         $this->zone = $zone;
-        $deserializeFormat = is_string($deserializeFormat) ? [$deserializeFormat] : $deserializeFormat;
+        $deserializeFormat = \is_string($deserializeFormat) ? [$deserializeFormat] : $deserializeFormat;
         $this->deserializeFormats = $allDeserializeFormats ?: $deserializeFormat;
     }
 

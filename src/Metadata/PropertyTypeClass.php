@@ -71,6 +71,9 @@ final class PropertyTypeClass extends AbstractPropertyType
         if (is_a($this->getClassName(), Collection::class, true) && (($other instanceof PropertyTypeIterable) && $other->isCollection())) {
             return $other->merge($this);
         }
+        if (is_a($this->getClassName(), \DateTimeInterface::class, true) && ($other instanceof PropertyTypeDateTime)) {
+            return $other->merge($this);
+        }
         if (!$other instanceof self) {
             throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be the same or unknown', self::class, \get_class($other)));
         }
