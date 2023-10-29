@@ -31,7 +31,7 @@ final class DateTimeOptions implements \JsonSerializable
         $this->format = $format;
         $this->zone = $zone;
         $deserializeFormat = is_string($deserializeFormat) ? [$deserializeFormat] : $deserializeFormat;
-        $this->deserializeFormats = $allDeserializeFormats ?: array_filter([$deserializeFormat ?? $format]);
+        $this->deserializeFormats = $allDeserializeFormats ?: $deserializeFormat;
     }
 
     public function getFormat(): ?string
@@ -44,9 +44,12 @@ final class DateTimeOptions implements \JsonSerializable
         return $this->zone;
     }
 
+    /**
+     * @deprecated Please use {@see getDeserializeFormats}
+     */
     public function getDeserializeFormat(): ?string
     {
-        foreach ($this->deserializeFormats as $format) {
+        foreach ($this->deserializeFormats ?? [] as $format) {
             return $format;
         }
 
