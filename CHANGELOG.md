@@ -2,6 +2,11 @@
 
 # Version 2.x
 
+# 2.0.0 (unreleased)
+
+* Removed `PropertyTypeArray`, which is superseeded by `PropertyTypeIterable`.
+
+
 # Version 1.x
 
 # 1.2.0
