@@ -84,7 +84,9 @@ final class JMSTypeParser
         if (PropertyTypeDateTime::isTypeDateTime($typeInfo['name']) || (self::TYPE_DATETIME_INTERFACE === $typeInfo['name'])) {
             // the case of datetime without params is already handled above, we know we have params
             $serializeFormat = $typeInfo['params'][0] ?: null;
-            $deserializeFormats = ($typeInfo['params'][2] ?? null) ?: null;
+            // {@link \JMS\Serializer\Handler\DateHandler} of jms/serializer defaults to using the serialization format as a deserialization format if none was supplied...
+            $deserializeFormats = ($typeInfo['params'][2] ?? null) ?: $serializeFormat;
+            // ... and always converts single strings to arrays
             $deserializeFormats = \is_string($deserializeFormats) ? [$deserializeFormats] : $deserializeFormats;
             // Jms defaults to DateTime when given DateTimeInterface despite the documentation saying DateTimeImmutable, {@see \JMS\Serializer\Handler\DateHandler} in jms/serializer
             $className = (self::TYPE_DATETIME_INTERFACE === $typeInfo['name']) ? \DateTime::class : $typeInfo['name'];
@@ -95,7 +97,7 @@ final class JMSTypeParser
                 new DateTimeOptions(
                     $serializeFormat,
                     ($typeInfo['params'][1] ?? null) ?: null,
-                    $deserializeFormats ?: [$serializeFormat],
+                    $deserializeFormats,
                 )
             );
         }
