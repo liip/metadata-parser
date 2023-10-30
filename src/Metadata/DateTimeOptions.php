@@ -26,12 +26,16 @@ final class DateTimeOptions implements \JsonSerializable
      */
     private $deserializeFormats;
 
-    public function __construct(?string $format, ?string $zone, ?string $deserializeFormat, ?array $allDeserializeFormats = [])
+    /**
+     * @note Passing a string for $deserializeFormats is deprecated, please pass an array instead
+     *
+     * @param string[]|string|null $deserializeFormats
+     */
+    public function __construct(?string $format, ?string $zone, $deserializeFormats = null)
     {
         $this->format = $format;
         $this->zone = $zone;
-        $deserializeFormat = \is_string($deserializeFormat) ? [$deserializeFormat] : $deserializeFormat;
-        $this->deserializeFormats = $allDeserializeFormats ?: $deserializeFormat;
+        $this->deserializeFormats = \is_string($deserializeFormats) ? [$deserializeFormats] : $deserializeFormats;
     }
 
     public function getFormat(): ?string
