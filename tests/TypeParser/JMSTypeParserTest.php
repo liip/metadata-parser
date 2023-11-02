@@ -122,7 +122,7 @@ class JMSTypeParserTest extends TestCase
             'DateTime|null',
             'Y-m-d H:i:s',
             null,
-            ['Y-m-d H:i:s'],
+            'Y-m-d H:i:s',
         ];
 
         yield [
@@ -138,7 +138,7 @@ class JMSTypeParserTest extends TestCase
             'DateTime|null',
             null,
             null,
-            ['Y-m-d'],
+            'Y-m-d',
         ];
 
         yield [
@@ -146,7 +146,7 @@ class JMSTypeParserTest extends TestCase
             'DateTime|null',
             'Y-m-d H:i:s',
             'Europe/Zurich',
-            ['Y-m-d'],
+            'Y-m-d',
         ];
 
         yield [
@@ -162,7 +162,7 @@ class JMSTypeParserTest extends TestCase
             'DateTimeImmutable|null',
             'Y-m-d H:i:s',
             null,
-            ['Y-m-d H:i:s'],
+            'Y-m-d H:i:s',
         ];
 
         yield [
@@ -178,7 +178,7 @@ class JMSTypeParserTest extends TestCase
             'DateTimeImmutable|null',
             null,
             null,
-            ['Y-m-d'],
+            'Y-m-d',
         ];
 
         yield [
@@ -186,14 +186,14 @@ class JMSTypeParserTest extends TestCase
             'DateTimeImmutable|null',
             'Y-m-d H:i:s',
             'Europe/Zurich',
-            ['Y-m-d'],
+            'Y-m-d',
         ];
     }
 
     /**
      * @dataProvider provideDateTimeTypeCases
      */
-    public function testDateTimeType(string $rawType, string $expectedType, ?string $expectedFormat, ?string $expectedZone, ?array $expectedDeserializeFormats): void
+    public function testDateTimeType(string $rawType, string $expectedType, ?string $expectedFormat, ?string $expectedZone, ?string $expectedDeserializeFormat): void
     {
         /** @var PropertyTypeDateTime $type */
         $type = $this->parser->parse($rawType);
@@ -201,7 +201,8 @@ class JMSTypeParserTest extends TestCase
         $this->assertSame($expectedType, (string) $type, 'Type should match');
         $this->assertSame($expectedFormat, $type->getFormat(), 'Date time format should match');
         $this->assertSame($expectedZone, $type->getZone(), 'Date time zone should match');
-        $this->assertSame($expectedDeserializeFormats, $type->getDeserializeFormats(), 'Date time deserialize format should match');
+        $this->assertSame($expectedDeserializeFormat, $type->getDeserializeFormat(), 'Date time deserialize format should match');
+        $this->assertSame($expectedDeserializeFormat ? [$expectedDeserializeFormat] : null, $type->getDeserializeFormats(), 'Date time deserialize format should match');
     }
 
     public function testInvalidTypeWithParameters(): void

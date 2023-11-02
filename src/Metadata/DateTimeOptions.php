@@ -31,7 +31,7 @@ final class DateTimeOptions implements \JsonSerializable
      *
      * @param string[]|string|null $deserializeFormats
      */
-    public function __construct(?string $format, ?string $zone, $deserializeFormats = null)
+    public function __construct(?string $format, ?string $zone, $deserializeFormats)
     {
         $this->format = $format;
         $this->zone = $zone;
