@@ -20,17 +20,22 @@ final class DateTimeOptions implements \JsonSerializable
     private $zone;
 
     /**
-     * Use if a different format should be used for parsing dates than for generating dates.
+     * Use if different formats should be used for parsing dates than for generating dates.
      *
-     * @var string|null
+     * @var string[]|null
      */
-    private $deserializeFormat;
+    private $deserializeFormats;
 
-    public function __construct(?string $format, ?string $zone, ?string $deserializeFormat)
+    /**
+     * @note Passing a string for $deserializeFormats is deprecated, please pass an array instead
+     *
+     * @param string[]|string|null $deserializeFormats
+     */
+    public function __construct(?string $format, ?string $zone, $deserializeFormats)
     {
         $this->format = $format;
         $this->zone = $zone;
-        $this->deserializeFormat = $deserializeFormat;
+        $this->deserializeFormats = \is_string($deserializeFormats) ? [$deserializeFormats] : $deserializeFormats;
     }
 
     public function getFormat(): ?string
@@ -43,9 +48,21 @@ final class DateTimeOptions implements \JsonSerializable
         return $this->zone;
     }
 
+    /**
+     * @deprecated Please use {@see getDeserializeFormats}
+     */
     public function getDeserializeFormat(): ?string
     {
-        return $this->deserializeFormat;
+        foreach ($this->deserializeFormats ?? [] as $format) {
+            return $format;
+        }
+
+        return null;
+    }
+
+    public function getDeserializeFormats(): ?array
+    {
+        return $this->deserializeFormats;
     }
 
     public function jsonSerialize(): array
@@ -53,7 +70,8 @@ final class DateTimeOptions implements \JsonSerializable
         return array_filter([
             'format' => $this->format,
             'zone' => $this->zone,
-            'deserialize_format' => $this->deserializeFormat,
+            'deserialize_format' => $this->getDeserializeFormat(),
+            'deserialize_formats' => $this->deserializeFormats,
         ]);
     }
 }

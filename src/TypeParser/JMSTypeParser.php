@@ -20,6 +20,7 @@ final class JMSTypeParser
 {
     private const TYPE_ARRAY = 'array';
     private const TYPE_ARRAY_COLLECTION = 'ArrayCollection';
+    private const TYPE_DATETIME_INTERFACE = 'DateTimeInterface';
 
     /**
      * @var Parser
@@ -80,15 +81,23 @@ final class JMSTypeParser
             throw new InvalidTypeException(sprintf('JMS property type array can\'t have more than 2 parameters (%s)', var_export($typeInfo, true)));
         }
 
-        if (PropertyTypeDateTime::isTypeDateTime($typeInfo['name'])) {
+        if (PropertyTypeDateTime::isTypeDateTime($typeInfo['name']) || (self::TYPE_DATETIME_INTERFACE === $typeInfo['name'])) {
             // the case of datetime without params is already handled above, we know we have params
+            $serializeFormat = $typeInfo['params'][0] ?: null;
+            // {@link \JMS\Serializer\Handler\DateHandler} of jms/serializer defaults to using the serialization format as a deserialization format if none was supplied...
+            $deserializeFormats = ($typeInfo['params'][2] ?? null) ?: $serializeFormat;
+            // ... and always converts single strings to arrays
+            $deserializeFormats = \is_string($deserializeFormats) ? [$deserializeFormats] : $deserializeFormats;
+            // Jms defaults to DateTime when given DateTimeInterface despite the documentation saying DateTimeImmutable, {@see \JMS\Serializer\Handler\DateHandler} in jms/serializer
+            $className = (self::TYPE_DATETIME_INTERFACE === $typeInfo['name']) ? \DateTime::class : $typeInfo['name'];
+
             return PropertyTypeDateTime::fromDateTimeClass(
-                $typeInfo['name'],
+                $className,
                 $nullable,
                 new DateTimeOptions(
-                    $typeInfo['params'][0] ?: null,
+                    $serializeFormat,
                     ($typeInfo['params'][1] ?? null) ?: null,
-                    ($typeInfo['params'][2] ?? null) ?: null
+                    $deserializeFormats,
                 )
             );
         }

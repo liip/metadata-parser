@@ -122,7 +122,7 @@ class JMSTypeParserTest extends TestCase
             'DateTime|null',
             'Y-m-d H:i:s',
             null,
-            null,
+            'Y-m-d H:i:s',
         ];
 
         yield [
@@ -162,7 +162,7 @@ class JMSTypeParserTest extends TestCase
             'DateTimeImmutable|null',
             'Y-m-d H:i:s',
             null,
-            null,
+            'Y-m-d H:i:s',
         ];
 
         yield [
@@ -202,6 +202,7 @@ class JMSTypeParserTest extends TestCase
         $this->assertSame($expectedFormat, $type->getFormat(), 'Date time format should match');
         $this->assertSame($expectedZone, $type->getZone(), 'Date time zone should match');
         $this->assertSame($expectedDeserializeFormat, $type->getDeserializeFormat(), 'Date time deserialize format should match');
+        $this->assertSame($expectedDeserializeFormat ? [$expectedDeserializeFormat] : null, $type->getDeserializeFormats(), 'Date time deserialize format should match');
     }
 
     public function testInvalidTypeWithParameters(): void
