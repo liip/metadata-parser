@@ -166,7 +166,7 @@ class PhpTypeParserTest extends TestCase
     {
         $type = $this->parser->parseAnnotationType($rawType, new \ReflectionClass($this));
         self::assertInstanceOf(PropertyTypeIterable::class, $type);
-        self::assertTrue($type->isCollection());
+        self::assertTrue($type->isTraversable());
     }
 
     public function testMultiType(): void

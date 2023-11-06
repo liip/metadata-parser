@@ -63,14 +63,34 @@ class PropertyTypeArray extends AbstractPropertyType
         return $this->subType;
     }
 
+    /**
+     * @deprecated Please prefer using {@link isTraversable}
+     */
     public function isCollection(): bool
     {
         return $this->isCollection;
     }
 
+    /**
+     * @deprecated Please prefer using {@link getTraversableClass}
+     */
     public function getCollectionClass(): ?string
     {
         return $this->isCollection() ? Collection::class : null;
+    }
+
+    public function isTraversable(): bool
+    {
+        return $this->isCollection;
+    }
+
+    public function getTraversableClass(): string
+    {
+        if (!$this->isTraversable()) {
+            throw new \UnexpectedValueException("Iterable type '{$this}' is not traversable.");
+        }
+
+        return \Traversable::class;
     }
 
     /**

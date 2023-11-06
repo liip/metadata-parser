@@ -17,52 +17,73 @@ final class PropertyTypeIterable extends PropertyTypeArray
     /**
      * @var string
      */
-    private $collectionClass;
+    private $traversableClass;
 
     /**
-     * @param class-string<\Traversable>|null $collectionClass
+     * @param class-string<\Traversable>|null $traversableClass
      */
-    public function __construct(PropertyType $subType, bool $hashmap, bool $nullable, string $collectionClass = null)
+    public function __construct(PropertyType $subType, bool $hashmap, bool $nullable, string $traversableClass = null)
     {
-        parent::__construct($subType, $hashmap, $nullable, null != $collectionClass);
+        parent::__construct($subType, $hashmap, $nullable, null != $traversableClass);
 
-        $this->collectionClass = $collectionClass;
+        $this->traversableClass = $traversableClass;
     }
 
     public function __toString(): string
     {
         if ($this->subType instanceof PropertyTypeUnknown) {
-            return 'array'.($this->isCollection() ? '|\\'.$this->collectionClass : '');
+            return 'array'.($this->isTraversable() ? '|\\'.$this->traversableClass : '');
         }
 
         $array = $this->isHashmap() ? '[string]' : '[]';
-        if ($this->isCollection()) {
+        if ($this->isTraversable()) {
             $collectionType = $this->isHashmap() ? ', string' : '';
-            $array .= sprintf('|\\%s<%s%s>', $this->collectionClass, $this->subType, $collectionType);
+            $array .= sprintf('|\\%s<%s%s>', $this->traversableClass, $this->subType, $collectionType);
         }
 
         return ((string) $this->subType).$array.AbstractPropertyType::__toString();
     }
 
+    /**
+     * @deprecated Please prefer using {@link getTraversableClass}
+     */
     public function getCollectionClass(): ?string
     {
-        return $this->collectionClass;
+        return $this->traversableClass;
     }
 
+    /**
+     * @deprecated Please prefer using {@link isTraversable}
+     */
     public function isCollection(): bool
     {
-        return null != $this->getCollectionClass();
+        return null != $this->getTraversableClass();
+    }
+
+    public function getTraversableClass(): string
+    {
+        if (!$this->isTraversable()) {
+            throw new \UnexpectedValueException("Iterable type '{$this}' is not traversable.");
+        }
+
+        return $this->traversableClass;
+    }
+
+    public function isTraversable(): bool
+    {
+        return null != $this->traversableClass;
     }
 
     public function merge(PropertyType $other): PropertyType
     {
         $nullable = $this->isNullable() && $other->isNullable();
+        $thisTraversableClass = $this->isTraversable() ? $this->getTraversableClass() : null;
 
         if ($other instanceof PropertyTypeUnknown) {
-            return new self($this->subType, $this->isHashmap(), $nullable, $this->getCollectionClass());
+            return new self($this->subType, $this->isHashmap(), $nullable, $thisTraversableClass);
         }
-        if ($this->isCollection() && (($other instanceof PropertyTypeClass) && is_a($other->getClassName(), Collection::class, true))) {
-            return new self($this->getSubType(), $this->isHashmap(), $nullable, $this->findCommonCollectionClass($this->getCollectionClass(), $other->getClassName()));
+        if ($this->isTraversable() && (($other instanceof PropertyTypeClass) && is_a($other->getClassName(), \Traversable::class, true))) {
+            return new self($this->getSubType(), $this->isHashmap(), $nullable, $this->findCommonCollectionClass($thisTraversableClass, $other->getClassName()));
         }
         if (!$other instanceof parent) {
             throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be the same or unknown', self::class, \get_class($other)));
@@ -77,13 +98,9 @@ final class PropertyTypeIterable extends PropertyTypeArray
             throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, can\'t change hashmap into plain array', self::class, \get_class($other)));
         }
 
-        if ($other->isCollection()) {
-            $otherCollectionClass = ($other instanceof self) ? $other->getCollectionClass() : Collection::class;
-        } else {
-            $otherCollectionClass = null;
-        }
+        $otherTraversableClass = $other->isTraversable() ? $other->getTraversableClass() : null;
         $hashmap = $this->isHashmap() || $other->isHashmap();
-        $commonClass = $this->findCommonCollectionClass($this->getCollectionClass(), $otherCollectionClass);
+        $commonClass = $this->findCommonCollectionClass($thisTraversableClass, $otherTraversableClass);
 
         if ($other->getSubType() instanceof PropertyTypeUnknown) {
             return new self($this->getSubType(), $hashmap, $nullable, $commonClass);
@@ -99,7 +116,7 @@ final class PropertyTypeIterable extends PropertyTypeArray
      * Find the most derived class that doesn't deny both class hints, meaning the most derived
      * between left and right if one is a child of the other
      */
-    protected function findCommonCollectionClass(?string $left, ?string $right): ?string
+    private function findCommonCollectionClass(?string $left, ?string $right): ?string
     {
         if (null === $right) {
             return $left;
@@ -115,6 +132,6 @@ final class PropertyTypeIterable extends PropertyTypeArray
             return $right;
         }
 
-        throw new \UnexpectedValueException("Collection classes '{$left}' and '{$right}' do not match.");
+        throw new \UnexpectedValueException("Traversable classes '{$left}' and '{$right}' do not match.");
     }
 }
