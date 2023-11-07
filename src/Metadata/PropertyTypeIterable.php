@@ -46,12 +46,12 @@ final class PropertyTypeIterable extends PropertyTypeArray
 
     /**
      * @deprecated Please prefer using {@link getTraversableClass}
+     *
      * @return class-string<Collection>|null
      */
     public function getCollectionClass(): ?string
     {
         return $this->isCollection() ? null : $this->traversableClass;
-
     }
 
     /**
@@ -63,7 +63,7 @@ final class PropertyTypeIterable extends PropertyTypeArray
     }
 
     /**
-     * @return class-string<\Traversable>|null
+     * @return class-string<\Traversable>
      */
     public function getTraversableClass(): string
     {
