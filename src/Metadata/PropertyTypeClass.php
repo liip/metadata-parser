@@ -68,7 +68,7 @@ final class PropertyTypeClass extends AbstractPropertyType
         if ($other instanceof PropertyTypeUnknown) {
             return new self($this->className, $nullable);
         }
-        if (is_a($this->getClassName(), Collection::class, true) && (($other instanceof PropertyTypeIterable) && $other->isCollection())) {
+        if (is_a($this->getClassName(), Collection::class, true) && (($other instanceof PropertyTypeIterable) && $other->isTraversable())) {
             return $other->merge($this);
         }
         if (is_a($this->getClassName(), \DateTimeInterface::class, true) && ($other instanceof PropertyTypeDateTime)) {
