@@ -4,12 +4,13 @@
 
 # Version 1.x
 
-# 1.2.0 (unreleased)
+# 1.2.0
 
 * DateTimeOptions now features a list of deserialization formats instead of a single string one. Passing a string instead of an array to its `__construct`or is deprecated, and will be forbidden in the next version
   Similarly, `getDeserializeFormat(): ?string` is deprecated in favor of `getDeserializeFormats(): ?array`
 * Added `PropertyTypeIterable`, which generalizes `PropertyTypeArray` to allow merging Collection informations like one would with arrays, including between interfaces and concrete classes
 * Deprecated `PropertyTypeArray`, please prefer using `PropertyTypeIterable` instead
+* `PropertyTypeArray::isCollection()` and `PropertyTypeArray::getCollectionClass()` are deprecated, including in its child classes, in favor of `isTraversable()` and `getTraversableClass()`
 * Added a model parser `VisibilityAwarePropertyAccessGuesser` that tries to guess getter and setter methods for non-public properties.
 
 # 1.1.0
