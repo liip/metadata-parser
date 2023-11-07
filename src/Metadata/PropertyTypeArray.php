@@ -73,6 +73,7 @@ class PropertyTypeArray extends AbstractPropertyType
 
     /**
      * @deprecated Please prefer using {@link getTraversableClass}
+     * @return class-string<Collection>|null
      */
     public function getCollectionClass(): ?string
     {
@@ -84,6 +85,9 @@ class PropertyTypeArray extends AbstractPropertyType
         return $this->isCollection;
     }
 
+    /**
+     * @return class-string<\Traversable>|null
+     */
     public function getTraversableClass(): string
     {
         if (!$this->isTraversable()) {
