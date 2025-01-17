@@ -38,6 +38,10 @@ $config
             'static_lambda' => true,
             'ternary_to_null_coalescing' => true,
             'void_return' => true,
+            'new_with_parentheses' => false,
+            'php_unit_data_provider_static' => false,
+            'php_unit_data_provider_name' => false,
+            'php_unit_data_provider_return_type' => false,
 
             // Don't mark tests as @internal
             'php_unit_internal_class' => false,
