@@ -149,7 +149,7 @@ class PhpTypeParserTest extends TestCase
     /**
      * @dataProvider providePropertyTypeCases
      */
-    public function testPropertyType(string $rawType, string $expectedType, bool $expectedNullable = null): void
+    public function testPropertyType(string $rawType, string $expectedType, ?bool $expectedNullable = null): void
     {
         $type = $this->parser->parseAnnotationType($rawType, new \ReflectionClass($this));
 
@@ -259,7 +259,7 @@ class PhpTypeParserTest extends TestCase
     /**
      * @dataProvider provideReflectionTypeCases
      */
-    public function testReflectionType(\ReflectionType $reflType, string $expectedType, bool $expectedNullable = null): void
+    public function testReflectionType(\ReflectionType $reflType, string $expectedType, ?bool $expectedNullable = null): void
     {
         $type = $this->parser->parseReflectionType($reflType);
 

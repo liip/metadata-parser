@@ -58,7 +58,7 @@ final class ParameterMetadata implements \JsonSerializable
     public function getDefaultValue()
     {
         if ($this->required) {
-            throw new \BadMethodCallException(sprintf('Parameter %s is required and therefore has no default value', (string) $this));
+            throw new \BadMethodCallException(\sprintf('Parameter %s is required and therefore has no default value', (string) $this));
         }
 
         return $this->defaultValue;

@@ -124,7 +124,7 @@ final class ClassMetadata implements \JsonSerializable
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('Class %s has no constructor parameter called "%s"', $this->className, $name));
+        throw new \InvalidArgumentException(\sprintf('Class %s has no constructor parameter called "%s"', $this->className, $name));
     }
 
     /**

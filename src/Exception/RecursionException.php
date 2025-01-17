@@ -12,7 +12,7 @@ final class RecursionException extends SchemaException
 
     public static function forClass(string $className, RecursionContext $context): self
     {
-        return new self(sprintf(
+        return new self(\sprintf(
             self::FOR_CLASS,
             $className,
             (string) $context

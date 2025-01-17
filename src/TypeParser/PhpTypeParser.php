@@ -71,7 +71,7 @@ final class PhpTypeParser
             return new PropertyTypeUnknown($nullable);
         }
         if (\count($filteredTypes) > 1) {
-            throw new InvalidTypeException(sprintf('Multiple types are not supported (%s)', $rawType));
+            throw new InvalidTypeException(\sprintf('Multiple types are not supported (%s)', $rawType));
         }
 
         return $this->createType($filteredTypes[0], $nullable, $declaringClass, $traversableClass);
@@ -86,10 +86,10 @@ final class PhpTypeParser
             return $this->createType($reflType->getName(), $reflType->allowsNull());
         }
 
-        throw new InvalidTypeException(sprintf('No type information found, got %s but expected %s', \ReflectionType::class, \ReflectionNamedType::class));
+        throw new InvalidTypeException(\sprintf('No type information found, got %s but expected %s', \ReflectionType::class, \ReflectionNamedType::class));
     }
 
-    private function createType(string $rawType, bool $nullable, \ReflectionClass $reflClass = null, string $traversableClass = null): PropertyType
+    private function createType(string $rawType, bool $nullable, ?\ReflectionClass $reflClass = null, ?string $traversableClass = null): PropertyType
     {
         if (self::TYPE_ARRAY === $rawType) {
             return new PropertyTypeIterable(new PropertyTypeUnknown(false), false, $nullable);
@@ -123,7 +123,7 @@ final class PhpTypeParser
         return new PropertyTypeClass($resolvedClass, $nullable);
     }
 
-    private function resolveClass(string $className, \ReflectionClass $reflClass = null): string
+    private function resolveClass(string $className, ?\ReflectionClass $reflClass = null): string
     {
         // leading backslash means absolute class name
         if (0 === strpos($className, '\\')) {

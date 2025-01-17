@@ -32,7 +32,7 @@ final class PropertyTypePrimitive extends AbstractPropertyType
             $typeName = self::TYPE_MAP[$typeName];
         }
         if (!self::isTypePrimitive($typeName)) {
-            throw new \UnexpectedValueException(sprintf('Given type "%s" is not primitive', $typeName));
+            throw new \UnexpectedValueException(\sprintf('Given type "%s" is not primitive', $typeName));
         }
         $this->typeName = $typeName;
     }
@@ -55,10 +55,10 @@ final class PropertyTypePrimitive extends AbstractPropertyType
             return new self($this->typeName, $nullable);
         }
         if (!$other instanceof self) {
-            throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be the same or unknown', self::class, \get_class($other)));
+            throw new \UnexpectedValueException(\sprintf('Can\'t merge type %s with %s, they must be the same or unknown', self::class, \get_class($other)));
         }
         if ($this->getTypeName() !== $other->getTypeName()) {
-            throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be equal', self::class, \get_class($other)));
+            throw new \UnexpectedValueException(\sprintf('Can\'t merge type %s with %s, they must be equal', self::class, \get_class($other)));
         }
 
         return new self($this->typeName, $nullable);

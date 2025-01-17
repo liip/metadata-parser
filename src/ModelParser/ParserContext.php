@@ -33,7 +33,7 @@ final class ParserContext
             return $propertyMetadata->getName();
         }, $this->stack);
 
-        return sprintf('%s->%s', $this->root, implode('->', $stack));
+        return \sprintf('%s->%s', $this->root, implode('->', $stack));
     }
 
     public function push(PropertyVariationMetadata $property): self

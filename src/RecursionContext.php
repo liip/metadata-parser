@@ -37,7 +37,7 @@ final class RecursionContext
             return $propertyMetadata->getSerializedName();
         }, $this->stack);
 
-        return sprintf('%s->%s', $this->root, implode('->', $stack));
+        return \sprintf('%s->%s', $this->root, implode('->', $stack));
     }
 
     public function push(PropertyMetadata $property): self

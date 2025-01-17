@@ -80,7 +80,7 @@ final class JMSTypeParser
                 return new PropertyTypeIterable($this->parseType($typeInfo['params'][1], true), true, $nullable, $traversableClass);
             }
 
-            throw new InvalidTypeException(sprintf('JMS property type array can\'t have more than 2 parameters (%s)', var_export($typeInfo, true)));
+            throw new InvalidTypeException(\sprintf('JMS property type array can\'t have more than 2 parameters (%s)', var_export($typeInfo, true)));
         }
 
         if (PropertyTypeDateTime::isTypeDateTime($typeInfo['name']) || (self::TYPE_DATETIME_INTERFACE === $typeInfo['name'])) {
@@ -104,7 +104,7 @@ final class JMSTypeParser
             );
         }
 
-        throw new InvalidTypeException(sprintf('Unknown JMS property found (%s)', var_export($typeInfo, true)));
+        throw new InvalidTypeException(\sprintf('Unknown JMS property found (%s)', var_export($typeInfo, true)));
     }
 
     private function getTraversableClass(string $name): ?string

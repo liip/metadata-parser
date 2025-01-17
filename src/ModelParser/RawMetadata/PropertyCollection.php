@@ -34,7 +34,7 @@ final class PropertyCollection implements \JsonSerializable
             return $name;
         }
 
-        return strtolower(preg_replace('/[A-Z]/', '_\\0', $name));
+        return strtolower(preg_replace('/[A-Z]/', '_\0', $name));
     }
 
     public static function useIdenticalNamingStrategy($value = true): void
@@ -106,7 +106,7 @@ final class PropertyCollection implements \JsonSerializable
     {
         $property = $this->findVariation($name);
         if (null === $property) {
-            throw new \UnexpectedValueException(sprintf('Property variation %s not found on PropertyCollection %s', $name, $this->serializedName));
+            throw new \UnexpectedValueException(\sprintf('Property variation %s not found on PropertyCollection %s', $name, $this->serializedName));
         }
 
         return $property;

@@ -11,7 +11,6 @@ namespace Liip\MetadataParser\Annotation;
  * different versions with JMS serializer, and not specifying any version.
  *
  * @Annotation
- *
  * @Target({"METHOD", "PROPERTY"})
  */
 final class Preferred
