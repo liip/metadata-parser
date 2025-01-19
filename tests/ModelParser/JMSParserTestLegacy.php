@@ -14,7 +14,7 @@ class JMSParserTestLegacy extends JMSParserTestCase
 {
     public function testReadOnlyProperty(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\ReadOnly()
              */

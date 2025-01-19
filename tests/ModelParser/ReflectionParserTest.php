@@ -45,7 +45,7 @@ class ReflectionParserTest extends TestCase
 
     public function testEmpty(): void
     {
-        $c = new class() {
+        $c = new class {
         };
 
         $rawClassMetadata = new RawClassMetadata(\get_class($c));
@@ -57,7 +57,7 @@ class ReflectionParserTest extends TestCase
 
     public function testProperties(): void
     {
-        $c = new class() {
+        $c = new class {
             private $property1;
             protected $property2;
             public $property3;
@@ -157,7 +157,7 @@ class ReflectionParserTest extends TestCase
 
     public function testPrefilledClassMetadata(): void
     {
-        $c = new class() {
+        $c = new class {
             private $property1;
             private $property2;
         };
@@ -182,7 +182,7 @@ class ReflectionParserTest extends TestCase
 
     public function testInheritedProperties(): void
     {
-        $c = new class() extends ReflectionBaseModel {
+        $c = new class extends ReflectionBaseModel {
             private $property1;
             public $parentProperty2;
         };

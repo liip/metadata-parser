@@ -36,7 +36,7 @@ class PhpDocParserTest extends TestCase
 
     public function testEmpty(): void
     {
-        $c = new class() {
+        $c = new class {
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
@@ -57,7 +57,7 @@ class PhpDocParserTest extends TestCase
 
     public function testInvalidType(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @var resource
              */
@@ -71,10 +71,10 @@ class PhpDocParserTest extends TestCase
         $this->parser->parse($classMetadata);
     }
 
-    public function providePropertyCases(): iterable
+    public static function providePropertyCases(): iterable
     {
         yield [
-            new class() {
+            new class {
                 private $property;
             },
             PropertyTypeUnknown::class,
@@ -83,7 +83,7 @@ class PhpDocParserTest extends TestCase
         ];
 
         yield [
-            new class() {
+            new class {
                 /**
                  * Test property with docblock but no type
                  */
@@ -95,7 +95,7 @@ class PhpDocParserTest extends TestCase
         ];
 
         yield [
-            new class() {
+            new class {
                 private $property;
             },
             PropertyTypeUnknown::class,
@@ -104,7 +104,7 @@ class PhpDocParserTest extends TestCase
         ];
 
         yield [
-            new class() {
+            new class {
                 /**
                  * @var int|null
                  */
@@ -116,7 +116,7 @@ class PhpDocParserTest extends TestCase
         ];
 
         yield [
-            new class() {
+            new class {
                 /**
                  * @var \stdClass|null
                  */
@@ -147,7 +147,7 @@ class PhpDocParserTest extends TestCase
 
     public function testPrefilledClassMetadata(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @var string
              */
@@ -179,7 +179,7 @@ class PhpDocParserTest extends TestCase
 
     public function testUpgradeArrayOfUnknown(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @var string[]
              */
@@ -203,7 +203,7 @@ class PhpDocParserTest extends TestCase
 
     public function testInheritedProperty(): void
     {
-        $c = new class() extends BaseModel {
+        $c = new class extends BaseModel {
             /**
              * @var string
              */
@@ -239,7 +239,7 @@ class PhpDocParserTest extends TestCase
 
     public function testNestedProperty(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @var Nested
              */

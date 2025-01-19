@@ -43,7 +43,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testEmpty(): void
     {
-        $c = new class() {
+        $c = new class {
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
@@ -67,7 +67,7 @@ abstract class JMSParserTestCase extends TestCase
         /**
          * @JMS\AccessType
          */
-        $c = new class() {
+        $c = new class {
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
@@ -82,7 +82,7 @@ abstract class JMSParserTestCase extends TestCase
         /**
          * @JMS\AccessType("public_method")
          */
-        $c = new class() {
+        $c = new class {
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
@@ -97,7 +97,7 @@ abstract class JMSParserTestCase extends TestCase
         /**
          * @JMS\XmlRoot("foo")
          */
-        $c = new class() {
+        $c = new class {
             private $property;
         };
 
@@ -109,10 +109,10 @@ abstract class JMSParserTestCase extends TestCase
         $this->assertPropertyCollection('property', 1, $props[0]);
     }
 
-    public function providePropertyTypeCases(): iterable
+    public static function providePropertyTypeCases(): iterable
     {
         yield [
-            new class() {
+            new class {
                 private $property;
             },
             PropertyTypeUnknown::class,
@@ -121,7 +121,7 @@ abstract class JMSParserTestCase extends TestCase
         ];
 
         yield [
-            new class() {
+            new class {
                 /**
                  * Test property with docblock but no type
                  */
@@ -133,7 +133,7 @@ abstract class JMSParserTestCase extends TestCase
         ];
 
         yield [
-            new class() {
+            new class {
                 /**
                  * @JMS\Type("string")
                  */
@@ -145,7 +145,7 @@ abstract class JMSParserTestCase extends TestCase
         ];
 
         yield [
-            new class() {
+            new class {
                 /**
                  * @JMS\Type("integer")
                  */
@@ -157,7 +157,7 @@ abstract class JMSParserTestCase extends TestCase
         ];
 
         yield [
-            new class() {
+            new class {
                 /**
                  * @JMS\Type("array<string>")
                  */
@@ -169,7 +169,7 @@ abstract class JMSParserTestCase extends TestCase
         ];
 
         yield [
-            new class() {
+            new class {
                 /**
                  * @JMS\Type("ArrayCollection<string>")
                  */
@@ -181,7 +181,7 @@ abstract class JMSParserTestCase extends TestCase
         ];
 
         yield [
-            new class() {
+            new class {
                 /**
                  * @JMS\Type("Doctrine\Common\Collections\ArrayCollection<string>")
                  */
@@ -193,7 +193,7 @@ abstract class JMSParserTestCase extends TestCase
         ];
 
         yield [
-            new class() {
+            new class {
                 /**
                  * @JMS\Type("ArrayCollection<string, int>")
                  */
@@ -224,7 +224,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testNestedProperty(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\Type("Tests\Liip\MetadataParser\ModelParser\Model\Nested")
              */
@@ -248,7 +248,7 @@ abstract class JMSParserTestCase extends TestCase
         if (!class_exists(NamedArgumentConstructor::class)) {
             $this->markTestSkipped('Before doctrine/annotations 1.12, the exception message is different');
         }
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\Type("__invalid__")
              */
@@ -264,7 +264,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testInheritedProperty(): void
     {
-        $c = new class() extends BaseModel {
+        $c = new class extends BaseModel {
             /**
              * @JMS\Type("string")
              */
@@ -304,7 +304,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testSerializedName(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\SerializedName("foo")
              */
@@ -323,7 +323,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testIdenticalNamingStrategy(): void
     {
-        $c = new class() {
+        $c = new class {
             private $myProperty;
             private $mySecondProperty;
         };
@@ -343,7 +343,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testSerializedNameTwice(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\SerializedName("foo")
              */
@@ -368,7 +368,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testSerializedNameMerge(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\SerializedName("links")
              *
@@ -397,7 +397,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testSerializedNamePrefilled(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\SerializedName("foo")
              */
@@ -417,7 +417,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testSerializedNamePrefilledMerge(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\SerializedName("links")
              *
@@ -448,7 +448,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testExclude(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\Exclude
              */
@@ -467,7 +467,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testExcludePrefilled(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\Exclude
              */
@@ -489,7 +489,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testExcludePartial(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\SerializedName("foo")
              */
@@ -515,7 +515,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testConditionalExclude(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\Exclude(if="foo")
              */
@@ -532,7 +532,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testGroups(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\Groups({"group1", "group2"})
              */
@@ -551,7 +551,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testAccessor(): void
     {
-        $c = new class() {
+        $c = new class {
             private $property;
 
             /**
@@ -591,7 +591,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testVersionRange(): void
     {
-        $c = new class() {
+        $c = new class {
             private $property1;
 
             /**
@@ -643,7 +643,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testInvalidPropertyAnnotations(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\Type
              */
@@ -659,7 +659,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testPropertyXmlAnnotations(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\Type("string")
              *
@@ -686,7 +686,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testUnsupportedPropertyAnnotations(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\Type("string")
              *
@@ -707,7 +707,7 @@ abstract class JMSParserTestCase extends TestCase
         /**
          * @JMS\AccessorOrder("custom", custom={"foo", "proPerty4", "proPerty1", "propPerty1"})
          */
-        $c = new class() {
+        $c = new class {
             private $proPerty1;
             /**
              * @JMS\SerializedName("foo")
@@ -736,7 +736,7 @@ abstract class JMSParserTestCase extends TestCase
         /**
          * @JMS\AccessorOrder("foo")
          */
-        $c = new class() {
+        $c = new class {
             private $property;
         };
 
@@ -752,7 +752,7 @@ abstract class JMSParserTestCase extends TestCase
         /**
          * @JMS\ExclusionPolicy("NONE")
          */
-        $c = new class() {
+        $c = new class {
             private $property;
         };
 
@@ -769,7 +769,7 @@ abstract class JMSParserTestCase extends TestCase
         /**
          * @JMS\ExclusionPolicy("ALL")
          */
-        $c = new class() {
+        $c = new class {
             private $property;
         };
 
@@ -782,7 +782,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testMethodWithoutDocBlock(): void
     {
-        $c = new class() {
+        $c = new class {
             public function foo(): string
             {
                 return 'bar';
@@ -798,7 +798,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testVirtualProperty(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\VirtualProperty
              */
@@ -823,7 +823,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testVirtualPropertyWithName(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\VirtualProperty("bar")
              */
@@ -848,7 +848,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testVirtualPropertyWithReturnTypeHint(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\VirtualProperty
              */
@@ -871,7 +871,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testVirtualPropertyWithReturnDocBlock(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\VirtualProperty
              *
@@ -896,7 +896,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testVirtualPropertyWithConflictingReturnDocBlock(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\VirtualProperty
              *
@@ -917,7 +917,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testVirtualPropertyWithInvalidReturnDocBlock(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\VirtualProperty
              *
@@ -938,7 +938,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testVirtualPropertyType(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\VirtualProperty
              *
@@ -965,7 +965,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testVirtualPropertyTypeConflictingWithTypeHint(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\VirtualProperty
              *
@@ -986,7 +986,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testVirtualPropertyTypeConflictingWithDocBlockType(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\VirtualProperty
              *
@@ -1009,7 +1009,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testVirtualPropertyTypeExtendingPrimitive(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\VirtualProperty
              *
@@ -1035,7 +1035,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testVirtualPropertyTypeExtendingDateTime(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\VirtualProperty
              *
@@ -1067,7 +1067,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testVirtualPropertyTypeExtendingDateTimeWithUnknown(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\VirtualProperty
              *
@@ -1102,7 +1102,7 @@ abstract class JMSParserTestCase extends TestCase
         if (!class_exists(NamedArgumentConstructor::class)) {
             $this->markTestSkipped('Before doctrine/annotations 1.12, the exception message is different');
         }
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\VirtualProperty
              *
@@ -1123,7 +1123,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testInvalidVirtualPropertyAnnotations(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\VirtualProperty
              *
@@ -1144,7 +1144,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testPrivateVirtualProperty(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\VirtualProperty
              */
@@ -1163,7 +1163,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testVirtualPropertyExclude(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\VirtualProperty
              *
@@ -1184,7 +1184,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testVirtualPropertyWithGroups(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\VirtualProperty
              *
@@ -1208,7 +1208,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testVirtualPropertyWithVersionRange(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\VirtualProperty
              *
@@ -1237,7 +1237,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testVirtualPropertyOverridesProperty(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\Type("string")
              */
@@ -1271,7 +1271,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testVirtualPropertyWithSerializedNameOverridesProperty(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\Type("string")
              */
@@ -1307,7 +1307,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testVirtualPropertyXmlAnnotations(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\VirtualProperty
              *
@@ -1337,7 +1337,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testUnsupportedVirtualPropertyAnnotations(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\VirtualProperty
              *
@@ -1358,7 +1358,7 @@ abstract class JMSParserTestCase extends TestCase
 
     public function testPostDeserializedMethods(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\PostDeserialize
              */

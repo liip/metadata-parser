@@ -16,7 +16,7 @@ class JMSParserTest81 extends JMSParserTestCase
 {
     public function testReadOnlyProperty(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\ReadOnlyProperty()
              */
@@ -35,7 +35,7 @@ class JMSParserTest81 extends JMSParserTestCase
 
     public function testAttributes(): void
     {
-        $c = new class() {
+        $c = new class {
             #[JMS\Type('string')]
             private $property1;
 
@@ -62,7 +62,7 @@ class JMSParserTest81 extends JMSParserTestCase
 
     public function testAttributesMixedWithAnnotations(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @JMS\SerializedName("property_mixed")
              *
@@ -106,7 +106,7 @@ class JMSParserTest81 extends JMSParserTestCase
 
     public function testVirtualPropertyWithoutDocblock(): void
     {
-        $c = new class() {
+        $c = new class {
             #[JMS\VirtualProperty]
             public function foo(): string
             {

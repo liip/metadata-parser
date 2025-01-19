@@ -43,7 +43,7 @@ class BuilderTest extends TestCase
 
     public function testBuild(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @var Nested
              */
