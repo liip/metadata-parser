@@ -24,7 +24,7 @@ class JMSTypeParserTest extends TestCase
         $this->parser = new JMSTypeParser();
     }
 
-    public function provideTypeCases(): iterable
+    public static function provideTypeCases(): iterable
     {
         yield [
             '',
@@ -107,7 +107,7 @@ class JMSTypeParserTest extends TestCase
         }
     }
 
-    public function provideDateTimeTypeCases(): iterable
+    public static function provideDateTimeTypeCases(): iterable
     {
         yield [
             'DateTime',

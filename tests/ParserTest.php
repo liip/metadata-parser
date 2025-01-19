@@ -44,7 +44,7 @@ class ParserTest extends TestCase
 
     public function testSimple(): void
     {
-        $c = new class() {
+        $c = new class {
             private $property1;
             protected $property2;
 
@@ -79,7 +79,7 @@ class ParserTest extends TestCase
 
     public function testNested(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @var Nested
              */
@@ -113,7 +113,7 @@ class ParserTest extends TestCase
 
     public function testNestedArray(): void
     {
-        $c = new class() {
+        $c = new class {
             /**
              * @var Nested[]
              */

@@ -49,7 +49,7 @@ class VersionRangeTest extends TestCase
         $this->assertSame('2', $version->getUntil());
     }
 
-    public function provideIsIncludedCases(): iterable
+    public static function provideIsIncludedCases(): iterable
     {
         return [
             'null is lowest and highest' => [
@@ -93,7 +93,7 @@ class VersionRangeTest extends TestCase
         $this->assertSame($expected, $versionRange->isIncluded($version));
     }
 
-    public function provideAllowsLowerThanCases(): iterable
+    public static function provideAllowsLowerThanCases(): iterable
     {
         return [
             'same null' => [
@@ -137,7 +137,7 @@ class VersionRangeTest extends TestCase
         $this->assertSame($lower, $versionRange->allowsLowerThan($other));
     }
 
-    public function provideAllowsHigherThanCases(): iterable
+    public static function provideAllowsHigherThanCases(): iterable
     {
         return [
             'same null' => [

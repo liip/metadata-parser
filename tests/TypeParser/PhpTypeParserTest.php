@@ -28,7 +28,7 @@ class PhpTypeParserTest extends TestCase
         $this->parser = new PhpTypeParser();
     }
 
-    public function providePropertyTypeCases(): iterable
+    public static function providePropertyTypeCases(): iterable
     {
         yield [
             '',
@@ -135,7 +135,7 @@ class PhpTypeParserTest extends TestCase
         ];
     }
 
-    public function providePropertyTypeArrayIsCollectionCases(): iterable
+    public static function providePropertyTypeArrayIsCollectionCases(): iterable
     {
         yield [
             'string[]|\Doctrine\Common\Collections\Collection',
@@ -181,7 +181,7 @@ class PhpTypeParserTest extends TestCase
         $this->parser->parseAnnotationType('resource', new \ReflectionClass($this));
     }
 
-    public function provideNamespaceResolutionCases(): iterable
+    public static function provideNamespaceResolutionCases(): iterable
     {
         yield [
             'ReflectionAbstractModel',
@@ -219,9 +219,9 @@ class PhpTypeParserTest extends TestCase
         $this->assertSame($expectedType, (string) $type, 'Type should match');
     }
 
-    public function provideReflectionTypeCases(): iterable
+    public static function provideReflectionTypeCases(): iterable
     {
-        $c = new class() {
+        $c = new class {
             private function method1(): string
             {
                 return '1';
