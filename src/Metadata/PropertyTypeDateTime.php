@@ -21,7 +21,7 @@ final class PropertyTypeDateTime extends AbstractPropertyType
      */
     private $dateTimeOptions;
 
-    public function __construct(bool $immutable, bool $nullable, DateTimeOptions $dateTimeOptions = null)
+    public function __construct(bool $immutable, bool $nullable, ?DateTimeOptions $dateTimeOptions = null)
     {
         parent::__construct($nullable);
         $this->immutable = $immutable;
@@ -108,10 +108,10 @@ final class PropertyTypeDateTime extends AbstractPropertyType
         return new self($this->immutable, $nullable, $options);
     }
 
-    public static function fromDateTimeClass(string $className, bool $nullable, DateTimeOptions $dateTimeOptions = null): self
+    public static function fromDateTimeClass(string $className, bool $nullable, ?DateTimeOptions $dateTimeOptions = null): self
     {
         if (!self::isTypeDateTime($className)) {
-            throw new \UnexpectedValueException(sprintf('Given type "%s" is not date time class or interface', $className));
+            throw new \UnexpectedValueException(\sprintf('Given type "%s" is not date time class or interface', $className));
         }
 
         return new self(\DateTimeImmutable::class === $className, $nullable, $dateTimeOptions);

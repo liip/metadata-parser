@@ -30,7 +30,7 @@ final class PropertyTypeIterable extends AbstractPropertyType
     /**
      * @param class-string<\Traversable>|null $traversableClass
      */
-    public function __construct(PropertyType $subType, bool $hashmap, bool $nullable, string $traversableClass = null)
+    public function __construct(PropertyType $subType, bool $hashmap, bool $nullable, ?string $traversableClass = null)
     {
         parent::__construct($nullable);
 
@@ -48,7 +48,7 @@ final class PropertyTypeIterable extends AbstractPropertyType
         $array = $this->isHashmap() ? '[string]' : '[]';
         if ($this->isTraversable()) {
             $collectionType = $this->isHashmap() ? ', string' : '';
-            $array .= sprintf('|\\%s<%s%s>', $this->traversableClass, $this->subType, $collectionType);
+            $array .= \sprintf('|\%s<%s%s>', $this->traversableClass, $this->subType, $collectionType);
         }
 
         return ((string) $this->subType).$array.parent::__toString();
@@ -109,7 +109,7 @@ final class PropertyTypeIterable extends AbstractPropertyType
             return new self($this->getSubType(), $this->isHashmap(), $nullable, $this->findCommonTraversableClass($thisTraversableClass, $other->getClassName()));
         }
         if (!$other instanceof self) {
-            throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, they must be the same or unknown', self::class, \get_class($other)));
+            throw new \UnexpectedValueException(\sprintf('Can\'t merge type %s with %s, they must be the same or unknown', self::class, \get_class($other)));
         }
 
         /*
@@ -118,7 +118,7 @@ final class PropertyTypeIterable extends AbstractPropertyType
          * PHPDoc has no clear definition for hashmaps with string indexes, but JMS Serializer annotations do.
          */
         if ($this->isHashmap() && !$other->isHashmap()) {
-            throw new \UnexpectedValueException(sprintf('Can\'t merge type %s with %s, can\'t change hashmap into plain array', self::class, \get_class($other)));
+            throw new \UnexpectedValueException(\sprintf('Can\'t merge type %s with %s, can\'t change hashmap into plain array', self::class, \get_class($other)));
         }
 
         $otherTraversableClass = $other->isTraversable() ? $other->getTraversableClass() : null;

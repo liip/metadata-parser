@@ -66,7 +66,7 @@ final class RawClassMetadata implements \JsonSerializable
     {
         $property = $this->findPropertyVariation($name);
         if (null === $property) {
-            throw new \UnexpectedValueException(sprintf('Property variation %s not found on class %s', $name, $this->className));
+            throw new \UnexpectedValueException(\sprintf('Property variation %s not found on class %s', $name, $this->className));
         }
 
         return $property;
@@ -105,14 +105,14 @@ final class RawClassMetadata implements \JsonSerializable
     public function renameProperty(string $propertyName, string $serializedName): void
     {
         if (!$this->hasPropertyCollection($propertyName)) {
-            throw new \UnexpectedValueException(sprintf('Property "%s::%s" not found to rename', (string) $this, $propertyName));
+            throw new \UnexpectedValueException(\sprintf('Property "%s::%s" not found to rename', (string) $this, $propertyName));
         }
         $prop = $this->getPropertyCollection($propertyName);
 
         if ($this->hasPropertyCollection($serializedName)) {
             $target = $this->getPropertyCollection($serializedName);
             if ($target === $prop) {
-                throw new \LogicException(sprintf('You can not rename %s into %s as it is the same property. Did you miss to handle camelCase properties with PropertyCollection::serializedName?', $propertyName, $serializedName));
+                throw new \LogicException(\sprintf('You can not rename %s into %s as it is the same property. Did you miss to handle camelCase properties with PropertyCollection::serializedName?', $propertyName, $serializedName));
             }
             foreach ($target->getVariations() as $variation) {
                 $prop->addVariation($variation);
@@ -120,7 +120,7 @@ final class RawClassMetadata implements \JsonSerializable
 
             $key = array_search($target, $this->properties, true);
             if (false === $key) {
-                throw new \RuntimeException(sprintf('This should not be possible: Target property %s found but then not found $this->properties. While renaming from %s::%s', $serializedName, $this->getClassName(), $propertyName));
+                throw new \RuntimeException(\sprintf('This should not be possible: Target property %s found but then not found $this->properties. While renaming from %s::%s', $serializedName, $this->getClassName(), $propertyName));
             }
             unset($this->properties[$key]);
         }
@@ -174,7 +174,7 @@ final class RawClassMetadata implements \JsonSerializable
     {
         $property = $this->findPropertyCollection($serializedName);
         if (null === $property) {
-            throw new \UnexpectedValueException(sprintf('Property collection %s not found on class %s', $serializedName, $this->className));
+            throw new \UnexpectedValueException(\sprintf('Property collection %s not found on class %s', $serializedName, $this->className));
         }
 
         return $property;
@@ -186,7 +186,7 @@ final class RawClassMetadata implements \JsonSerializable
     public function addPropertyCollection(PropertyCollection $property): void
     {
         if ($this->hasPropertyCollection($property->getSerializedName())) {
-            throw new \UnexpectedValueException(sprintf('Property "%s" is already defined on model %s, cannot add it twice', (string) $property, (string) $this));
+            throw new \UnexpectedValueException(\sprintf('Property "%s" is already defined on model %s, cannot add it twice', (string) $property, (string) $this));
         }
 
         $this->properties[] = $property;

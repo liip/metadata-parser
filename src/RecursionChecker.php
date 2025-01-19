@@ -45,7 +45,7 @@ final class RecursionChecker
      *
      * @param string[][] $expectedRecursions List of expected recursions
      */
-    public function __construct(LoggerInterface $logger = null, array $expectedRecursions = [])
+    public function __construct(?LoggerInterface $logger = null, array $expectedRecursions = [])
     {
         $this->logger = $logger;
         $this->expectedRecursions = $expectedRecursions;

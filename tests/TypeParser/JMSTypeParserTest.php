@@ -97,7 +97,7 @@ class JMSTypeParserTest extends TestCase
     /**
      * @dataProvider provideTypeCases
      */
-    public function testType(string $rawType, string $expectedType, bool $expectedNullable = null): void
+    public function testType(string $rawType, string $expectedType, ?bool $expectedNullable = null): void
     {
         $type = $this->parser->parse($rawType);
 

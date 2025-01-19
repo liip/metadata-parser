@@ -22,7 +22,7 @@ final class ParseException extends SchemaException
     public static function classNotFound(string $className, \Exception $previousException): self
     {
         return new self(
-            sprintf(self::CLASS_NOT_FOUND, $className),
+            \sprintf(self::CLASS_NOT_FOUND, $className),
             $previousException->getCode(),
             $previousException
         );
@@ -31,7 +31,7 @@ final class ParseException extends SchemaException
     public static function classError(string $className, \Exception $previousException): self
     {
         return new self(
-            sprintf(self::CLASS_ERROR, $className, $previousException->getMessage()),
+            \sprintf(self::CLASS_ERROR, $className, $previousException->getMessage()),
             $previousException->getCode(),
             $previousException
         );
@@ -40,7 +40,7 @@ final class ParseException extends SchemaException
     public static function propertyError(string $className, string $propertyName, \Exception $previousException): self
     {
         return new self(
-            sprintf(self::PROPERTY_ERROR, $className, $propertyName, $previousException->getMessage()),
+            \sprintf(self::PROPERTY_ERROR, $className, $propertyName, $previousException->getMessage()),
             $previousException->getCode(),
             $previousException
         );
@@ -49,7 +49,7 @@ final class ParseException extends SchemaException
     public static function propertyTypeError(string $className, string $propertyName, \Exception $previousException): self
     {
         return new self(
-            sprintf(self::PROPERTY_TYPE_ERROR, $className, $propertyName, $previousException->getMessage()),
+            \sprintf(self::PROPERTY_TYPE_ERROR, $className, $propertyName, $previousException->getMessage()),
             $previousException->getCode(),
             $previousException
         );
@@ -57,13 +57,13 @@ final class ParseException extends SchemaException
 
     public static function propertyTypeNameNull(string $className, string $propertyName): self
     {
-        return new self(sprintf(self::PROPERTY_TYPE_NAME_NULL, $className, $propertyName));
+        return new self(\sprintf(self::PROPERTY_TYPE_NAME_NULL, $className, $propertyName));
     }
 
     public static function propertyTypeConflict(string $className, string $propertyName, string $typeA, string $typeB, \Exception $previousException): self
     {
         return new self(
-            sprintf(self::PROPERTY_TYPE_CONFLICT, $className, $propertyName, $typeA, $typeB),
+            \sprintf(self::PROPERTY_TYPE_CONFLICT, $className, $propertyName, $typeA, $typeB),
             $previousException->getCode(),
             $previousException
         );
@@ -71,26 +71,26 @@ final class ParseException extends SchemaException
 
     public static function unsupportedClassAnnotation(string $className, string $annotation): self
     {
-        return new self(sprintf(self::UNSUPPORTED_CLASS_ANNOTATION, $className, $annotation));
+        return new self(\sprintf(self::UNSUPPORTED_CLASS_ANNOTATION, $className, $annotation));
     }
 
     public static function unsupportedPropertyAnnotation(string $className, string $propertyName, string $annotation): self
     {
-        return new self(sprintf(self::UNSUPPORTED_PROPERTY_ANNOTATION, $className, $propertyName, $annotation));
+        return new self(\sprintf(self::UNSUPPORTED_PROPERTY_ANNOTATION, $className, $propertyName, $annotation));
     }
 
     public static function nonPublicMethod(string $className, string $methodName): self
     {
-        return new self(sprintf(self::NON_PUBLIC_METHOD, $className, $methodName));
+        return new self(\sprintf(self::NON_PUBLIC_METHOD, $className, $methodName));
     }
 
     public static function propertyAlreadyExists(string $propertyName, string $className): self
     {
-        return new self(sprintf(self::PROPERTY_ALREADY_EXISTS, $propertyName, $className));
+        return new self(\sprintf(self::PROPERTY_ALREADY_EXISTS, $propertyName, $className));
     }
 
     public static function classNotParsed(string $notFoundClassName, string $className, string $propertyName): self
     {
-        return new self(sprintf(self::CLASS_NOT_PARSED, $notFoundClassName, $className, $propertyName));
+        return new self(\sprintf(self::CLASS_NOT_PARSED, $notFoundClassName, $className, $propertyName));
     }
 }

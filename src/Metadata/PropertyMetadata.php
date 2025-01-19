@@ -25,14 +25,14 @@ final class PropertyMetadata extends AbstractPropertyMetadata
     public function __construct(
         string $serializedName,
         string $name,
-        PropertyType $type = null,
+        ?PropertyType $type = null,
         bool $readOnly = true,
         bool $public = false,
-        VersionRange $versionRange = null,
+        ?VersionRange $versionRange = null,
         array $groups = [],
-        PropertyAccessor $accessor = null,
+        ?PropertyAccessor $accessor = null,
         array $customInformation = [],
-        int $maxDepth = null
+        ?int $maxDepth = null,
     ) {
         parent::__construct($name, $readOnly, $public);
         $this->serializedName = $serializedName;
