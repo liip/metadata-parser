@@ -25,10 +25,8 @@ use Tests\Liip\MetadataParser\ModelParser\Model\Nested;
 
 /**
  * @small
- *
- * We need 2 versions of this test to avoid parser errors about ReadOnly
  */
-abstract class JMSParserTestCase extends TestCase
+class JMSParserTest extends TestCase
 {
     /**
      * @var JMSParser
@@ -177,7 +175,7 @@ abstract class JMSParserTestCase extends TestCase
             },
             PropertyTypeIterable::class,
             true,
-            'string[]|\Doctrine\Common\Collections\Collection<string>|null',
+            'string[]|\Doctrine\Common\Collections\ArrayCollection<string>|null',
         ];
 
         yield [
@@ -189,7 +187,7 @@ abstract class JMSParserTestCase extends TestCase
             },
             PropertyTypeIterable::class,
             true,
-            'string[]|\Doctrine\Common\Collections\Collection<string>|null',
+            'string[]|\Doctrine\Common\Collections\ArrayCollection<string>|null',
         ];
 
         yield [
@@ -201,7 +199,7 @@ abstract class JMSParserTestCase extends TestCase
             },
             PropertyTypeIterable::class,
             true,
-            'int[string]|\Doctrine\Common\Collections\Collection<int, string>|null',
+            'int[string]|\Doctrine\Common\Collections\ArrayCollection<int, string>|null',
         ];
     }
 
@@ -299,8 +297,6 @@ abstract class JMSParserTestCase extends TestCase
         $this->assertPropertyVariation('property1', false, false, $property);
         $this->assertPropertyType(PropertyTypePrimitive::class, 'string|null', true, $property->getType());
     }
-
-    abstract public function testReadOnlyProperty(): void;
 
     public function testSerializedName(): void
     {
@@ -1380,6 +1376,119 @@ abstract class JMSParserTestCase extends TestCase
         $this->assertSame(['foo', 'bar'], $classMetadata->getPostDeserializeMethods());
     }
 
+    public function testReadOnlyProperty(): void
+    {
+        $c = new class {
+            /**
+             * @JMS\ReadOnlyProperty()
+             */
+            private $property;
+        };
+
+        $classMetadata = new RawClassMetadata(\get_class($c));
+        $this->parser->parse($classMetadata);
+
+        $props = $classMetadata->getPropertyCollections();
+        $this->assertCount(1, $props, 'Number of properties should match');
+
+        $this->assertPropertyCollection('property', 1, $props[0]);
+        $this->assertPropertyVariation('property', false, true, $props[0]->getVariations()[0]);
+    }
+
+    public function testAttributes(): void
+    {
+        $c = new class {
+            #[JMS\Type('string')]
+            private $property1;
+
+            #[JMS\Type('bool')]
+            public $property2;
+        };
+
+        $classMetadata = new RawClassMetadata(\get_class($c));
+        $this->parser->parse($classMetadata);
+
+        $props = $classMetadata->getPropertyCollections();
+        $this->assertCount(2, $props, 'Number of properties should match');
+
+        $this->assertPropertyCollection('property1', 1, $props[0]);
+        $property = $props[0]->getVariations()[0];
+        $this->assertPropertyVariation('property1', false, false, $property);
+        $this->assertPropertyType(PropertyTypePrimitive::class, 'string|null', true, $property->getType());
+
+        $this->assertPropertyCollection('property2', 1, $props[1]);
+        $property = $props[1]->getVariations()[0];
+        $this->assertPropertyVariation('property2', true, false, $property);
+        $this->assertPropertyType(PropertyTypePrimitive::class, 'bool|null', true, $property->getType());
+    }
+
+    public function testAttributesMixedWithAnnotations(): void
+    {
+        $c = new class {
+            /**
+             * @JMS\SerializedName("property_mixed")
+             *
+             * @JMS\Groups({"group1"})
+             */
+            #[JMS\Type('string')]
+            private $mixedProperty;
+
+            #[JMS\SerializedName('property_attribute')]
+            #[JMS\Type('bool')]
+            public $attributeProperty;
+
+            /**
+             * @JMS\Type("array<string>")
+             */
+            public $annotationsProperty;
+        };
+
+        $classMetadata = new RawClassMetadata(\get_class($c));
+        $this->parser->parse($classMetadata);
+
+        $props = $classMetadata->getPropertyCollections();
+        $this->assertCount(3, $props, 'Number of properties should match');
+
+        $this->assertPropertyCollection('property_mixed', 1, $props[0]);
+        $property = $props[0]->getVariations()[0];
+        $this->assertPropertyVariation('mixedProperty', false, false, $property);
+        $this->assertPropertyType(PropertyTypePrimitive::class, 'string|null', true, $property->getType());
+        $this->assertSame(['group1'], $props[0]->getVariations()[0]->getGroups());
+
+        $this->assertPropertyCollection('property_attribute', 1, $props[1]);
+        $property = $props[1]->getVariations()[0];
+        $this->assertPropertyVariation('attributeProperty', true, false, $property);
+        $this->assertPropertyType(PropertyTypePrimitive::class, 'bool|null', true, $property->getType());
+
+        $this->assertPropertyCollection('annotations_property', 1, $props[2]);
+        $property = $props[2]->getVariations()[0];
+        $this->assertPropertyVariation('annotationsProperty', true, false, $property);
+        $this->assertPropertyType(PropertyTypeIterable::class, 'string[]|null', true, $property->getType());
+    }
+
+    public function testVirtualPropertyWithoutDocblock(): void
+    {
+        $c = new class {
+            #[JMS\VirtualProperty]
+            public function foo(): string
+            {
+                return 'bar';
+            }
+        };
+
+        $classMetadata = new RawClassMetadata(\get_class($c));
+        $this->parser->parse($classMetadata);
+
+        $props = $classMetadata->getPropertyCollections();
+        $this->assertCount(1, $props, 'Number of properties should match');
+
+        $this->assertPropertyCollection('foo', 1, $props[0]);
+        $property = $props[0]->getVariations()[0];
+        $this->assertPropertyVariation('foo', true, true, $property);
+        $this->assertPropertyType(PropertyTypePrimitive::class, 'string', false, $property->getType());
+        $this->assertPropertyAccessor('foo', null, $property->getAccessor());
+    }
+
     protected function assertPropertyCollection(string $serializedName, int $variations, PropertyCollection $prop): void
     {
         $this->assertSame($serializedName, $prop->getSerializedName(), 'Serialized name of property should match');
@@ -1405,10 +1514,4 @@ abstract class JMSParserTestCase extends TestCase
         $this->assertSame($getterMethod, $accessor->getGetterMethod(), 'Getter method of property should match');
         $this->assertSame($setterMethod, $accessor->getSetterMethod(), 'Setter method of property should match');
     }
-}
-
-if (\PHP_VERSION_ID > 80100) {
-    require 'JMSParserTest81.php';
-} else {
-    require 'JMSParserTestLegacy.php';
 }
