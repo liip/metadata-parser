@@ -1057,7 +1057,6 @@ class JMSParserTest extends TestCase
         $this->assertPropertyType(PropertyTypeDateTime::class, 'DateTime|null', true, $type);
         $this->assertSame('Y-m-d H:i:s', $type->getFormat(), 'Date time format should match');
         $this->assertSame('Europe/Zurich', $type->getZone(), 'Date time zone should match');
-        $this->assertSame('Y-m-d', $type->getDeserializeFormat(), 'Date time deserialize format should match');
         $this->assertSame(['Y-m-d'], $type->getDeserializeFormats(), 'Date time deserialize format should match');
     }
 
@@ -1089,7 +1088,6 @@ class JMSParserTest extends TestCase
         $this->assertPropertyType(PropertyTypeDateTime::class, 'DateTime|null', true, $type);
         $this->assertSame('Y-m-d H:i:s', $type->getFormat(), 'Date time format should match');
         $this->assertSame('Europe/Zurich', $type->getZone(), 'Date time zone should match');
-        $this->assertSame('Y-m-d', $type->getDeserializeFormat(), 'Date time deserialize format should match');
         $this->assertSame(['Y-m-d'], $type->getDeserializeFormats(), 'Date time deserialize format should match');
     }
 

@@ -29,13 +29,13 @@ final class DateTimeOptions implements \JsonSerializable
     /**
      * @note Passing a string for $deserializeFormats is deprecated, please pass an array instead
      *
-     * @param string[]|string|null $deserializeFormats
+     * @param string[]|null $deserializeFormats
      */
-    public function __construct(?string $format, ?string $zone, $deserializeFormats)
+    public function __construct(?string $format, ?string $zone, ?array $deserializeFormats)
     {
         $this->format = $format;
         $this->zone = $zone;
-        $this->deserializeFormats = \is_string($deserializeFormats) ? [$deserializeFormats] : $deserializeFormats;
+        $this->deserializeFormats = $deserializeFormats;
     }
 
     public function getFormat(): ?string
@@ -48,18 +48,6 @@ final class DateTimeOptions implements \JsonSerializable
         return $this->zone;
     }
 
-    /**
-     * @deprecated Please use {@see getDeserializeFormats}
-     */
-    public function getDeserializeFormat(): ?string
-    {
-        foreach ($this->deserializeFormats ?? [] as $format) {
-            return $format;
-        }
-
-        return null;
-    }
-
     public function getDeserializeFormats(): ?array
     {
         return $this->deserializeFormats;
@@ -70,7 +58,6 @@ final class DateTimeOptions implements \JsonSerializable
         return array_filter([
             'format' => $this->format,
             'zone' => $this->zone,
-            'deserialize_format' => $this->getDeserializeFormat(),
             'deserialize_formats' => $this->deserializeFormats,
         ]);
     }
