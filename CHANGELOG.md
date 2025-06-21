@@ -10,6 +10,8 @@
 * `JMSTypeParser::getTraversableClass` returns `Traversable::class` instead of `Doctrine\Common\Collections\Collection` for general traversable properties.
 * Dropped support for PHP 7
 * Adjusted code to not trigger warnings with PHP 8.4
+* Removed deprecated `getDeserializeFormat` method from date time
+* Add attribute support for the `@Preferred` annotation 
 
 # Version 1.x
 

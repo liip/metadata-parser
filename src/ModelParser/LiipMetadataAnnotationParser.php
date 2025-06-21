@@ -21,10 +21,7 @@ use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
  */
 final class LiipMetadataAnnotationParser implements ModelParserInterface
 {
-    /**
-     * @var Reader
-     */
-    private $annotationsReader;
+    private Reader $annotationsReader;
 
     public function __construct(Reader $annotationsReader)
     {
@@ -54,11 +51,7 @@ final class LiipMetadataAnnotationParser implements ModelParserInterface
                 continue;
             }
 
-            try {
-                $annotations = $this->annotationsReader->getPropertyAnnotations($reflProperty);
-            } catch (AnnotationException $e) {
-                throw ParseException::propertyError((string) $classMetadata, $reflProperty->getName(), $e);
-            }
+            $annotations = $this->getPropertyAnnotations($classMetadata, $reflProperty);
 
             $property = $classMetadata->getPropertyVariation($reflProperty->getName());
             $this->parsePropertyAnnotations($classMetadata, $property, $annotations);
@@ -79,11 +72,7 @@ final class LiipMetadataAnnotationParser implements ModelParserInterface
                 continue;
             }
 
-            try {
-                $annotations = $this->annotationsReader->getMethodAnnotations($reflMethod);
-            } catch (AnnotationException $e) {
-                throw ParseException::propertyError((string) $classMetadata, $reflMethod->getName(), $e);
-            }
+            $annotations = $this->getMethodAnnotations($classMetadata, $reflMethod);
 
             $property = $classMetadata->getPropertyVariation($this->getMethodName($reflMethod));
             $this->parsePropertyAnnotations($classMetadata, $property, $annotations);
@@ -116,5 +105,39 @@ final class LiipMetadataAnnotationParser implements ModelParserInterface
         }
 
         return $name;
+    }
+
+    private function getMethodAnnotations(RawClassMetadata $classMetadata, \ReflectionMethod $reflectionMethod): array
+    {
+        try {
+            $annotations = $this->annotationsReader->getMethodAnnotations($reflectionMethod);
+        } catch (AnnotationException $e) {
+            throw ParseException::propertyError((string) $classMetadata, $reflectionMethod->getName(), $e);
+        }
+
+        $attributes = $reflectionMethod->getAttributes();
+        $attributes = array_map(
+            static fn (\ReflectionAttribute $attribute) => $attribute->newInstance(),
+            $attributes
+        );
+
+        return array_merge($attributes, $annotations);
+    }
+
+    private function getPropertyAnnotations(RawClassMetadata $classMetadata, \ReflectionProperty $reflectionProperty): array
+    {
+        try {
+            $annotations = $this->annotationsReader->getPropertyAnnotations($reflectionProperty);
+        } catch (AnnotationException $e) {
+            throw ParseException::propertyError((string) $classMetadata, $reflectionProperty->getName(), $e);
+        }
+
+        $attributes = $reflectionProperty->getAttributes();
+        $attributes = array_map(
+            static fn (\ReflectionAttribute $attribute) => $attribute->newInstance(),
+            $attributes
+        );
+
+        return array_merge($attributes, $annotations);
     }
 }

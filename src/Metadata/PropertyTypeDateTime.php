@@ -58,18 +58,6 @@ final class PropertyTypeDateTime extends AbstractPropertyType
         return null;
     }
 
-    /**
-     * @deprecated Please prefer {@link getDeserializeFormats}
-     */
-    public function getDeserializeFormat(): ?string
-    {
-        if ($this->dateTimeOptions) {
-            return $this->dateTimeOptions->getDeserializeFormat();
-        }
-
-        return null;
-    }
-
     public function getDeserializeFormats(): ?array
     {
         if ($this->dateTimeOptions) {

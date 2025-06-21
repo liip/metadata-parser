@@ -52,7 +52,7 @@ use Liip\MetadataParser\TypeParser\PhpTypeParser;
  *
  * @internal
  */
-abstract class BaseJMSParser implements ModelParserInterface
+final class JMSParser implements ModelParserInterface
 {
     private const ACCESS_ORDER_CUSTOM = 'custom';
 
@@ -69,7 +69,7 @@ abstract class BaseJMSParser implements ModelParserInterface
     /**
      * @var JMSTypeParser
      */
-    protected $jmsTypeParser;
+    private $jmsTypeParser;
 
     public function __construct(Reader $annotationsReader)
     {
@@ -228,22 +228,9 @@ abstract class BaseJMSParser implements ModelParserInterface
         return $map;
     }
 
-    /**
-     * If the annotation is about readonly information, update the $property accordingly and return true.
-     *
-     * This check is extracted to have different implementations for PHP 8.1 and newer, and for older PHP versions.
-     * If the method returns true, we don't try to match the annotation type.
-     *
-     * @return bool whether $annotation was a readonly information
-     */
-    abstract protected function parsePropertyAnnotationsReadOnly(object $annotation, PropertyVariationMetadata $property): bool;
-
     private function parsePropertyAnnotations(RawClassMetadata $classMetadata, PropertyVariationMetadata $property, array $annotations): void
     {
         foreach ($annotations as $annotation) {
-            if ($this->parsePropertyAnnotationsReadOnly($annotation, $property)) {
-                continue;
-            }
             switch (true) {
                 case $annotation instanceof Type:
                     if (null === $annotation->name) {
@@ -287,6 +274,10 @@ abstract class BaseJMSParser implements ModelParserInterface
 
                 case $annotation instanceof Until:
                     $property->setVersionRange($property->getVersionRange()->withUntil($annotation->version));
+                    break;
+
+                case $annotation instanceof ReadOnlyProperty:
+                    $property->setReadOnly(true);
                     break;
 
                 case $annotation instanceof MaxDepth:
@@ -429,25 +420,4 @@ abstract class BaseJMSParser implements ModelParserInterface
 
         return $name;
     }
-}
-
-if (\PHP_VERSION_ID > 80100) {
-    /**
-     * Version for PHP 8.1+ without the ReadOnly annotation.
-     */
-    final class JMSParser extends BaseJMSParser
-    {
-        protected function parsePropertyAnnotationsReadOnly(object $annotation, PropertyVariationMetadata $property): bool
-        {
-            if ($annotation instanceof ReadOnlyProperty) {
-                $property->setReadOnly($annotation->readOnly);
-
-                return true;
-            }
-
-            return false;
-        }
-    }
-} else {
-    require 'JMSParserLegacy.php';
 }
