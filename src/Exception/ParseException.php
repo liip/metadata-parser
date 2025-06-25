@@ -10,10 +10,10 @@ final class ParseException extends SchemaException
     private const CLASS_ERROR = 'Class "%s" couldn\'t be parsed because of an error: %s';
     private const PROPERTY_ERROR = 'Property "%s::%s" couldn\'t be parsed because of an error: %s';
     private const PROPERTY_TYPE_ERROR = 'Property "%s::%s" has an invalid type which results in: %s';
-    private const PROPERTY_TYPE_NAME_NULL = 'Property "%s::%s" has an invalid type annotation. [Type Error] Attribute "name" of @JMS\Type may not be null.';
+    private const PROPERTY_TYPE_NAME_NULL = 'Property "%s::%s" has an invalid type attribute. [Type Error] Attribute "name" of #[JMS\Type] may not be null.';
     private const PROPERTY_TYPE_CONFLICT = 'Property "%s::%s" has different type definitions which conflict: %s != %s';
-    private const UNSUPPORTED_CLASS_ANNOTATION = 'Class "%s" has an unsupported annotation "%s"';
-    private const UNSUPPORTED_PROPERTY_ANNOTATION = 'Property "%s::%s" has an unsupported annotation "%s"';
+    private const UNSUPPORTED_CLASS_ATTRIBUTE = 'Class "%s" has an unsupported attribute "%s"';
+    private const UNSUPPORTED_PROPERTY_ATTRIBUTE = 'Property "%s::%s" has an unsupported attribute "%s"';
     private const NON_PUBLIC_METHOD = 'Method "%s::%s" is not public and therefore cannot be included';
 
     private const PROPERTY_ALREADY_EXISTS = 'Property "%s" is already defined for "%s", cannot add it twice';
@@ -69,14 +69,14 @@ final class ParseException extends SchemaException
         );
     }
 
-    public static function unsupportedClassAnnotation(string $className, string $annotation): self
+    public static function unsupportedClassAttribute(string $className, string $attribute): self
     {
-        return new self(\sprintf(self::UNSUPPORTED_CLASS_ANNOTATION, $className, $annotation));
+        return new self(\sprintf(self::UNSUPPORTED_CLASS_ATTRIBUTE, $className, $attribute));
     }
 
-    public static function unsupportedPropertyAnnotation(string $className, string $propertyName, string $annotation): self
+    public static function unsupportedPropertyAttribute(string $className, string $propertyName, string $attribute): self
     {
-        return new self(\sprintf(self::UNSUPPORTED_PROPERTY_ANNOTATION, $className, $propertyName, $annotation));
+        return new self(\sprintf(self::UNSUPPORTED_PROPERTY_ATTRIBUTE, $className, $propertyName, $attribute));
     }
 
     public static function nonPublicMethod(string $className, string $methodName): self

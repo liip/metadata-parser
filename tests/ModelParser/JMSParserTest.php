@@ -28,10 +28,7 @@ use Tests\Liip\MetadataParser\ModelParser\Model\Nested;
  */
 class JMSParserTest extends TestCase
 {
-    /**
-     * @var JMSParser
-     */
-    protected $parser;
+    protected JMSParser $parser;
 
     protected function setUp(): void
     {
@@ -86,7 +83,7 @@ class JMSParserTest extends TestCase
         $classMetadata = new RawClassMetadata(\get_class($c));
 
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('unsupported annotation');
+        $this->expectExceptionMessage('unsupported attribute');
         $this->parser->parse($classMetadata);
     }
 
@@ -694,7 +691,7 @@ class JMSParserTest extends TestCase
         $classMetadata = new RawClassMetadata(\get_class($c));
 
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('unsupported annotation');
+        $this->expectExceptionMessage('unsupported attribute');
         $this->parser->parse($classMetadata);
     }
 
@@ -1093,9 +1090,6 @@ class JMSParserTest extends TestCase
 
     public function testVirtualPropertyInvalidType(): void
     {
-        if (!class_exists(NamedArgumentConstructor::class)) {
-            $this->markTestSkipped('Before doctrine/annotations 1.12, the exception message is different');
-        }
         $c = new class {
             /**
              * @JMS\VirtualProperty
@@ -1346,7 +1340,7 @@ class JMSParserTest extends TestCase
         $classMetadata = new RawClassMetadata(\get_class($c));
 
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('unsupported annotation');
+        $this->expectExceptionMessage('unsupported attribute');
         $this->parser->parse($classMetadata);
     }
 

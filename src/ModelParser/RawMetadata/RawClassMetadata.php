@@ -22,7 +22,7 @@ final class RawClassMetadata implements \JsonSerializable
      * This list contains the property collections for each property.
      *
      * The grouping happens based on the serialized name and several properties could have the same serialized name or
-     * methods with annotations can lead to serialized name clashes. The PropertyReducer is responsible for converting
+     * methods with attributes can lead to serialized name clashes. The PropertyReducer is responsible for converting
      * this into a single PropertyMetadata.
      *
      * @var PropertyCollection[]
@@ -131,7 +131,7 @@ final class RawClassMetadata implements \JsonSerializable
     /**
      * Removes an already registered property from the metadata.
      *
-     * This can be used for example for JMS Exclude annotation.
+     * This can be used for example for JMS Exclude attribute.
      *
      * @param string $name Name used in PropertyVariationMetadata::__construct
      */

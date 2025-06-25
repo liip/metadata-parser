@@ -27,10 +27,7 @@ final class PhpTypeParser
         'mixed',
     ];
 
-    /**
-     * @var PhpParser
-     */
-    private $useStatementsParser;
+    private PhpParser $useStatementsParser;
 
     public function __construct()
     {

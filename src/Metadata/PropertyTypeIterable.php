@@ -115,7 +115,7 @@ final class PropertyTypeIterable extends AbstractPropertyType
         /*
          * We allow converting array to hashmap (but not the other way round).
          *
-         * PHPDoc has no clear definition for hashmaps with string indexes, but JMS Serializer annotations do.
+         * PHPDoc has no clear definition for hashmaps with string indexes, but JMS Serializer attributes do.
          */
         if ($this->isHashmap() && !$other->isHashmap()) {
             throw new \UnexpectedValueException(\sprintf('Can\'t merge type %s with %s, can\'t change hashmap into plain array', self::class, \get_class($other)));

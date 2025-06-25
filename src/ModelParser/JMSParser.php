@@ -4,13 +4,6 @@ declare(strict_types=1);
 
 namespace Liip\MetadataParser\ModelParser;
 
-/*
- * We need different class definitions for PHP 8.1 and newer, and one for versions older than 8.1.
- * There was a JMS annotation "ReadOnly", but readonly became a reserved keyword in PHP 8.1.
- * For PHP 8.0 and older, we must still support the ReadOnly annotation, even with older versions of JMS serializer where ReadOnly does not yet extend ReadOnlyProperty.
- * For PHP 8.1, our code can not mention ReadOnly. If we do, we get a parse error.
- */
-
 use Doctrine\Common\Annotations\AnnotationException;
 use Doctrine\Common\Annotations\Reader;
 use JMS\Serializer\Annotation\Accessor;
@@ -46,9 +39,9 @@ use Liip\MetadataParser\TypeParser\JMSTypeParser;
 use Liip\MetadataParser\TypeParser\PhpTypeParser;
 
 /**
- * Parse JMSSerializer annotations.
+ * Parse JMSSerializer attributes/annotations.
  *
- * Run this parser *after* the PHPDoc parser as JMS annotations are more precise.
+ * Run this parser *after* the PHPDoc parser as JMS attributes are more precise.
  *
  * @internal
  */
@@ -56,28 +49,16 @@ final class JMSParser implements ModelParserInterface
 {
     private const ACCESS_ORDER_CUSTOM = 'custom';
 
-    /**
-     * @var Reader
-     */
-    private $annotationsReader;
+    private PhpTypeParser $phpTypeParser;
 
-    /**
-     * @var PhpTypeParser
-     */
-    private $phpTypeParser;
+    private JMSTypeParser $jmsTypeParser;
 
-    /**
-     * @var JMSTypeParser
-     */
-    private $jmsTypeParser;
+    private Reader $annotationOrAttributeReader;
 
-    public function __construct(Reader $annotationsReader)
+    public function __construct(Reader $reader)
     {
-        if (\PHP_VERSION_ID >= 80000 && class_exists(AttributeReader::class)) {
-            $annotationsReader = new AttributeReader($annotationsReader);
-        }
+        $this->annotationOrAttributeReader = new AttributeReader($reader);
 
-        $this->annotationsReader = $annotationsReader;
         $this->phpTypeParser = new PhpTypeParser();
         $this->jmsTypeParser = new JMSTypeParser();
     }
@@ -107,13 +88,13 @@ final class JMSParser implements ModelParserInterface
 
         foreach ($reflClass->getProperties() as $reflProperty) {
             try {
-                $annotations = $this->annotationsReader->getPropertyAnnotations($reflProperty);
+                $attributes = $this->annotationOrAttributeReader->getPropertyAnnotations($reflProperty);
             } catch (AnnotationException $e) {
                 throw ParseException::propertyError((string) $classMetadata, $reflProperty->getName(), $e);
             }
 
-            $property = $this->getProperty($classMetadata, $reflProperty, $annotations);
-            $this->parsePropertyAnnotations($classMetadata, $property, $annotations);
+            $property = $this->getProperty($classMetadata, $reflProperty, $attributes);
+            $this->parsePropertyAttributes($classMetadata, $property, $attributes);
         }
     }
 
@@ -125,18 +106,17 @@ final class JMSParser implements ModelParserInterface
 
         foreach ($reflClass->getMethods() as $reflMethod) {
             try {
-                $annotations = $this->annotationsReader->getMethodAnnotations($reflMethod);
+                $attributes = $this->annotationOrAttributeReader->getMethodAnnotations($reflMethod);
             } catch (AnnotationException $e) {
                 throw ParseException::propertyError((string) $classMetadata, $reflMethod->getName(), $e);
             }
-
-            if ($this->isVirtualProperty($annotations)) {
+            if ($this->isVirtualProperty($attributes)) {
                 if (!$reflMethod->isPublic()) {
                     throw ParseException::nonPublicMethod((string) $classMetadata, $reflMethod->getName());
                 }
 
-                $methodName = $this->getMethodName($annotations, $reflMethod);
-                $name = $this->getSerializedName($annotations) ?: $methodName;
+                $methodName = $this->getMethodName($attributes, $reflMethod);
+                $name = $this->getSerializedName($attributes) ?: $methodName;
 
                 $property = new PropertyVariationMetadata($methodName, true, true);
                 $classMetadata->addPropertyVariation($name, $property);
@@ -144,10 +124,10 @@ final class JMSParser implements ModelParserInterface
                 $property->setType($this->getReturnType($property, $reflMethod, $reflClass));
                 $property->setAccessor(new PropertyAccessor($reflMethod->getName(), null));
 
-                $this->parsePropertyAnnotations($classMetadata, $property, $annotations);
+                $this->parsePropertyAttributes($classMetadata, $property, $attributes);
             }
 
-            if ($this->isPostDeserializeMethod($annotations)) {
+            if ($this->isPostDeserializeMethod($attributes)) {
                 if (!$reflMethod->isPublic()) {
                     throw ParseException::nonPublicMethod((string) $classMetadata, $reflMethod->getName());
                 }
@@ -160,23 +140,22 @@ final class JMSParser implements ModelParserInterface
     private function parseClass(\ReflectionClass $reflClass, RawClassMetadata $classMetadata): void
     {
         try {
-            $annotations = $this->gatherClassAnnotations($reflClass);
+            $attributes = $this->gatherClassAttributes($reflClass);
         } catch (AnnotationException $e) {
             throw ParseException::classError($reflClass->getName(), $e);
         }
-
-        foreach ($annotations as $annotation) {
+        foreach ($attributes as $attribute) {
             switch (true) {
-                case $annotation instanceof AccessorOrder:
-                    if (self::ACCESS_ORDER_CUSTOM !== $annotation->order) {
-                        throw ParseException::unsupportedClassAnnotation((string) $classMetadata, 'AccessorOrder::'.$annotation->order);
+                case $attribute instanceof AccessorOrder:
+                    if (self::ACCESS_ORDER_CUSTOM !== $attribute->order) {
+                        throw ParseException::unsupportedClassAttribute((string) $classMetadata, 'AccessorOrder::'.$attribute->order);
                     }
 
                     // usort is not stable for the same result. we want to preserve order of the fields that are not explicitly mentioned
                     $order = [];
-                    $init = \count($annotation->custom);
+                    $init = \count($attribute->custom);
                     foreach ($classMetadata->getPropertyCollections() as $property) {
-                        $position = $property->getPosition($annotation->custom);
+                        $position = $property->getPosition($attribute->custom);
                         if (null === $position) {
                             $position = $init++;
                         }
@@ -188,56 +167,55 @@ final class JMSParser implements ModelParserInterface
                     });
                     break;
 
-                case $annotation instanceof ExclusionPolicy:
-                    if (ExclusionPolicy::NONE !== $annotation->policy) {
-                        throw ParseException::unsupportedClassAnnotation((string) $classMetadata, 'ExclusionPolicy::'.$annotation->policy);
+                case $attribute instanceof ExclusionPolicy:
+                    if (ExclusionPolicy::NONE !== $attribute->policy) {
+                        throw ParseException::unsupportedClassAttribute((string) $classMetadata, 'ExclusionPolicy::'.$attribute->policy);
                     }
                     break;
 
-                case $annotation instanceof XmlRoot:
+                case $attribute instanceof XmlRoot:
                     // skip these attributes, we don't do xml
                     break;
 
                 default:
-                    if (0 === strncmp('JMS\Serializer\\', \get_class($annotation), mb_strlen('JMS\Serializer\\'))) {
-                        // if there are annotations we can safely ignore, we need to explicitly ignore them
-                        throw ParseException::unsupportedClassAnnotation((string) $classMetadata, \get_class($annotation));
+                    if (0 === strncmp('JMS\Serializer\\', \get_class($attribute), mb_strlen('JMS\Serializer\\'))) {
+                        // if there are attributes we can safely ignore, we need to explicitly ignore them
+                        throw ParseException::unsupportedClassAttribute((string) $classMetadata, \get_class($attribute));
                     }
             }
         }
     }
 
     /**
-     * Find the annotations we care about by looking through all ancestors of $reflectionClass.
+     * Find the attributes we care about by looking through all ancestors of $reflectionClass.
      *
-     * @return object[] Hashmap of annotation class => annotation object
-     *
-     * @throws AnnotationException
+     * @return object[] Hashmap of attribute class => attribute object
      */
-    private function gatherClassAnnotations(\ReflectionClass $reflectionClass): array
+    private function gatherClassAttributes(\ReflectionClass $reflectionClass): array
     {
         $map = [];
         if ($parent = $reflectionClass->getParentClass()) {
-            $map = $this->gatherClassAnnotations($parent);
+            $map = $this->gatherClassAttributes($parent);
         }
-        $annotations = $this->annotationsReader->getClassAnnotations($reflectionClass);
-        foreach ($annotations as $annotation) {
-            $map[\get_class($annotation)] = $annotation;
+
+        $attributes = $this->annotationOrAttributeReader->getClassAnnotations($reflectionClass);
+        foreach ($attributes as $attribute) {
+            $map[\get_class($attribute)] = $attribute;
         }
 
         return $map;
     }
 
-    private function parsePropertyAnnotations(RawClassMetadata $classMetadata, PropertyVariationMetadata $property, array $annotations): void
+    private function parsePropertyAttributes(RawClassMetadata $classMetadata, PropertyVariationMetadata $property, array $attributes): void
     {
-        foreach ($annotations as $annotation) {
+        foreach ($attributes as $attribute) {
             switch (true) {
-                case $annotation instanceof Type:
-                    if (null === $annotation->name) {
+                case $attribute instanceof Type:
+                    if (null === $attribute->name) {
                         throw ParseException::propertyTypeNameNull((string) $classMetadata, (string) $property);
                     }
                     try {
-                        $type = $this->jmsTypeParser->parse($annotation->name);
+                        $type = $this->jmsTypeParser->parse($attribute->name);
                     } catch (InvalidTypeException $e) {
                         throw ParseException::propertyTypeError((string) $classMetadata, (string) $property, $e);
                     }
@@ -253,53 +231,53 @@ final class JMSParser implements ModelParserInterface
                     }
                     break;
 
-                case $annotation instanceof Exclude:
-                    if (null !== $annotation->if) {
-                        throw ParseException::unsupportedPropertyAnnotation((string) $classMetadata, (string) $property, 'Exclude::if');
+                case $attribute instanceof Exclude:
+                    if (null !== $attribute->if) {
+                        throw ParseException::unsupportedPropertyAttribute((string) $classMetadata, (string) $property, 'Exclude::if');
                     }
                     $classMetadata->removePropertyVariation((string) $property);
                     break;
 
-                case $annotation instanceof Groups:
-                    $property->setGroups($annotation->groups);
+                case $attribute instanceof Groups:
+                    $property->setGroups($attribute->groups);
                     break;
 
-                case $annotation instanceof Accessor:
-                    $property->setAccessor(new PropertyAccessor($annotation->getter, $annotation->setter));
+                case $attribute instanceof Accessor:
+                    $property->setAccessor(new PropertyAccessor($attribute->getter, $attribute->setter));
                     break;
 
-                case $annotation instanceof Since:
-                    $property->setVersionRange($property->getVersionRange()->withSince($annotation->version));
+                case $attribute instanceof Since:
+                    $property->setVersionRange($property->getVersionRange()->withSince($attribute->version));
                     break;
 
-                case $annotation instanceof Until:
-                    $property->setVersionRange($property->getVersionRange()->withUntil($annotation->version));
+                case $attribute instanceof Until:
+                    $property->setVersionRange($property->getVersionRange()->withUntil($attribute->version));
                     break;
 
-                case $annotation instanceof ReadOnlyProperty:
+                case $attribute instanceof ReadOnlyProperty:
                     $property->setReadOnly(true);
                     break;
 
-                case $annotation instanceof MaxDepth:
-                    $property->setMaxDepth($annotation->depth);
+                case $attribute instanceof MaxDepth:
+                    $property->setMaxDepth($attribute->depth);
                     break;
 
-                case $annotation instanceof VirtualProperty:
+                case $attribute instanceof VirtualProperty:
                     // we handle this separately
-                case $annotation instanceof SerializedName:
+                case $attribute instanceof SerializedName:
                     // we handle this separately
-                case $annotation instanceof XmlAttribute:
-                case $annotation instanceof XmlKeyValuePairs:
-                case $annotation instanceof XmlList:
-                case $annotation instanceof XmlMap:
-                case $annotation instanceof XmlValue:
+                case $attribute instanceof XmlAttribute:
+                case $attribute instanceof XmlKeyValuePairs:
+                case $attribute instanceof XmlList:
+                case $attribute instanceof XmlMap:
+                case $attribute instanceof XmlValue:
                     // skip these attributes, we don't do xml
                     break;
 
                 default:
-                    if (0 === strncmp('JMS\Serializer\\', \get_class($annotation), mb_strlen('JMS\Serializer\\'))) {
-                        // if there are annotations we can safely ignore, we need to explicitly ignore them
-                        throw ParseException::unsupportedPropertyAnnotation((string) $classMetadata, (string) $property, \get_class($annotation));
+                    if (0 === strncmp('JMS\Serializer\\', \get_class($attribute), mb_strlen('JMS\Serializer\\'))) {
+                        // if there are attributes we can safely ignore, we need to explicitly ignore them
+                        throw ParseException::unsupportedPropertyAttribute((string) $classMetadata, (string) $property, \get_class($attribute));
                     }
                     break;
             }
@@ -312,10 +290,10 @@ final class JMSParser implements ModelParserInterface
      * If the property already exists on the class metadata this is returned.
      * If the property has a serialized name that overrides the name of an existing property, it will be renamed and merged.
      */
-    private function getProperty(RawClassMetadata $classMetadata, \ReflectionProperty $reflProperty, array $annotations): PropertyVariationMetadata
+    private function getProperty(RawClassMetadata $classMetadata, \ReflectionProperty $reflProperty, array $attributes): PropertyVariationMetadata
     {
         $defaultName = PropertyCollection::serializedName($reflProperty->getName());
-        $name = $this->getSerializedName($annotations) ?: $defaultName;
+        $name = $this->getSerializedName($attributes) ?: $defaultName;
         if ($classMetadata->hasPropertyVariation($reflProperty->getName())) {
             $property = $classMetadata->getPropertyVariation($reflProperty->getName());
             if ($defaultName !== $name && $classMetadata->hasPropertyCollection($defaultName)) {
@@ -371,21 +349,21 @@ final class JMSParser implements ModelParserInterface
         return null;
     }
 
-    private function getSerializedName(array $annotations): ?string
+    private function getSerializedName(array $attributes): ?string
     {
-        foreach ($annotations as $annotation) {
-            if ($annotation instanceof SerializedName) {
-                return $annotation->name;
+        foreach ($attributes as $attribute) {
+            if ($attribute instanceof SerializedName) {
+                return $attribute->name;
             }
         }
 
         return null;
     }
 
-    private function isVirtualProperty(array $annotations): bool
+    private function isVirtualProperty(array $attributes): bool
     {
-        foreach ($annotations as $annotation) {
-            if ($annotation instanceof VirtualProperty) {
+        foreach ($attributes as $attribute) {
+            if ($attribute instanceof VirtualProperty) {
                 return true;
             }
         }
@@ -393,10 +371,10 @@ final class JMSParser implements ModelParserInterface
         return false;
     }
 
-    private function isPostDeserializeMethod(array $annotations): bool
+    private function isPostDeserializeMethod(array $attributes): bool
     {
-        foreach ($annotations as $annotation) {
-            if ($annotation instanceof PostDeserialize) {
+        foreach ($attributes as $attribute) {
+            if ($attribute instanceof PostDeserialize) {
                 return true;
             }
         }
@@ -404,12 +382,12 @@ final class JMSParser implements ModelParserInterface
         return false;
     }
 
-    private function getMethodName(array $annotations, \ReflectionMethod $reflMethod): string
+    private function getMethodName(array $attributes, \ReflectionMethod $reflMethod): string
     {
         $name = $reflMethod->getName();
-        foreach ($annotations as $annotation) {
-            if ($annotation instanceof VirtualProperty && null !== $annotation->name) {
-                $name = $annotation->name;
+        foreach ($attributes as $attribute) {
+            if ($attribute instanceof VirtualProperty && null !== $attribute->name) {
+                $name = $attribute->name;
                 break;
             }
         }

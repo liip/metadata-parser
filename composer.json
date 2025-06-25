@@ -16,7 +16,7 @@
     "require": {
         "php": "^8.0",
         "ext-json": "*",
-        "doctrine/annotations": "^2.0.1",
+        "doctrine/annotations": "^2.0.2",
         "psr/log": "^1|^2|^3"
     },
     "require-dev": {
