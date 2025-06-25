@@ -11,7 +11,7 @@
 * Dropped support for PHP 7
 * Adjusted code to not trigger warnings with PHP 8.4
 * Removed deprecated `getDeserializeFormat` method from date time
-* Add attribute support for the `@Preferred` annotation 
+* Replaced `@Preferred` annotation with the `#[Preferred]` attribute
 
 # Version 1.x
 

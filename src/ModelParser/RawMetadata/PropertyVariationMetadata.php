@@ -13,7 +13,7 @@ use Liip\MetadataParser\Metadata\VersionRange;
 /**
  * A single property variant represents one item of a class that is serialized to a specific name.
  *
- * Different properties or methods with JMS serialized name annotations are considered variants of the same property.
+ * Different properties or methods with JMS serialized name attributes are considered variants of the same property.
  */
 final class PropertyVariationMetadata extends AbstractPropertyMetadata
 {
