@@ -10,7 +10,6 @@ use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\ModelParser\ModelParserInterface;
 use Liip\MetadataParser\ModelParser\NamingStrategy\PropertyNamingStrategyInterface;
 use Liip\MetadataParser\ModelParser\NamingStrategy\SnakeCasePropertyNamingStrategy;
-use Liip\MetadataParser\ModelParser\ParserContext;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 
 final class Parser
@@ -40,12 +39,12 @@ final class Parser
     {
         $registry = new RawClassMetadataRegistry();
 
-        $this->parseModel($className, new ParserContext($className), $registry);
+        $this->parseModel($className, $registry);
 
         return $registry->getAll();
     }
 
-    private function parseModel(string $className, ParserContext $context, RawClassMetadataRegistry $registry): void
+    private function parseModel(string $className, RawClassMetadataRegistry $registry): void
     {
         if ($registry->contains($className)) {
             return;
@@ -65,7 +64,7 @@ final class Parser
                 $type = $type->getLeafType();
             }
             if ($type instanceof PropertyTypeClass) {
-                $this->parseModel($type->getClassName(), $context->push($property), $registry);
+                $this->parseModel($type->getClassName(), $registry);
             }
         }
     }
@@ -77,7 +76,7 @@ final class Parser
         }
 
         foreach ($rawClassMetadata->getDiscriminatorMetadata()->classMap as $childClass) {
-            $this->parseModel($childClass, new ParserContext($childClass), $registry);
+            $this->parseModel($childClass, $registry);
         }
     }
 }
