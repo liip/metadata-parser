@@ -8,6 +8,7 @@ use Doctrine\Common\Annotations\AnnotationException;
 use Doctrine\Common\Annotations\Reader;
 use JMS\Serializer\Annotation\Accessor;
 use JMS\Serializer\Annotation\AccessorOrder;
+use JMS\Serializer\Annotation\Discriminator;
 use JMS\Serializer\Annotation\Exclude;
 use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Groups;
@@ -145,7 +146,8 @@ final class JMSParser implements ModelParserInterface
         } catch (AnnotationException $e) {
             throw ParseException::classError($reflClass->getName(), $e);
         }
-        foreach ($attributes as $attribute) {
+        foreach ($attributes as $values) {
+            ['attribute' => $attribute, 'className' => $className] = $values;
             switch (true) {
                 case $attribute instanceof AccessorOrder:
                     if (self::ACCESS_ORDER_CUSTOM !== $attribute->order) {
@@ -178,6 +180,10 @@ final class JMSParser implements ModelParserInterface
                     // skip these attributes, we don't do xml
                     break;
 
+                case $attribute instanceof Discriminator:
+                    $classMetadata->setDiscriminator($reflClass, $className, $attribute);
+                    break;
+
                 default:
                     if (0 === strncmp('JMS\Serializer\\', \get_class($attribute), mb_strlen('JMS\Serializer\\'))) {
                         // if there are attributes we can safely ignore, we need to explicitly ignore them
@@ -201,7 +207,10 @@ final class JMSParser implements ModelParserInterface
 
         $attributes = $this->annotationOrAttributeReader->getClassAnnotations($reflectionClass);
         foreach ($attributes as $attribute) {
-            $map[\get_class($attribute)] = $attribute;
+            $map[\get_class($attribute)] = [
+                'attribute' => $attribute,
+                'className' => $reflectionClass->getName(),
+            ];
         }
 
         return $map;

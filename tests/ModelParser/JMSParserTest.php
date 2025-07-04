@@ -1483,6 +1483,48 @@ class JMSParserTest extends TestCase
         $this->assertPropertyAccessor('foo', null, $property->getAccessor());
     }
 
+    public function testDiscriminator(): void
+    {
+        $classMetadata = new RawClassMetadata(Car::class);
+
+        $this->parser->parse($classMetadata);
+
+        $this->assertSame(Vehicle::class, $classMetadata->getDiscriminatorMetadata()->baseClass);
+        $this->assertFalse($classMetadata->getDiscriminatorMetadata()->disabled);
+
+        $this->assertArrayHasKey('moped', $classMetadata->getDiscriminatorMetadata()->classMap);
+        $this->assertSame(Moped::class, $classMetadata->getDiscriminatorMetadata()->classMap['moped']);
+
+        $this->assertArrayHasKey('car', $classMetadata->getDiscriminatorMetadata()->classMap);
+        $this->assertSame(Car::class, $classMetadata->getDiscriminatorMetadata()->classMap['car']);
+    }
+
+    public function testOverriddenDiscriminator(): void
+    {
+        $classMetadata = new RawClassMetadata(CabinCruiser::class);
+
+        $this->parser->parse($classMetadata);
+
+        $this->assertSame(Boat::class, $classMetadata->getDiscriminatorMetadata()->baseClass);
+        $this->assertFalse($classMetadata->getDiscriminatorMetadata()->disabled);
+
+        $this->assertArrayHasKey('cabinCruiser', $classMetadata->getDiscriminatorMetadata()->classMap);
+        $this->assertSame(CabinCruiser::class, $classMetadata->getDiscriminatorMetadata()->classMap['cabinCruiser']);
+
+        $this->assertArrayHasKey('ferry', $classMetadata->getDiscriminatorMetadata()->classMap);
+        $this->assertSame(Ferry::class, $classMetadata->getDiscriminatorMetadata()->classMap['ferry']);
+    }
+
+    public function testExistingDiscriminatorPropertyThrowsException(): void
+    {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('The discriminator field name "type" of the base-class "Tests\Liip\MetadataParser\ModelParser\Model\BaseDiscriminator" conflicts with a regular property of the sub-class "Tests\Liip\MetadataParser\ModelParser\Model\DiscriminatorWithFieldProperty');
+
+        $classMetadata = new RawClassMetadata(DiscriminatorWithFieldProperty::class);
+
+        $this->parser->parse($classMetadata);
+    }
+
     protected function assertPropertyCollection(string $serializedName, int $variations, PropertyCollection $prop): void
     {
         $this->assertSame($serializedName, $prop->getSerializedName(), 'Serialized name of property should match');

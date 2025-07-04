@@ -51,6 +51,8 @@ final class Builder
         }
 
         foreach ($classMetadataList as $classMetadata) {
+            $this->setDiscriminatorClassMetadata($classMetadata, $classMetadataList);
+
             foreach ($classMetadata->getProperties() as $property) {
                 try {
                     $this->setTypeClassMetadata($property->getType(), $classMetadataList);
@@ -82,5 +84,20 @@ final class Builder
         if ($type instanceof PropertyTypeIterable) {
             $this->setTypeClassMetadata($type->getLeafType(), $classMetadataList);
         }
+    }
+
+    private function setDiscriminatorClassMetadata(ClassMetadata $classMetadata, array $classMetadataList): void
+    {
+        if (null === $classMetadata->getDiscriminatorMetadata()) {
+            return;
+        }
+
+        $classes = array_values($classMetadata->getDiscriminatorMetadata()->classMap);
+        $discriminatorMetadataList = [];
+        foreach ($classes as $class) {
+            $discriminatorMetadataList[] = $classMetadataList[$class];
+        }
+
+        $classMetadata->getDiscriminatorMetadata()->setClassMetadataList($discriminatorMetadataList);
     }
 }

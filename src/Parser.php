@@ -57,6 +57,8 @@ final class Parser
         }
         $registry->add($rawClassMetadata);
 
+        $this->parseDiscriminatorClasses($rawClassMetadata, $registry);
+
         foreach ($rawClassMetadata->getPropertyVariations() as $property) {
             $type = $property->getType();
             if ($type instanceof PropertyTypeIterable) {
@@ -65,6 +67,17 @@ final class Parser
             if ($type instanceof PropertyTypeClass) {
                 $this->parseModel($type->getClassName(), $context->push($property), $registry);
             }
+        }
+    }
+
+    private function parseDiscriminatorClasses(RawClassMetadata $rawClassMetadata, RawClassMetadataRegistry $registry): void
+    {
+        if ($rawClassMetadata->getDiscriminatorMetadata() === null) {
+            return;
+        }
+
+        foreach ($rawClassMetadata->getDiscriminatorMetadata()->classMap as $childClass) {
+            $this->parseModel($childClass, new ParserContext($childClass), $registry);
         }
     }
 }
