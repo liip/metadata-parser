@@ -277,13 +277,16 @@ final class RawClassMetadata implements \JsonSerializable
             return;
         }
 
-        if (!\in_array($this->className, $classMap, true)) {
+        $typeValue = array_search($this->className, $classMap, true);
+        if (false === $typeValue) {
             throw new \UnexpectedValueException(\sprintf('The sub-class "%s" is not listed in the discriminator map of the base class %s', $this->className, $baseClass));
         }
 
         if ($this->hasPropertyCollection($propertyName)) {
             throw new \UnexpectedValueException(\sprintf('The discriminator field name "%s" of the base-class "%s" conflicts with a regular property of the sub-class "%s".', $propertyName, $baseClass, $this->className));
         }
+
+        $this->discriminatorMetadata->value = $typeValue;
     }
 
     public function getDiscriminatorMetadata(): ?ClassDiscriminatorMetadata
