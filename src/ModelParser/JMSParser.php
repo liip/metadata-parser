@@ -32,6 +32,8 @@ use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\PropertyAccessor;
 use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
+use Liip\MetadataParser\ModelParser\NamingStrategy\PropertyNamingStrategyInterface;
+use Liip\MetadataParser\ModelParser\NamingStrategy\SnakeCasePropertyNamingStrategy;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyCollection;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
@@ -55,12 +57,16 @@ final class JMSParser implements ModelParserInterface
 
     private Reader $annotationOrAttributeReader;
 
-    public function __construct(Reader $reader)
+    private PropertyNamingStrategyInterface $namingStrategy;
+
+    public function __construct(Reader $reader, ?PropertyNamingStrategyInterface $namingStrategy = null)
     {
         $this->annotationOrAttributeReader = new AttributeReader($reader);
 
         $this->phpTypeParser = new PhpTypeParser();
         $this->jmsTypeParser = new JMSTypeParser();
+
+        $this->namingStrategy = $namingStrategy ?? new SnakeCasePropertyNamingStrategy();
     }
 
     public function parse(RawClassMetadata $classMetadata): void
@@ -292,16 +298,16 @@ final class JMSParser implements ModelParserInterface
      */
     private function getProperty(RawClassMetadata $classMetadata, \ReflectionProperty $reflProperty, array $attributes): PropertyVariationMetadata
     {
-        $defaultName = PropertyCollection::serializedName($reflProperty->getName());
-        $name = $this->getSerializedName($attributes) ?: $defaultName;
+        $defaultName = $this->namingStrategy->getSerializedName($reflProperty->getName());
+        $serializedName = $this->getSerializedName($attributes) ?: $defaultName;
         if ($classMetadata->hasPropertyVariation($reflProperty->getName())) {
             $property = $classMetadata->getPropertyVariation($reflProperty->getName());
-            if ($defaultName !== $name && $classMetadata->hasPropertyCollection($defaultName)) {
-                $classMetadata->renameProperty($defaultName, $name);
+            if ($defaultName !== $serializedName && $classMetadata->hasPropertyCollection($defaultName)) {
+                $classMetadata->renameProperty($reflProperty->getName(), $serializedName);
             }
         } else {
             $property = PropertyVariationMetadata::fromReflection($reflProperty);
-            $classMetadata->addPropertyVariation($name, $property);
+            $classMetadata->addPropertyVariation($serializedName, $property);
         }
 
         return $property;

@@ -22,7 +22,7 @@ class RawClassMetadataTest extends TestCase
         $this->assertCount(1, $collection->getVariations());
         $this->assertSame('test', $collection->getSerializedName());
 
-        $rawClassMetadata->renameProperty('test', 'new_name');
+        $rawClassMetadata->renameProperty('testProperty', 'new_name');
         $this->assertFalse($rawClassMetadata->hasPropertyCollection('test'));
         $this->assertTrue($rawClassMetadata->hasPropertyCollection('new_name'));
         $collection = $rawClassMetadata->getPropertyCollection('new_name');

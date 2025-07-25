@@ -6,6 +6,8 @@ namespace Liip\MetadataParser\ModelParser;
 
 use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\ParameterMetadata;
+use Liip\MetadataParser\ModelParser\NamingStrategy\PropertyNamingStrategyInterface;
+use Liip\MetadataParser\ModelParser\NamingStrategy\SnakeCasePropertyNamingStrategy;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 use Liip\MetadataParser\TypeParser\PhpTypeParser;
@@ -24,10 +26,14 @@ final class ReflectionParser implements ModelParserInterface
      */
     private $reflectionSupportsPropertyType;
 
-    public function __construct()
+    private PropertyNamingStrategyInterface $namingStrategy;
+
+    public function __construct(?PropertyNamingStrategyInterface $namingStrategy = null)
     {
         $this->typeParser = new PhpTypeParser();
         $this->reflectionSupportsPropertyType = version_compare(\PHP_VERSION, '7.4', '>=');
+
+        $this->namingStrategy = $namingStrategy ?? new SnakeCasePropertyNamingStrategy();
     }
 
     public function parse(RawClassMetadata $classMetadata): void
@@ -68,7 +74,8 @@ final class ReflectionParser implements ModelParserInterface
                 if ($type) {
                     $property->setType($type);
                 }
-                $classMetadata->addPropertyVariation($reflProperty->getName(), $property);
+                $serializedName = $this->namingStrategy->getSerializedName($reflProperty->getName());
+                $classMetadata->addPropertyVariation($serializedName, $property);
             }
         }
     }

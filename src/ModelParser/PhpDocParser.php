@@ -7,6 +7,8 @@ namespace Liip\MetadataParser\ModelParser;
 use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
+use Liip\MetadataParser\ModelParser\NamingStrategy\PropertyNamingStrategyInterface;
+use Liip\MetadataParser\ModelParser\NamingStrategy\SnakeCasePropertyNamingStrategy;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyCollection;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
@@ -19,9 +21,13 @@ final class PhpDocParser implements ModelParserInterface
      */
     private $typeParser;
 
-    public function __construct()
+    private PropertyNamingStrategyInterface $namingStrategy;
+
+    public function __construct(?PropertyNamingStrategyInterface $namingStrategy = null)
     {
         $this->typeParser = new PhpTypeParser();
+
+        $this->namingStrategy = $namingStrategy ?? new SnakeCasePropertyNamingStrategy();
     }
 
     public function parse(RawClassMetadata $classMetadata): void
@@ -55,8 +61,9 @@ final class PhpDocParser implements ModelParserInterface
             if ($classMetadata->hasPropertyVariation($reflProperty->getName())) {
                 $property = $classMetadata->getPropertyVariation($reflProperty->getName());
             } else {
+                $serializedName = $this->namingStrategy->getSerializedName($reflProperty->getName());
                 $property = PropertyVariationMetadata::fromReflection($reflProperty);
-                $classMetadata->addPropertyVariation($reflProperty->getName(), $property);
+                $classMetadata->addPropertyVariation($serializedName, $property);
             }
 
             $docComment = $reflProperty->getDocComment();

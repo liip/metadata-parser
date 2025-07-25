@@ -16,6 +16,7 @@ use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
 use Liip\MetadataParser\ModelParser\JMSParser;
+use Liip\MetadataParser\ModelParser\NamingStrategy\IdenticalPropertyNamingStrategy;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyCollection;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
@@ -32,7 +33,6 @@ class JMSParserTest extends TestCase
 
     protected function setUp(): void
     {
-        PropertyCollection::useIdenticalNamingStrategy(false);
         $this->parser = new JMSParser(new AnnotationReader());
     }
 
@@ -321,9 +321,10 @@ class JMSParserTest extends TestCase
             private $mySecondProperty;
         };
 
-        PropertyCollection::useIdenticalNamingStrategy();
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+
+        $parser = new JMSParser(new AnnotationReader(), new IdenticalPropertyNamingStrategy());
+        $parser->parse($classMetadata);
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(2, $props, 'Number of properties should match');
@@ -427,7 +428,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $classMetadata->addPropertyVariation('fakeLinks', new PropertyVariationMetadata('fakeLinks', false, true));
+        $classMetadata->addPropertyVariation('fake_links', new PropertyVariationMetadata('fakeLinks', false, true));
         $classMetadata->addPropertyVariation('links', new PropertyVariationMetadata('links', false, true));
         $this->parser->parse($classMetadata);
 
