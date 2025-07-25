@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Liip\MetadataParser;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+use JMS\Serializer\Annotation\SerializedName;
 use Liip\MetadataParser\Builder;
 use Liip\MetadataParser\Metadata\PropertyMetadata;
 use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
+use Liip\MetadataParser\ModelParser\JMSParser;
 use Liip\MetadataParser\ModelParser\PhpDocParser;
 use Liip\MetadataParser\ModelParser\ReflectionParser;
 use Liip\MetadataParser\Parser;
@@ -21,10 +24,7 @@ use Tests\Liip\MetadataParser\ModelParser\Model\Nested;
  */
 class BuilderTest extends TestCase
 {
-    /**
-     * @var Builder
-     */
-    private $builder;
+    private Builder $builder;
 
     protected function setUp(): void
     {
@@ -32,6 +32,7 @@ class BuilderTest extends TestCase
             [
                 new ReflectionParser(),
                 new PhpDocParser(),
+                new JMSParser(new AnnotationReader()),
             ]
         );
 
@@ -64,6 +65,24 @@ class BuilderTest extends TestCase
         $props = $nestedMetadata->getProperties();
         $this->assertCount(1, $props, 'Number of properties should match');
         $this->assertProperty('nestedProperty', 'nested_property', false, false, $props[0]);
+    }
+
+    public function testPropertyWithDifferentSerializedName(): void
+    {
+        $c = new class {
+            /**
+             * @SerializedName("myProperty")
+             */
+            #[SerializedName('myProperty')]
+            public string $myProperty;
+        };
+
+        $classMetadata = $this->builder->build(\get_class($c));
+
+        $props = $classMetadata->getProperties();
+        $this->assertCount(1, $props, 'Number of properties should match');
+
+        $this->assertProperty('myProperty', 'myProperty', true, false, $props[0]);
     }
 
     private function assertProperty(string $name, string $serializedName, bool $public, bool $readOnly, PropertyMetadata $property): void
