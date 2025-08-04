@@ -7,7 +7,6 @@ namespace Liip\MetadataParser\ModelParser;
 use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\ParameterMetadata;
 use Liip\MetadataParser\ModelParser\NamingStrategy\PropertyNamingStrategyInterface;
-use Liip\MetadataParser\ModelParser\NamingStrategy\SnakeCasePropertyNamingStrategy;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 use Liip\MetadataParser\TypeParser\PhpTypeParser;
@@ -26,17 +25,13 @@ final class ReflectionParser implements ModelParserInterface
      */
     private $reflectionSupportsPropertyType;
 
-    private PropertyNamingStrategyInterface $namingStrategy;
-
-    public function __construct(?PropertyNamingStrategyInterface $namingStrategy = null)
+    public function __construct()
     {
         $this->typeParser = new PhpTypeParser();
         $this->reflectionSupportsPropertyType = version_compare(\PHP_VERSION, '7.4', '>=');
-
-        $this->namingStrategy = $namingStrategy ?? new SnakeCasePropertyNamingStrategy();
     }
 
-    public function parse(RawClassMetadata $classMetadata): void
+    public function parse(RawClassMetadata $classMetadata, PropertyNamingStrategyInterface $propertyNamingStrategy): void
     {
         try {
             $reflClass = new \ReflectionClass($classMetadata->getClassName());
@@ -44,14 +39,14 @@ final class ReflectionParser implements ModelParserInterface
             throw ParseException::classNotFound($classMetadata->getClassName(), $e);
         }
 
-        $this->parseProperties($reflClass, $classMetadata);
+        $this->parseProperties($reflClass, $classMetadata, $propertyNamingStrategy);
         $this->parseConstructor($reflClass, $classMetadata);
     }
 
-    private function parseProperties(\ReflectionClass $reflClass, RawClassMetadata $classMetadata): void
+    private function parseProperties(\ReflectionClass $reflClass, RawClassMetadata $classMetadata, PropertyNamingStrategyInterface $propertyNamingStrategy): void
     {
         if ($reflParentClass = $reflClass->getParentClass()) {
-            $this->parseProperties($reflParentClass, $classMetadata);
+            $this->parseProperties($reflParentClass, $classMetadata, $propertyNamingStrategy);
         }
 
         foreach ($reflClass->getProperties() as $reflProperty) {
@@ -74,7 +69,7 @@ final class ReflectionParser implements ModelParserInterface
                 if ($type) {
                     $property->setType($type);
                 }
-                $serializedName = $this->namingStrategy->getSerializedName($reflProperty->getName());
+                $serializedName = $propertyNamingStrategy->getSerializedName($reflProperty->getName());
                 $classMetadata->addPropertyVariation($serializedName, $property);
             }
         }

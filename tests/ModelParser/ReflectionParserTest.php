@@ -10,6 +10,7 @@ use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
+use Liip\MetadataParser\ModelParser\NamingStrategy\SnakeCasePropertyNamingStrategy;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyCollection;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
@@ -40,7 +41,7 @@ class ReflectionParserTest extends TestCase
         $rawClassMetadata = new RawClassMetadata('__invalid__');
 
         $this->expectException(ParseException::class);
-        $this->parser->parse($rawClassMetadata);
+        $this->parser->parse($rawClassMetadata, new SnakeCasePropertyNamingStrategy());
     }
 
     public function testEmpty(): void
@@ -49,7 +50,7 @@ class ReflectionParserTest extends TestCase
         };
 
         $rawClassMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($rawClassMetadata);
+        $this->parser->parse($rawClassMetadata, new SnakeCasePropertyNamingStrategy());
 
         $this->assertSame(\get_class($c), $rawClassMetadata->getClassName());
         $this->assertCount(0, $rawClassMetadata->getPropertyCollections(), 'Number of class metadata properties should match');
@@ -64,7 +65,7 @@ class ReflectionParserTest extends TestCase
         };
 
         $rawClassMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($rawClassMetadata);
+        $this->parser->parse($rawClassMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $rawClassMetadata->getPropertyCollections();
         $this->assertCount(3, $props, 'Number of class metadata properties should match');
@@ -92,7 +93,7 @@ class ReflectionParserTest extends TestCase
         }
 
         $rawClassMetadata = new RawClassMetadata(TypeDeclarationModel::class);
-        $this->parser->parse($rawClassMetadata);
+        $this->parser->parse($rawClassMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $rawClassMetadata->getPropertyCollections();
         $this->assertCount(3, $props, 'Number of class metadata properties should match');
@@ -120,7 +121,7 @@ class ReflectionParserTest extends TestCase
         }
 
         $rawClassMetadata = new RawClassMetadata(UnionTypeDeclarationModel::class);
-        $this->parser->parse($rawClassMetadata);
+        $this->parser->parse($rawClassMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $rawClassMetadata->getPropertyCollections();
         $this->assertCount(2, $props, 'Number of class metadata properties should match');
@@ -143,7 +144,7 @@ class ReflectionParserTest extends TestCase
         }
 
         $rawClassMetadata = new RawClassMetadata(IntersectionTypeDeclarationModel::class);
-        $this->parser->parse($rawClassMetadata);
+        $this->parser->parse($rawClassMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $rawClassMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of class metadata properties should match');
@@ -164,7 +165,7 @@ class ReflectionParserTest extends TestCase
 
         $rawClassMetadata = new RawClassMetadata(\get_class($c));
         $rawClassMetadata->addPropertyVariation('foo', new PropertyVariationMetadata('property1', false, true));
-        $this->parser->parse($rawClassMetadata);
+        $this->parser->parse($rawClassMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $rawClassMetadata->getPropertyCollections();
         $this->assertCount(2, $props, 'Number of class metadata properties should match');
@@ -188,7 +189,7 @@ class ReflectionParserTest extends TestCase
         };
 
         $rawClassMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($rawClassMetadata);
+        $this->parser->parse($rawClassMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $rawClassMetadata->getPropertyCollections();
         $this->assertCount(3, $props, 'Number of class metadata properties should match');
@@ -219,7 +220,7 @@ class ReflectionParserTest extends TestCase
         };
 
         $rawClassMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($rawClassMetadata);
+        $this->parser->parse($rawClassMetadata, new SnakeCasePropertyNamingStrategy());
 
         $parameters = $rawClassMetadata->getConstructorParameters();
         $this->assertCount(3, $parameters, 'Number of constructor parameters should match');

@@ -33,7 +33,6 @@ use Liip\MetadataParser\Metadata\PropertyAccessor;
 use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
 use Liip\MetadataParser\ModelParser\NamingStrategy\PropertyNamingStrategyInterface;
-use Liip\MetadataParser\ModelParser\NamingStrategy\SnakeCasePropertyNamingStrategy;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyCollection;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
@@ -57,19 +56,15 @@ final class JMSParser implements ModelParserInterface
 
     private Reader $annotationOrAttributeReader;
 
-    private PropertyNamingStrategyInterface $namingStrategy;
-
-    public function __construct(Reader $reader, ?PropertyNamingStrategyInterface $namingStrategy = null)
+    public function __construct(Reader $reader)
     {
         $this->annotationOrAttributeReader = new AttributeReader($reader);
 
         $this->phpTypeParser = new PhpTypeParser();
         $this->jmsTypeParser = new JMSTypeParser();
-
-        $this->namingStrategy = $namingStrategy ?? new SnakeCasePropertyNamingStrategy();
     }
 
-    public function parse(RawClassMetadata $classMetadata): void
+    public function parse(RawClassMetadata $classMetadata, PropertyNamingStrategyInterface $propertyNamingStrategy): void
     {
         try {
             $reflClass = new \ReflectionClass($classMetadata->getClassName());
@@ -78,7 +73,7 @@ final class JMSParser implements ModelParserInterface
         }
 
         try {
-            $this->parseProperties($reflClass, $classMetadata);
+            $this->parseProperties($reflClass, $classMetadata, $propertyNamingStrategy);
             $this->parseMethods($reflClass, $classMetadata);
             $this->parseClass($reflClass, $classMetadata);
         } catch (SyntaxError $exception) {
@@ -86,10 +81,10 @@ final class JMSParser implements ModelParserInterface
         }
     }
 
-    private function parseProperties(\ReflectionClass $reflClass, RawClassMetadata $classMetadata): void
+    private function parseProperties(\ReflectionClass $reflClass, RawClassMetadata $classMetadata, PropertyNamingStrategyInterface $propertyNamingStrategy): void
     {
         if ($reflParentClass = $reflClass->getParentClass()) {
-            $this->parseProperties($reflParentClass, $classMetadata);
+            $this->parseProperties($reflParentClass, $classMetadata, $propertyNamingStrategy);
         }
 
         foreach ($reflClass->getProperties() as $reflProperty) {
@@ -99,7 +94,7 @@ final class JMSParser implements ModelParserInterface
                 throw ParseException::propertyError((string) $classMetadata, $reflProperty->getName(), $e);
             }
 
-            $property = $this->getProperty($classMetadata, $reflProperty, $attributes);
+            $property = $this->getProperty($classMetadata, $reflProperty, $attributes, $propertyNamingStrategy);
             $this->parsePropertyAttributes($classMetadata, $property, $attributes);
         }
     }
@@ -296,9 +291,9 @@ final class JMSParser implements ModelParserInterface
      * If the property already exists on the class metadata this is returned.
      * If the property has a serialized name that overrides the name of an existing property, it will be renamed and merged.
      */
-    private function getProperty(RawClassMetadata $classMetadata, \ReflectionProperty $reflProperty, array $attributes): PropertyVariationMetadata
+    private function getProperty(RawClassMetadata $classMetadata, \ReflectionProperty $reflProperty, array $attributes, PropertyNamingStrategyInterface $propertyNamingStrategy): PropertyVariationMetadata
     {
-        $defaultName = $this->namingStrategy->getSerializedName($reflProperty->getName());
+        $defaultName = $propertyNamingStrategy->getSerializedName($reflProperty->getName());
         $serializedName = $this->getSerializedName($attributes) ?: $defaultName;
         if ($classMetadata->hasPropertyVariation($reflProperty->getName())) {
             $property = $classMetadata->getPropertyVariation($reflProperty->getName());
