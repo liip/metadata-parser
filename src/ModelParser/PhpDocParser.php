@@ -8,7 +8,6 @@ use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
 use Liip\MetadataParser\ModelParser\NamingStrategy\PropertyNamingStrategyInterface;
-use Liip\MetadataParser\ModelParser\NamingStrategy\SnakeCasePropertyNamingStrategy;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyCollection;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
@@ -21,16 +20,12 @@ final class PhpDocParser implements ModelParserInterface
      */
     private $typeParser;
 
-    private PropertyNamingStrategyInterface $namingStrategy;
-
-    public function __construct(?PropertyNamingStrategyInterface $namingStrategy = null)
+    public function __construct()
     {
         $this->typeParser = new PhpTypeParser();
-
-        $this->namingStrategy = $namingStrategy ?? new SnakeCasePropertyNamingStrategy();
     }
 
-    public function parse(RawClassMetadata $classMetadata): void
+    public function parse(RawClassMetadata $classMetadata, PropertyNamingStrategyInterface $propertyNamingStrategy): void
     {
         try {
             $reflClass = new \ReflectionClass($classMetadata->getClassName());
@@ -38,13 +33,13 @@ final class PhpDocParser implements ModelParserInterface
             throw ParseException::classNotFound($classMetadata->getClassName(), $e);
         }
 
-        $this->parseProperties($reflClass, $classMetadata);
+        $this->parseProperties($reflClass, $classMetadata, $propertyNamingStrategy);
     }
 
     /**
      * @return string[] the property names that have been added
      */
-    private function parseProperties(\ReflectionClass $reflClass, RawClassMetadata $classMetadata): array
+    private function parseProperties(\ReflectionClass $reflClass, RawClassMetadata $classMetadata, PropertyNamingStrategyInterface $propertyNamingStrategy): array
     {
         $existingProperties = array_map(static function (PropertyCollection $prop): string {
             return (string) $prop;
@@ -53,7 +48,7 @@ final class PhpDocParser implements ModelParserInterface
         $addedProperties = [];
         $parentProperties = [];
         if ($reflParentClass = $reflClass->getParentClass()) {
-            $parentProperties = $this->parseProperties($reflParentClass, $classMetadata);
+            $parentProperties = $this->parseProperties($reflParentClass, $classMetadata, $propertyNamingStrategy);
         }
         $parentPropertiesLookup = array_flip($parentProperties);
 
@@ -61,7 +56,7 @@ final class PhpDocParser implements ModelParserInterface
             if ($classMetadata->hasPropertyVariation($reflProperty->getName())) {
                 $property = $classMetadata->getPropertyVariation($reflProperty->getName());
             } else {
-                $serializedName = $this->namingStrategy->getSerializedName($reflProperty->getName());
+                $serializedName = $propertyNamingStrategy->getSerializedName($reflProperty->getName());
                 $property = PropertyVariationMetadata::fromReflection($reflProperty);
                 $classMetadata->addPropertyVariation($serializedName, $property);
             }

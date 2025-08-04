@@ -8,6 +8,8 @@ use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
 use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\ModelParser\ModelParserInterface;
+use Liip\MetadataParser\ModelParser\NamingStrategy\PropertyNamingStrategyInterface;
+use Liip\MetadataParser\ModelParser\NamingStrategy\SnakeCasePropertyNamingStrategy;
 use Liip\MetadataParser\ModelParser\ParserContext;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 
@@ -16,14 +18,17 @@ final class Parser
     /**
      * @var ModelParserInterface[]
      */
-    private $parsers;
+    private array $parsers;
+
+    private PropertyNamingStrategyInterface $propertyNamingStrategy;
 
     /**
      * @param ModelParserInterface[] $parsers
      */
-    public function __construct(array $parsers)
+    public function __construct(array $parsers, ?PropertyNamingStrategyInterface $propertyNamingStrategy = null)
     {
         $this->parsers = $parsers;
+        $this->propertyNamingStrategy = $propertyNamingStrategy ?? new SnakeCasePropertyNamingStrategy();
     }
 
     /**
@@ -48,7 +53,7 @@ final class Parser
 
         $rawClassMetadata = new RawClassMetadata($className);
         foreach ($this->parsers as $parser) {
-            $parser->parse($rawClassMetadata);
+            $parser->parse($rawClassMetadata, $this->propertyNamingStrategy);
         }
         $registry->add($rawClassMetadata);
 

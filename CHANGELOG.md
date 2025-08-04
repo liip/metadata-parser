@@ -12,11 +12,11 @@
 * Adjusted code to not trigger warnings with PHP 8.4
 * Removed deprecated `getDeserializeFormat` method from date time
 * Replaced `@Preferred` annotation with the `#[Preferred]` attribute
-* Added a new `PropertyNamingStrategyInterface`  which can be used to modify the naming strategy for properties. Previously 
-  this could be adjusted via the `PropertyCollection::useIdenticalNamingStrategy` method, but as this was a bit error prone, a separate
-  interface was introduced. This new interface also comes with two implementations: 
+* Replaced `PropertyCollection::useIdenticalNamingStrategy` static method with the `PropertyNamingStrategyInterface`.
+  If you need to change the property naming strategy, remove the call to the static method and instead pass a strategy instance to the parser.
+  The library provides two implementations for the property naming strategy:
   * `IdenticalPropertyNamingStrategy` 
-  * `SnakeCasePropertyNamingStrategy`.
+  * `SnakeCasePropertyNamingStrategy` (default).
 
 # Version 1.x
 

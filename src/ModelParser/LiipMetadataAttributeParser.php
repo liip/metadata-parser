@@ -6,6 +6,7 @@ namespace Liip\MetadataParser\ModelParser;
 
 use Liip\MetadataParser\Attribute\Preferred;
 use Liip\MetadataParser\Exception\ParseException;
+use Liip\MetadataParser\ModelParser\NamingStrategy\PropertyNamingStrategyInterface;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 
@@ -19,7 +20,7 @@ use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
  */
 final class LiipMetadataAttributeParser implements ModelParserInterface
 {
-    public function parse(RawClassMetadata $classMetadata): void
+    public function parse(RawClassMetadata $classMetadata, PropertyNamingStrategyInterface $propertyNamingStrategy): void
     {
         try {
             $reflClass = new \ReflectionClass($classMetadata->getClassName());

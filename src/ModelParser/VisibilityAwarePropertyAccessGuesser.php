@@ -6,6 +6,7 @@ namespace Liip\MetadataParser\ModelParser;
 
 use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\PropertyAccessor;
+use Liip\MetadataParser\ModelParser\NamingStrategy\PropertyNamingStrategyInterface;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 
@@ -21,7 +22,7 @@ use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
  */
 class VisibilityAwarePropertyAccessGuesser implements ModelParserInterface
 {
-    public function parse(RawClassMetadata $classMetadata): void
+    public function parse(RawClassMetadata $classMetadata, PropertyNamingStrategyInterface $propertyNamingStrategy): void
     {
         try {
             $reflClass = new \ReflectionClass($classMetadata->getClassName());

@@ -95,19 +95,21 @@ is validated to not contain any infinite recursion.
 By default, property names will be translated from a camelCased to a lower and 
 snake_cased name (e.g. `myProperty` becomes `my_property`). If you want to keep
 the property name as is, you can change the strategy to `identical` by passing
-the corresponding strategy to the parser you are using.
-
-For the `JMSParser`, it would look like this:
+the corresponding strategy to the parser.
 
 ```php
-use Doctrine\Common\Annotations\AnnotationReader;
 use Liip\MetadataParser\Builder;
-use Liip\MetadataParser\ModelParser\JMSParser;
 use Liip\MetadataParser\ModelParser\NamingStrategy\IdenticalPropertyNamingStrategy;
 
 $identicalNamingStrategy = new IdenticalPropertyNamingStrategy();
 
-$parser = new JMSParser(new AnnotationReader(), $identicalNamingStrategy);
+$parser = new Parser(
+    [
+        // your parsers
+    ],
+    new IdenticalPropertyNamingStrategy()
+);
+
 $builder = new Builder($parser)
 ```
 

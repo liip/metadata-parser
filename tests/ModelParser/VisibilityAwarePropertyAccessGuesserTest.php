@@ -6,6 +6,7 @@ namespace Tests\Liip\MetadataParser\ModelParser;
 
 use Generator;
 use Liip\MetadataParser\ModelParser\ModelParserInterface;
+use Liip\MetadataParser\ModelParser\NamingStrategy\SnakeCasePropertyNamingStrategy;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 use Liip\MetadataParser\ModelParser\ReflectionParser;
 use Liip\MetadataParser\ModelParser\VisibilityAwarePropertyAccessGuesser;
@@ -49,7 +50,7 @@ class VisibilityAwarePropertyAccessGuesserTest extends TestCase
         $classMetadata = new RawClassMetadata($class);
 
         foreach ($parsers as $parser) {
-            $parser->parse($classMetadata);
+            $parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
         }
 
         return $classMetadata;
