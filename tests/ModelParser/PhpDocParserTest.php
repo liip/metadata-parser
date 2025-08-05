@@ -11,6 +11,7 @@ use Liip\MetadataParser\Metadata\PropertyTypeClass;
 use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
+use Liip\MetadataParser\ModelParser\NamingStrategy\SnakeCasePropertyNamingStrategy;
 use Liip\MetadataParser\ModelParser\PhpDocParser;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyCollection;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
@@ -40,7 +41,7 @@ class PhpDocParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $this->assertSame(\get_class($c), $classMetadata->getClassName());
         $this->assertCount(0, $classMetadata->getPropertyCollections(), 'Number of properties should match');
@@ -52,7 +53,7 @@ class PhpDocParserTest extends TestCase
 
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('__invalid__');
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
     }
 
     public function testInvalidType(): void
@@ -68,7 +69,7 @@ class PhpDocParserTest extends TestCase
 
         $this->expectException(InvalidTypeException::class);
         $this->expectExceptionMessage('resource');
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
     }
 
     public static function providePropertyCases(): iterable
@@ -134,7 +135,7 @@ class PhpDocParserTest extends TestCase
     public function testProperty($c, string $propertyTypeClass, bool $nullable, string $type): void
     {
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -161,7 +162,7 @@ class PhpDocParserTest extends TestCase
 
         $classMetadata = new RawClassMetadata(\get_class($c));
         $classMetadata->addPropertyVariation('foo', new PropertyVariationMetadata('property1', false, true));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(2, $props, 'Number of properties should match');
@@ -190,7 +191,7 @@ class PhpDocParserTest extends TestCase
         $propertyMetadata = new PropertyVariationMetadata('property', false, true);
         $propertyMetadata->setType(new PropertyTypeIterable(new PropertyTypeUnknown(false), false, false));
         $classMetadata->addPropertyVariation('property', $propertyMetadata);
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -216,7 +217,7 @@ class PhpDocParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(3, $props, 'Number of properties should match');
@@ -247,7 +248,7 @@ class PhpDocParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');

@@ -21,15 +21,9 @@ use Liip\MetadataParser\Reducer\PropertyReducerInterface;
  */
 final class Builder
 {
-    /**
-     * @var Parser
-     */
-    private $parser;
+    private Parser $parser;
 
-    /**
-     * @var RecursionChecker
-     */
-    private $recursionChecker;
+    private RecursionChecker $recursionChecker;
 
     public function __construct(Parser $parser, RecursionChecker $recursionChecker)
     {

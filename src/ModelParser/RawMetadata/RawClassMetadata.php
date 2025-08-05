@@ -104,10 +104,11 @@ final class RawClassMetadata implements \JsonSerializable
      */
     public function renameProperty(string $propertyName, string $serializedName): void
     {
-        if (!$this->hasPropertyCollection($propertyName)) {
+        if (!$this->hasPropertyVariation($propertyName)) {
             throw new \UnexpectedValueException(\sprintf('Property "%s::%s" not found to rename', (string) $this, $propertyName));
         }
-        $prop = $this->getPropertyCollection($propertyName);
+
+        $prop = $this->getPropertyCollectionByPropertyVariation($propertyName);
 
         if ($this->hasPropertyCollection($serializedName)) {
             $target = $this->getPropertyCollection($serializedName);
@@ -192,6 +193,25 @@ final class RawClassMetadata implements \JsonSerializable
         $this->properties[] = $property;
     }
 
+    public function hasPropertyCollectionWithPropertyVariation(string $name): bool
+    {
+        return null !== $this->findPropertyCollectionByPropertyVariation($name);
+    }
+
+    /**
+     * @throws \UnexpectedValueException if no variation with this name exists
+     */
+    public function getPropertyCollectionByPropertyVariation(string $name): PropertyCollection
+    {
+        foreach ($this->properties as $prop) {
+            if ($prop->hasVariation($name)) {
+                return $prop;
+            }
+        }
+
+        throw new \UnexpectedValueException(\sprintf('Property collection for variation %s not found on class %s', $name, $this->className));
+    }
+
     /**
      * Usort the properties with this callable.
      */
@@ -238,9 +258,8 @@ final class RawClassMetadata implements \JsonSerializable
 
     private function findPropertyCollection(string $name): ?PropertyCollection
     {
-        $serializedName = PropertyCollection::serializedName($name);
         foreach ($this->properties as $property) {
-            if ($property->getSerializedName() === $serializedName) {
+            if ($property->getSerializedName() === $name) {
                 return $property;
             }
         }
@@ -253,6 +272,17 @@ final class RawClassMetadata implements \JsonSerializable
         foreach ($this->properties as $prop) {
             if ($prop->hasVariation($name)) {
                 return $prop->getVariation($name);
+            }
+        }
+
+        return null;
+    }
+
+    public function findPropertyCollectionByPropertyVariation(string $name): ?PropertyCollection
+    {
+        foreach ($this->properties as $prop) {
+            if ($prop->hasVariation($name)) {
+                return $prop;
             }
         }
 

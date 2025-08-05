@@ -94,12 +94,26 @@ is validated to not contain any infinite recursion.
 
 By default, property names will be translated from a camelCased to a lower and 
 snake_cased name (e.g. `myProperty` becomes `my_property`). If you want to keep
-the property name as is, you can change the strategy to `identical` via the 
-following code:
+the property name as is, you can change the strategy to `identical` by passing
+the corresponding strategy to the parser.
 
 ```php
-\Liip\MetadataParser\ModelParser\RawMetadata\PropertyCollection::useIdenticalNamingStrategy();
+use Liip\MetadataParser\Builder;
+use Liip\MetadataParser\ModelParser\NamingStrategy\IdenticalPropertyNamingStrategy;
+
+$identicalNamingStrategy = new IdenticalPropertyNamingStrategy();
+
+$parser = new Parser(
+    [
+        // your parsers
+    ],
+    new IdenticalPropertyNamingStrategy()
+);
+
+$builder = new Builder($parser)
 ```
+
+You can also create your own naming strategy by implementing the `Liip\MetadataParser\ModelParser\NamingStrategy\PropertyNamingStrategyInterface`
 
 ### Handling Edge Cases with @Preferred
 

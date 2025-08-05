@@ -16,6 +16,8 @@ use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
 use Liip\MetadataParser\ModelParser\JMSParser;
+use Liip\MetadataParser\ModelParser\NamingStrategy\IdenticalPropertyNamingStrategy;
+use Liip\MetadataParser\ModelParser\NamingStrategy\SnakeCasePropertyNamingStrategy;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyCollection;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
@@ -32,7 +34,6 @@ class JMSParserTest extends TestCase
 
     protected function setUp(): void
     {
-        PropertyCollection::useIdenticalNamingStrategy(false);
         $this->parser = new JMSParser(new AnnotationReader());
     }
 
@@ -42,7 +43,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $this->assertSame(\get_class($c), $classMetadata->getClassName());
         $this->assertCount(0, $classMetadata->getPropertyCollections(), 'Number of properties should match');
@@ -54,7 +55,7 @@ class JMSParserTest extends TestCase
 
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('__invalid__');
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
     }
 
     public function testInvalidClassAnnotations(): void
@@ -69,7 +70,7 @@ class JMSParserTest extends TestCase
 
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('AccessType');
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
     }
 
     public function testUnsupportedClassAnnotations(): void
@@ -84,7 +85,7 @@ class JMSParserTest extends TestCase
 
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('unsupported attribute');
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
     }
 
     public function testClassXmlAnnotations(): void
@@ -97,7 +98,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -206,7 +207,7 @@ class JMSParserTest extends TestCase
     public function testPropertyType($c, string $propertyTypeClass, bool $nullable, string $type): void
     {
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -227,7 +228,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -254,7 +255,7 @@ class JMSParserTest extends TestCase
 
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('unexpected "__" (T_UNKNOWN)');
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
     }
 
     public function testInheritedProperty(): void
@@ -274,7 +275,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(3, $props, 'Number of properties should match');
@@ -305,7 +306,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -321,9 +322,10 @@ class JMSParserTest extends TestCase
             private $mySecondProperty;
         };
 
-        PropertyCollection::useIdenticalNamingStrategy();
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+
+        $parser = new JMSParser(new AnnotationReader());
+        $parser->parse($classMetadata, new IdenticalPropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(2, $props, 'Number of properties should match');
@@ -349,7 +351,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -378,7 +380,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -399,7 +401,7 @@ class JMSParserTest extends TestCase
 
         $classMetadata = new RawClassMetadata(\get_class($c));
         $classMetadata->addPropertyVariation('property', new PropertyVariationMetadata('property', false, true));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -427,9 +429,9 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $classMetadata->addPropertyVariation('fakeLinks', new PropertyVariationMetadata('fakeLinks', false, true));
+        $classMetadata->addPropertyVariation('fake_links', new PropertyVariationMetadata('fakeLinks', false, true));
         $classMetadata->addPropertyVariation('links', new PropertyVariationMetadata('links', false, true));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -450,7 +452,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -472,7 +474,7 @@ class JMSParserTest extends TestCase
         $classMetadata->addPropertyVariation('property1', new PropertyVariationMetadata('property1', false, true));
         $classMetadata->addPropertyVariation('property2', new PropertyVariationMetadata('property2', false, true));
 
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -497,7 +499,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -520,7 +522,7 @@ class JMSParserTest extends TestCase
 
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('Exclude');
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
     }
 
     public function testGroups(): void
@@ -533,7 +535,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -564,7 +566,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(4, $props, 'Number of properties should match');
@@ -606,7 +608,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(4, $props, 'Number of properties should match');
@@ -647,7 +649,7 @@ class JMSParserTest extends TestCase
 
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('Type');
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
     }
 
     public function testPropertyXmlAnnotations(): void
@@ -670,7 +672,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -692,7 +694,7 @@ class JMSParserTest extends TestCase
 
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('unsupported attribute');
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
     }
 
     public function testOrder(): void
@@ -712,7 +714,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(5, $props, 'Number of properties should match');
@@ -737,7 +739,7 @@ class JMSParserTest extends TestCase
 
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('AccessorOrder');
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
     }
 
     public function testExclusionPolicy(): void
@@ -750,7 +752,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -770,7 +772,7 @@ class JMSParserTest extends TestCase
 
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('ExclusionPolicy');
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
     }
 
     public function testMethodWithoutDocBlock(): void
@@ -783,7 +785,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(0, $props, 'Number of properties should match');
@@ -802,7 +804,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -827,7 +829,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -852,7 +854,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -877,7 +879,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -905,7 +907,7 @@ class JMSParserTest extends TestCase
 
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('conflict');
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
     }
 
     public function testVirtualPropertyWithInvalidReturnDocBlock(): void
@@ -926,7 +928,7 @@ class JMSParserTest extends TestCase
 
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('resource');
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
     }
 
     public function testVirtualPropertyType(): void
@@ -944,7 +946,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -974,7 +976,7 @@ class JMSParserTest extends TestCase
 
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('conflict');
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
     }
 
     public function testVirtualPropertyTypeConflictingWithDocBlockType(): void
@@ -997,7 +999,7 @@ class JMSParserTest extends TestCase
 
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('conflict');
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
     }
 
     public function testVirtualPropertyTypeExtendingPrimitive(): void
@@ -1015,7 +1017,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -1041,7 +1043,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -1072,7 +1074,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -1106,7 +1108,7 @@ class JMSParserTest extends TestCase
 
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('unexpected "__" (T_UNKNOWN)');
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
     }
 
     public function testInvalidVirtualPropertyAnnotations(): void
@@ -1127,7 +1129,7 @@ class JMSParserTest extends TestCase
 
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('Type');
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
     }
 
     public function testPrivateVirtualProperty(): void
@@ -1146,7 +1148,7 @@ class JMSParserTest extends TestCase
 
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('public');
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
     }
 
     public function testVirtualPropertyExclude(): void
@@ -1164,7 +1166,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(0, $props, 'Number of properties should match');
@@ -1185,7 +1187,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -1211,7 +1213,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -1241,7 +1243,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -1277,7 +1279,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -1316,7 +1318,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -1341,7 +1343,7 @@ class JMSParserTest extends TestCase
 
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('unsupported attribute');
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
     }
 
     public function testPostDeserializedMethods(): void
@@ -1363,7 +1365,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $this->assertSame(['foo', 'bar'], $classMetadata->getPostDeserializeMethods());
     }
@@ -1378,7 +1380,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
@@ -1398,7 +1400,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(2, $props, 'Number of properties should match');
@@ -1436,7 +1438,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(3, $props, 'Number of properties should match');
@@ -1469,7 +1471,7 @@ class JMSParserTest extends TestCase
         };
 
         $classMetadata = new RawClassMetadata(\get_class($c));
-        $this->parser->parse($classMetadata);
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
 
         $props = $classMetadata->getPropertyCollections();
         $this->assertCount(1, $props, 'Number of properties should match');
