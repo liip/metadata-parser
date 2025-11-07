@@ -18,6 +18,7 @@ use JMS\Serializer\Annotation\ReadOnlyProperty;
 use JMS\Serializer\Annotation\SerializedName;
 use JMS\Serializer\Annotation\Since;
 use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\UnionDiscriminator;
 use JMS\Serializer\Annotation\Until;
 use JMS\Serializer\Annotation\VirtualProperty;
 use JMS\Serializer\Annotation\XmlAttribute;
@@ -32,6 +33,8 @@ use Liip\MetadataParser\Exception\InvalidTypeException;
 use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\PropertyAccessor;
 use Liip\MetadataParser\Metadata\PropertyType;
+use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
+use Liip\MetadataParser\Metadata\PropertyTypeUnion;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
 use Liip\MetadataParser\ModelParser\NamingStrategy\PropertyNamingStrategyInterface;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyCollection;
@@ -96,7 +99,7 @@ final class JMSParser implements ModelParserInterface
             }
 
             $property = $this->getProperty($classMetadata, $reflProperty, $attributes, $propertyNamingStrategy);
-            $this->parsePropertyAttributes($classMetadata, $property, $attributes);
+            $this->parsePropertyAttributes($classMetadata, $reflProperty, $property, $attributes);
         }
     }
 
@@ -126,7 +129,7 @@ final class JMSParser implements ModelParserInterface
                 $property->setType($this->getReturnType($property, $reflMethod, $reflClass));
                 $property->setAccessor(new PropertyAccessor($reflMethod->getName(), null));
 
-                $this->parsePropertyAttributes($classMetadata, $property, $attributes);
+                $this->parsePropertyAttributes($classMetadata, $reflMethod, $property, $attributes);
             }
 
             if ($this->isPostDeserializeMethod($attributes)) {
@@ -216,7 +219,7 @@ final class JMSParser implements ModelParserInterface
         return $map;
     }
 
-    private function parsePropertyAttributes(RawClassMetadata $classMetadata, PropertyVariationMetadata $property, array $attributes): void
+    private function parsePropertyAttributes(RawClassMetadata $classMetadata, \ReflectionProperty|\ReflectionMethod $reflection, PropertyVariationMetadata $property, array $attributes): void
     {
         foreach ($attributes as $attribute) {
             switch (true) {
@@ -270,6 +273,32 @@ final class JMSParser implements ModelParserInterface
 
                 case $attribute instanceof MaxDepth:
                     $property->setMaxDepth($attribute->depth);
+                    break;
+                case $attribute instanceof UnionDiscriminator:
+                    $types = [];
+                    $isNullable = $this->isNullable($reflection);
+                    if ($isNullable) {
+                        $types[] = new PropertyTypePrimitive('null', true);
+                    }
+
+                    foreach ($attribute->map as $value) {
+                        $types[] = $this->jmsTypeParser->parse($value, true);
+                    }
+
+                    $type = new PropertyTypeUnion($types, $isNullable);
+                    $type->setFieldName($attribute->field);
+                    $type->setTypeMap($attribute->map);
+
+                    if ($property->getType() instanceof PropertyTypeUnknown) {
+                        $property->setType($type);
+                    } else {
+                        try {
+                            $property->setType($property->getType()->merge($type));
+                        } catch (\UnexpectedValueException $e) {
+                            throw ParseException::propertyTypeConflict((string) $classMetadata, (string) $property, (string) $property->getType(), (string) $type, $e);
+                        }
+                    }
+
                     break;
 
                 case $attribute instanceof VirtualProperty:
@@ -407,5 +436,18 @@ final class JMSParser implements ModelParserInterface
         }
 
         return $name;
+    }
+
+    private function isNullable(\ReflectionProperty|\ReflectionMethod $reflection): bool
+    {
+        if ($reflection instanceof \ReflectionMethod) {
+            return false;
+        }
+
+        if (!$reflection->hasType()) {
+            return true;
+        }
+
+        return $reflection->getType()->allowsNull();
     }
 }

@@ -156,7 +156,7 @@ class ParserTest extends TestCase
     public function testDiscriminator(): void
     {
         $classMetadataList = $this->parser->parse(ClassWithVehicleProperty::class);
-        $classMetadata = $classMetadataList[0];
+        $classMetadata = $classMetadataList[1];
 
         $this->assertSame(Vehicle::class, $classMetadata->getDiscriminatorMetadata()->baseClass);
         $this->assertFalse($classMetadata->getDiscriminatorMetadata()->disabled);

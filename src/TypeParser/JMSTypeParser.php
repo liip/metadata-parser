@@ -34,13 +34,13 @@ final class JMSTypeParser
         $this->jmsTypeParser = new Parser();
     }
 
-    public function parse(string $rawType): PropertyType
+    public function parse(string $rawType, bool $isSubType = false): PropertyType
     {
         if ('' === $rawType) {
             return new PropertyTypeUnknown(true);
         }
 
-        return $this->parseType($this->jmsTypeParser->parse($rawType));
+        return $this->parseType($this->jmsTypeParser->parse($rawType), $isSubType);
     }
 
     private function parseType(array $typeInfo, bool $isSubType = false): PropertyType
