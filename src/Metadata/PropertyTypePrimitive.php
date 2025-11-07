@@ -18,6 +18,9 @@ final class PropertyTypePrimitive extends AbstractPropertyType
         'int',
         'float',
         'bool',
+        'null',
+        'true',
+        'false',
     ];
 
     /**
@@ -39,6 +42,10 @@ final class PropertyTypePrimitive extends AbstractPropertyType
 
     public function __toString(): string
     {
+        if ('null' === $this->typeName) {
+            return $this->typeName;
+        }
+
         return $this->typeName.parent::__toString();
     }
 
