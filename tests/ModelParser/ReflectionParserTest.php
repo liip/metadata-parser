@@ -9,6 +9,7 @@ use Liip\MetadataParser\Metadata\ParameterMetadata;
 use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
+use Liip\MetadataParser\Metadata\PropertyTypeUnion;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
 use Liip\MetadataParser\ModelParser\NamingStrategy\SnakeCasePropertyNamingStrategy;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyCollection;
@@ -134,7 +135,7 @@ class ReflectionParserTest extends TestCase
         $this->assertPropertyCollection('property2', 1, $props[1]);
         $property2 = $props[1]->getVariations()[0];
         $this->assertProperty('property2', true, false, $property2);
-        $this->assertPropertyType($property2->getType(), PropertyTypeUnknown::class, 'mixed', true);
+        $this->assertPropertyType($property2->getType(), PropertyTypeUnion::class, 'null|array|false|int|string', true);
     }
 
     public function testTypedPropertiesIntersection(): void

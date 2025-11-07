@@ -6,6 +6,8 @@ namespace Liip\MetadataParser\ModelParser;
 
 use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\ParameterMetadata;
+use Liip\MetadataParser\Metadata\PropertyType;
+use Liip\MetadataParser\Metadata\PropertyTypeUnion;
 use Liip\MetadataParser\ModelParser\NamingStrategy\PropertyNamingStrategyInterface;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
@@ -13,6 +15,18 @@ use Liip\MetadataParser\TypeParser\PhpTypeParser;
 
 final class ReflectionParser implements ModelParserInterface
 {
+    private const SUPPORTED_UNION_TYPES = [
+        'int',
+        'float',
+        'double',
+        'bool',
+        'true',
+        'false',
+        'string',
+        'null',
+        'array',
+    ];
+
     /**
      * @var PhpTypeParser
      */
@@ -52,11 +66,18 @@ final class ReflectionParser implements ModelParserInterface
         foreach ($reflClass->getProperties() as $reflProperty) {
             $type = null;
             $reflectionType = $this->reflectionSupportsPropertyType ? $reflProperty->getType() : null;
-            if ($reflectionType instanceof \ReflectionNamedType) {
-                // If the field has a union type (since PHP 8.0) or intersection type (since PHP 8.1),
-                // the type would be a different kind of ReflectionType than ReflectionNamedType.
-                // We don't have support in the metadata model to handle multiple types.
-                $type = $this->typeParser->parseReflectionType($reflectionType);
+            switch (true) {
+                case $reflectionType instanceof \ReflectionNamedType:
+                    $type = $this->typeParser->parseReflectionType($reflectionType);
+                    break;
+                case $reflectionType instanceof \ReflectionUnionType:
+                    $types = $this->getSupportedUnionTypes($reflectionType);
+                    if (\count($types) > 1) {
+                        $types = array_map(fn (\ReflectionType $namedType): PropertyType => $this->typeParser->parseReflectionType($namedType), $types);
+                        $type = new PropertyTypeUnion($types, $reflectionType->allowsNull());
+                    }
+
+                    break;
             }
             if ($classMetadata->hasPropertyVariation($reflProperty->getName())) {
                 $property = $classMetadata->getPropertyVariation($reflProperty->getName());
@@ -85,5 +106,20 @@ final class ReflectionParser implements ModelParserInterface
         foreach ($constructor->getParameters() as $reflParameter) {
             $classMetadata->addConstructorParameter(ParameterMetadata::fromReflection($reflParameter));
         }
+    }
+
+    /**
+     * @return \ReflectionType[]
+     */
+    private function getSupportedUnionTypes(\ReflectionUnionType $reflectionUnionType): array
+    {
+        $supportedTypes = [];
+        foreach ($reflectionUnionType->getTypes() as $type) {
+            if (\in_array($type->getName(), self::SUPPORTED_UNION_TYPES, true)) {
+                $supportedTypes[] = $type;
+            }
+        }
+
+        return $supportedTypes;
     }
 }

@@ -9,6 +9,7 @@ use Liip\MetadataParser\Metadata\ClassMetadata;
 use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
 use Liip\MetadataParser\Metadata\PropertyTypeIterable;
+use Liip\MetadataParser\Metadata\PropertyTypeUnion;
 use Liip\MetadataParser\Reducer\PropertyReducerInterface;
 
 /**
@@ -83,6 +84,12 @@ final class Builder
 
         if ($type instanceof PropertyTypeIterable) {
             $this->setTypeClassMetadata($type->getLeafType(), $classMetadataList);
+        }
+
+        if ($type instanceof PropertyTypeUnion) {
+            foreach ($type->getTypes() as $type) {
+                $this->setTypeClassMetadata($type, $classMetadataList);
+            }
         }
     }
 

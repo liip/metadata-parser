@@ -10,5 +10,6 @@ use Tests\Liip\MetadataParser\ModelParser\ReflectionParserTest;
 class UnionTypeDeclarationModel
 {
     protected ReflectionParserTest|ReflectionParser $property1;
-    public int|string|null $property2;
+
+    public int|string|array|false|null $property2;
 }
