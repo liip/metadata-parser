@@ -17,6 +17,7 @@
   The library provides two implementations for the property naming strategy:
   * `IdenticalPropertyNamingStrategy` 
   * `SnakeCasePropertyNamingStrategy` (default).
+* Add support for (union) discriminators and their related JMS attributes `#[UnionDiscriminator]` and `#[Discriminator]` 
 
 # Version 1.x
 
