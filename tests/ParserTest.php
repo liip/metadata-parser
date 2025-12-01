@@ -4,19 +4,25 @@ declare(strict_types=1);
 
 namespace Tests\Liip\MetadataParser;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
 use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
+use Liip\MetadataParser\ModelParser\JMSParser;
 use Liip\MetadataParser\ModelParser\PhpDocParser;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyCollection;
 use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\ReflectionParser;
 use Liip\MetadataParser\Parser;
 use PHPUnit\Framework\TestCase;
+use Tests\Liip\MetadataParser\ModelParser\Model\Car;
+use Tests\Liip\MetadataParser\ModelParser\Model\ClassWithVehicleProperty;
+use Tests\Liip\MetadataParser\ModelParser\Model\Moped;
 use Tests\Liip\MetadataParser\ModelParser\Model\Nested;
+use Tests\Liip\MetadataParser\ModelParser\Model\Vehicle;
 
 /**
  * @small
@@ -33,6 +39,7 @@ class ParserTest extends TestCase
         $this->parser = new Parser([
             new ReflectionParser(),
             new PhpDocParser(),
+            new JMSParser(new AnnotationReader()),
         ]);
     }
 
@@ -144,6 +151,21 @@ class ParserTest extends TestCase
         $property = $props[0]->getVariations()[0];
         $this->assertProperty('nestedProperty', false, false, $property);
         $this->assertPropertyType($property->getType(), PropertyTypeUnknown::class, 'mixed', true);
+    }
+
+    public function testDiscriminator(): void
+    {
+        $classMetadataList = $this->parser->parse(ClassWithVehicleProperty::class);
+        $classMetadata = $classMetadataList[1];
+
+        $this->assertSame(Vehicle::class, $classMetadata->getDiscriminatorMetadata()->baseClass);
+        $this->assertFalse($classMetadata->getDiscriminatorMetadata()->disabled);
+
+        $this->assertArrayHasKey('moped', $classMetadata->getDiscriminatorMetadata()->classMap);
+        $this->assertSame(Moped::class, $classMetadata->getDiscriminatorMetadata()->classMap['moped']);
+
+        $this->assertArrayHasKey('car', $classMetadata->getDiscriminatorMetadata()->classMap);
+        $this->assertSame(Car::class, $classMetadata->getDiscriminatorMetadata()->classMap['car']);
     }
 
     private function assertPropertyCollection(string $serializedName, int $variations, PropertyCollection $prop): void

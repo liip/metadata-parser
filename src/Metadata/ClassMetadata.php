@@ -38,12 +38,14 @@ final class ClassMetadata implements \JsonSerializable
      */
     private $constructorParameters = [];
 
+    private ?ClassDiscriminatorMetadata $discriminatorMetadata = null;
+
     /**
      * @param PropertyMetadata[]  $properties
      * @param ParameterMetadata[] $constructorParameters
      * @param string[]            $postDeserializeMethods
      */
-    public function __construct(string $className, array $properties, array $constructorParameters = [], array $postDeserializeMethods = [])
+    public function __construct(string $className, array $properties, array $constructorParameters = [], array $postDeserializeMethods = [], ?ClassDiscriminatorMetadata $discriminatorMetadata = null)
     {
         \assert(array_reduce($constructorParameters, static function (bool $carry, $parameter): bool {
             return $carry && $parameter instanceof ParameterMetadata;
@@ -52,6 +54,7 @@ final class ClassMetadata implements \JsonSerializable
         $this->className = $className;
         $this->constructorParameters = $constructorParameters;
         $this->postDeserializeMethods = $postDeserializeMethods;
+        $this->discriminatorMetadata = $discriminatorMetadata;
 
         foreach ($properties as $property) {
             $this->addProperty($property);
@@ -72,7 +75,8 @@ final class ClassMetadata implements \JsonSerializable
             $rawClassMetadata->getClassName(),
             $properties,
             $rawClassMetadata->getConstructorParameters(),
-            $rawClassMetadata->getPostDeserializeMethods()
+            $rawClassMetadata->getPostDeserializeMethods(),
+            $rawClassMetadata->getDiscriminatorMetadata()
         );
     }
 
@@ -125,6 +129,11 @@ final class ClassMetadata implements \JsonSerializable
         }
 
         throw new \InvalidArgumentException(\sprintf('Class %s has no constructor parameter called "%s"', $this->className, $name));
+    }
+
+    public function getDiscriminatorMetadata(): ?ClassDiscriminatorMetadata
+    {
+        return $this->discriminatorMetadata;
     }
 
     /**

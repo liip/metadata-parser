@@ -10,6 +10,8 @@ use Liip\MetadataParser\Builder;
 use Liip\MetadataParser\Metadata\PropertyMetadata;
 use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
+use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
+use Liip\MetadataParser\Metadata\PropertyTypeUnion;
 use Liip\MetadataParser\ModelParser\JMSParser;
 use Liip\MetadataParser\ModelParser\PhpDocParser;
 use Liip\MetadataParser\ModelParser\ReflectionParser;
@@ -17,6 +19,10 @@ use Liip\MetadataParser\Parser;
 use Liip\MetadataParser\RecursionChecker;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Tests\Liip\MetadataParser\ModelParser\Model\Car;
+use Tests\Liip\MetadataParser\ModelParser\Model\ClassUsingUnionDiscriminator;
+use Tests\Liip\MetadataParser\ModelParser\Model\ClassUsingUnionTyping;
+use Tests\Liip\MetadataParser\ModelParser\Model\Moped;
 use Tests\Liip\MetadataParser\ModelParser\Model\Nested;
 
 /**
@@ -83,6 +89,54 @@ class BuilderTest extends TestCase
         $this->assertCount(1, $props, 'Number of properties should match');
 
         $this->assertProperty('myProperty', 'myProperty', true, false, $props[0]);
+    }
+
+    public function testDiscriminatorClassMetadataList(): void
+    {
+        $classMetadata = $this->builder->build(Car::class);
+
+        $props = $classMetadata->getProperties();
+        $this->assertCount(1, $props, 'Number of properties should match');
+
+        $this->assertProperty('carProperty', 'car_property', true, false, $props[0]);
+        $this->assertPropertyType($props[0]->getType(), PropertyTypePrimitive::class, 'string', false);
+
+        $discriminatorMetadata = $classMetadata->getDiscriminatorMetadata();
+
+        $this->assertNotNull($discriminatorMetadata);
+        $this->assertCount(2, $discriminatorMetadata->getClassMetadataList());
+        $this->assertNotNull($discriminatorMetadata->getMetadataForClass(Car::class));
+        $this->assertNotNull($discriminatorMetadata->getMetadataForClass(Moped::class));
+    }
+
+    public function testUnionDiscriminatorClassMetadataList(): void
+    {
+        if (\PHP_VERSION_ID < 80100) {
+            $this->markTestSkipped('Intersection property types are only supported in PHP 8.1 or newer');
+        }
+
+        $classMetadata = $this->builder->build(ClassUsingUnionDiscriminator::class);
+
+        $props = $classMetadata->getProperties();
+        $this->assertCount(1, $props, 'Number of properties should match');
+
+        $this->assertProperty('property', 'property', true, false, $props[0]);
+        $this->assertPropertyType($props[0]->getType(), PropertyTypeUnion::class, 'null|Tests\Liip\MetadataParser\ModelParser\Model\DiscriminatorComment|Tests\Liip\MetadataParser\ModelParser\Model\DiscriminatorAuthor', true);
+    }
+
+    public function testUnionTypingClassMetadataList(): void
+    {
+        if (\PHP_VERSION_ID < 80100) {
+            $this->markTestSkipped('Intersection property types are only supported in PHP 8.1 or newer');
+        }
+
+        $classMetadata = $this->builder->build(ClassUsingUnionTyping::class);
+
+        $props = $classMetadata->getProperties();
+        $this->assertCount(1, $props, 'Number of properties should match');
+
+        $this->assertProperty('property', 'property', true, false, $props[0]);
+        $this->assertPropertyType($props[0]->getType(), PropertyTypeUnion::class, 'Tests\Liip\MetadataParser\ModelParser\Model\DiscriminatorComment|Tests\Liip\MetadataParser\ModelParser\Model\DiscriminatorAuthor', false);
     }
 
     private function assertProperty(string $name, string $serializedName, bool $public, bool $readOnly, PropertyMetadata $property): void

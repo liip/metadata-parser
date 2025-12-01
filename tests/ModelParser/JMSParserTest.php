@@ -14,6 +14,7 @@ use Liip\MetadataParser\Metadata\PropertyTypeClass;
 use Liip\MetadataParser\Metadata\PropertyTypeDateTime;
 use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
+use Liip\MetadataParser\Metadata\PropertyTypeUnion;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
 use Liip\MetadataParser\ModelParser\JMSParser;
 use Liip\MetadataParser\ModelParser\NamingStrategy\IdenticalPropertyNamingStrategy;
@@ -23,7 +24,18 @@ use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 use PHPUnit\Framework\TestCase;
 use Tests\Liip\MetadataParser\ModelParser\Model\BaseModel;
+use Tests\Liip\MetadataParser\ModelParser\Model\Boat;
+use Tests\Liip\MetadataParser\ModelParser\Model\CabinCruiser;
+use Tests\Liip\MetadataParser\ModelParser\Model\Car;
+use Tests\Liip\MetadataParser\ModelParser\Model\ClassUsingUnionDiscriminator;
+use Tests\Liip\MetadataParser\ModelParser\Model\ClassUsingUnionTyping;
+use Tests\Liip\MetadataParser\ModelParser\Model\DiscriminatorAuthor;
+use Tests\Liip\MetadataParser\ModelParser\Model\DiscriminatorComment;
+use Tests\Liip\MetadataParser\ModelParser\Model\DiscriminatorWithFieldProperty;
+use Tests\Liip\MetadataParser\ModelParser\Model\Ferry;
+use Tests\Liip\MetadataParser\ModelParser\Model\Moped;
 use Tests\Liip\MetadataParser\ModelParser\Model\Nested;
+use Tests\Liip\MetadataParser\ModelParser\Model\Vehicle;
 
 /**
  * @small
@@ -1481,6 +1493,86 @@ class JMSParserTest extends TestCase
         $this->assertPropertyVariation('foo', true, true, $property);
         $this->assertPropertyType(PropertyTypePrimitive::class, 'string', false, $property->getType());
         $this->assertPropertyAccessor('foo', null, $property->getAccessor());
+    }
+
+    public function testDiscriminator(): void
+    {
+        $classMetadata = new RawClassMetadata(Car::class);
+
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
+
+        $this->assertSame(Vehicle::class, $classMetadata->getDiscriminatorMetadata()->baseClass);
+        $this->assertFalse($classMetadata->getDiscriminatorMetadata()->disabled);
+
+        $this->assertArrayHasKey('moped', $classMetadata->getDiscriminatorMetadata()->classMap);
+        $this->assertSame(Moped::class, $classMetadata->getDiscriminatorMetadata()->classMap['moped']);
+
+        $this->assertArrayHasKey('car', $classMetadata->getDiscriminatorMetadata()->classMap);
+        $this->assertSame(Car::class, $classMetadata->getDiscriminatorMetadata()->classMap['car']);
+    }
+
+    public function testOverriddenDiscriminator(): void
+    {
+        $classMetadata = new RawClassMetadata(CabinCruiser::class);
+
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
+
+        $this->assertSame(Boat::class, $classMetadata->getDiscriminatorMetadata()->baseClass);
+        $this->assertFalse($classMetadata->getDiscriminatorMetadata()->disabled);
+
+        $this->assertArrayHasKey('cabinCruiser', $classMetadata->getDiscriminatorMetadata()->classMap);
+        $this->assertSame(CabinCruiser::class, $classMetadata->getDiscriminatorMetadata()->classMap['cabinCruiser']);
+
+        $this->assertArrayHasKey('ferry', $classMetadata->getDiscriminatorMetadata()->classMap);
+        $this->assertSame(Ferry::class, $classMetadata->getDiscriminatorMetadata()->classMap['ferry']);
+    }
+
+    public function testExistingDiscriminatorPropertyThrowsException(): void
+    {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('The discriminator field name "type" of the base-class "Tests\Liip\MetadataParser\ModelParser\Model\BaseDiscriminator" conflicts with a regular property of the sub-class "Tests\Liip\MetadataParser\ModelParser\Model\DiscriminatorWithFieldProperty');
+
+        $classMetadata = new RawClassMetadata(DiscriminatorWithFieldProperty::class);
+
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
+    }
+
+    public function testUnionDiscriminator(): void
+    {
+        if (\PHP_VERSION_ID < 80100) {
+            $this->markTestSkipped('Intersection property types are only supported in PHP 8.1 or newer');
+        }
+
+        $classMetadata = new RawClassMetadata(ClassUsingUnionDiscriminator::class);
+
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
+
+        $props = $classMetadata->getPropertyCollections();
+        $this->assertCount(1, $props);
+
+        $this->assertPropertyCollection('property', 1, $props[0]);
+
+        $property = $props[0]->getVariations()[0];
+        $this->assertPropertyType(PropertyTypeUnion::class, 'null|'.DiscriminatorComment::class.'|'.DiscriminatorAuthor::class, true, $property->getType());
+    }
+
+    public function testUnionDiscriminatorWithTyping(): void
+    {
+        if (\PHP_VERSION_ID < 80100) {
+            $this->markTestSkipped('Intersection property types are only supported in PHP 8.1 or newer');
+        }
+
+        $classMetadata = new RawClassMetadata(ClassUsingUnionTyping::class);
+
+        $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
+
+        $props = $classMetadata->getPropertyCollections();
+        $this->assertCount(1, $props);
+
+        $this->assertPropertyCollection('property', 1, $props[0]);
+
+        $property = $props[0]->getVariations()[0];
+        $this->assertPropertyType(PropertyTypeUnion::class, DiscriminatorComment::class.'|'.DiscriminatorAuthor::class, false, $property->getType());
     }
 
     protected function assertPropertyCollection(string $serializedName, int $variations, PropertyCollection $prop): void

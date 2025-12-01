@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Liip\MetadataParser;
 
 use Liip\MetadataParser\Exception\ParseException;
+use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
 use Liip\MetadataParser\Metadata\PropertyTypeIterable;
+use Liip\MetadataParser\Metadata\PropertyTypeUnion;
 use Liip\MetadataParser\ModelParser\ModelParserInterface;
 use Liip\MetadataParser\ModelParser\NamingStrategy\PropertyNamingStrategyInterface;
 use Liip\MetadataParser\ModelParser\NamingStrategy\SnakeCasePropertyNamingStrategy;
-use Liip\MetadataParser\ModelParser\ParserContext;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 
 final class Parser
@@ -40,12 +41,12 @@ final class Parser
     {
         $registry = new RawClassMetadataRegistry();
 
-        $this->parseModel($className, new ParserContext($className), $registry);
+        $this->parseModel($className, $registry);
 
         return $registry->getAll();
     }
 
-    private function parseModel(string $className, ParserContext $context, RawClassMetadataRegistry $registry): void
+    private function parseModel(string $className, RawClassMetadataRegistry $registry): void
     {
         if ($registry->contains($className)) {
             return;
@@ -57,13 +58,38 @@ final class Parser
         }
         $registry->add($rawClassMetadata);
 
+        $this->parseDiscriminatorClasses($rawClassMetadata, $registry);
+
         foreach ($rawClassMetadata->getPropertyVariations() as $property) {
             $type = $property->getType();
-            if ($type instanceof PropertyTypeIterable) {
-                $type = $type->getLeafType();
-            }
-            if ($type instanceof PropertyTypeClass) {
-                $this->parseModel($type->getClassName(), $context->push($property), $registry);
+            $this->parsePropertyType($type, $registry);
+        }
+    }
+
+    private function parseDiscriminatorClasses(RawClassMetadata $rawClassMetadata, RawClassMetadataRegistry $registry): void
+    {
+        if (null === $rawClassMetadata->getDiscriminatorMetadata()) {
+            return;
+        }
+
+        foreach ($rawClassMetadata->getDiscriminatorMetadata()->classMap as $childClass) {
+            $this->parseModel($childClass, $registry);
+        }
+    }
+
+    private function parsePropertyType(PropertyType $type, RawClassMetadataRegistry $registry): void
+    {
+        if ($type instanceof PropertyTypeIterable) {
+            $type = $type->getLeafType();
+        }
+
+        if ($type instanceof PropertyTypeClass) {
+            $this->parseModel($type->getClassName(), $registry);
+        }
+
+        if ($type instanceof PropertyTypeUnion) {
+            foreach ($type->getTypes() as $subType) {
+                $this->parsePropertyType($subType, $registry);
             }
         }
     }

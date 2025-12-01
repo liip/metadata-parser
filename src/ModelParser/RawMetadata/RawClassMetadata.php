@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Liip\MetadataParser\ModelParser\RawMetadata;
 
+use JMS\Serializer\Annotation\Discriminator;
+use Liip\MetadataParser\Metadata\ClassDiscriminatorMetadata;
 use Liip\MetadataParser\Metadata\ParameterMetadata;
 
 /**
@@ -13,10 +15,7 @@ use Liip\MetadataParser\Metadata\ParameterMetadata;
  */
 final class RawClassMetadata implements \JsonSerializable
 {
-    /**
-     * @var string
-     */
-    private $className;
+    private string $className;
 
     /**
      * This list contains the property collections for each property.
@@ -38,6 +37,8 @@ final class RawClassMetadata implements \JsonSerializable
      * @var ParameterMetadata[]
      */
     private $constructorParameters = [];
+
+    private ?ClassDiscriminatorMetadata $discriminatorMetadata = null;
 
     public function __construct(string $className)
     {
@@ -244,6 +245,53 @@ final class RawClassMetadata implements \JsonSerializable
     public function getConstructorParameters(): array
     {
         return $this->constructorParameters;
+    }
+
+    public function setDiscriminator(\ReflectionClass $reflClass, string $baseClass, Discriminator $discriminatorAttribute): void
+    {
+        $classMap = $discriminatorAttribute->map;
+        $propertyName = $discriminatorAttribute->field;
+        if ('' === trim($propertyName)) {
+            throw new \UnexpectedValueException('The $fieldName cannot be empty.');
+        }
+
+        if (0 === \count($discriminatorAttribute->map)) {
+            throw new \UnexpectedValueException('The discriminator class map cannot be empty.');
+        }
+
+        foreach ($classMap as $childClass) {
+            if (!is_subclass_of($childClass, $baseClass)) {
+                throw new \UnexpectedValueException(\sprintf('Discriminator class "%s" is not a subclass of "%s".', $childClass, $baseClass));
+            }
+        }
+
+        $this->discriminatorMetadata = new ClassDiscriminatorMetadata();
+
+        $this->discriminatorMetadata->baseClass = $baseClass;
+        $this->discriminatorMetadata->propertyName = $propertyName;
+        $this->discriminatorMetadata->classMap = $classMap;
+        $this->discriminatorMetadata->groups = $discriminatorAttribute->groups;
+        $this->discriminatorMetadata->disabled = $discriminatorAttribute->disabled;
+
+        if ($reflClass->isAbstract() || $reflClass->isInterface()) {
+            return;
+        }
+
+        $typeValue = array_search($this->className, $classMap, true);
+        if (false === $typeValue) {
+            throw new \UnexpectedValueException(\sprintf('The sub-class "%s" is not listed in the discriminator map of the base class %s', $this->className, $baseClass));
+        }
+
+        if ($this->hasPropertyCollection($propertyName)) {
+            throw new \UnexpectedValueException(\sprintf('The discriminator field name "%s" of the base-class "%s" conflicts with a regular property of the sub-class "%s".', $propertyName, $baseClass, $this->className));
+        }
+
+        $this->discriminatorMetadata->value = $typeValue;
+    }
+
+    public function getDiscriminatorMetadata(): ?ClassDiscriminatorMetadata
+    {
+        return $this->discriminatorMetadata;
     }
 
     public function jsonSerialize(): array
