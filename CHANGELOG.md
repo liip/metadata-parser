@@ -4,7 +4,7 @@
 
 # 2.0.0
 
-* Removed `PropertyTypeArray`, which is superseeded by `PropertyTypeIterable`.
+* Removed `PropertyTypeArray`, which is superseded by `PropertyTypeIterable`.
 * Removed the deprecated `PropertyTypeIterable::getCollectionClass`. Use `PropertyTypeIterable::getTraversableClass`
 * Removed the deprecated `PropertyTypeIterable::isCollection`. Use `PropertyTypeIterable::isTraversable`
 * `JMSTypeParser::getTraversableClass` returns `Traversable::class` instead of `Doctrine\Common\Collections\Collection` for general traversable properties.
