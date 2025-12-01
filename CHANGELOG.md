@@ -2,7 +2,7 @@
 
 # Version 2.x
 
-# 2.0.0 (unreleased)
+# 2.0.0
 
 * Removed `PropertyTypeArray`, which is superseeded by `PropertyTypeIterable`.
 * Removed the deprecated `PropertyTypeIterable::getCollectionClass`. Use `PropertyTypeIterable::getTraversableClass`
