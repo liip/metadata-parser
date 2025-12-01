@@ -11,13 +11,15 @@
 * Dropped support for PHP 7
 * Adjusted code to not trigger warnings with PHP 8.4
 * Removed deprecated `getDeserializeFormat` method from date time
-* Replaced `@Preferred` annotation with the `#[Preferred]` attribute
+* Use Attribute instead of Annotation
+  * Replaced `Liip\MetadataParser\ModelParser\LiipMetadataAnnotationParser` with `Liip\MetadataParser\ModelParser\LiipMetadataAttributeParser`
+  * Replaced `@Preferred` annotation with the `#[Preferred]` attribute
 * Replaced `PropertyCollection::useIdenticalNamingStrategy` static method with the `PropertyNamingStrategyInterface`.
   If you need to change the property naming strategy, remove the call to the static method and instead pass a strategy instance to the parser.
   The library provides two implementations for the property naming strategy:
-  * `IdenticalPropertyNamingStrategy` 
+  * `IdenticalPropertyNamingStrategy`
   * `SnakeCasePropertyNamingStrategy` (default).
-* Add support for (union) discriminators and their related JMS attributes `#[UnionDiscriminator]` and `#[Discriminator]` 
+* Add support for (union) discriminators and their related JMS attributes `#[UnionDiscriminator]` and `#[Discriminator]`
 
 # Version 1.x
 
