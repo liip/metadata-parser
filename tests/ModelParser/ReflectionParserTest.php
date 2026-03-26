@@ -8,6 +8,7 @@ use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\ParameterMetadata;
 use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
+use Liip\MetadataParser\Metadata\PropertyTypeEnum;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\Metadata\PropertyTypeUnion;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
@@ -17,7 +18,10 @@ use Liip\MetadataParser\ModelParser\RawMetadata\PropertyVariationMetadata;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 use Liip\MetadataParser\ModelParser\ReflectionParser;
 use PHPUnit\Framework\TestCase;
+use Tests\Liip\MetadataParser\ModelParser\Fixtures\DirectionEnum;
+use Tests\Liip\MetadataParser\ModelParser\Fixtures\EnumModel;
 use Tests\Liip\MetadataParser\ModelParser\Fixtures\IntersectionTypeDeclarationModel;
+use Tests\Liip\MetadataParser\ModelParser\Fixtures\SuitEnum;
 use Tests\Liip\MetadataParser\ModelParser\Fixtures\TypeDeclarationModel;
 use Tests\Liip\MetadataParser\ModelParser\Fixtures\UnionTypeDeclarationModel;
 use Tests\Liip\MetadataParser\ModelParser\Model\ReflectionBaseModel;
@@ -155,6 +159,36 @@ class ReflectionParserTest extends TestCase
         $this->assertProperty('property1', false, false, $property1);
         // For now, just make sure we don't crash on intersection types. In context of serializing, we can probably not do anything meaningful with a intersection type anyways.
         $this->assertPropertyType($property1->getType(), PropertyTypeUnknown::class, 'mixed', true);
+    }
+
+    public function testTypedEnumProperties(): void
+    {
+        if (\PHP_VERSION_ID < 80100) {
+            $this->markTestSkipped('Enum support requires PHP 8.1 or newer');
+        }
+
+        $rawClassMetadata = new RawClassMetadata(EnumModel::class);
+        $this->parser->parse($rawClassMetadata, new SnakeCasePropertyNamingStrategy());
+
+        $props = $rawClassMetadata->getPropertyCollections();
+        $this->assertCount(2, $props, 'Number of class metadata properties should match');
+
+        $this->assertPropertyCollection('suit', 1, $props[0]);
+        $suit = $props[0]->getVariations()[0];
+
+        $this->assertPropertyType($suit->getType(), PropertyTypeEnum::class, SuitEnum::class, false);
+
+        /** @var PropertyTypeEnum $suitType */
+        $suitType = $suit->getType();
+        $this->assertSame('string', $suitType->getBackingType());
+
+        $this->assertPropertyCollection('direction', 1, $props[1]);
+        $direction = $props[1]->getVariations()[0];
+        $this->assertPropertyType($direction->getType(), PropertyTypeEnum::class, DirectionEnum::class.'|null', true);
+
+        /** @var PropertyTypeEnum $directionType */
+        $directionType = $direction->getType();
+        $this->assertNull($directionType->getBackingType());
     }
 
     public function testPrefilledClassMetadata(): void

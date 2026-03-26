@@ -7,10 +7,12 @@ namespace Tests\Liip\MetadataParser\Metadata;
 use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
 use Liip\MetadataParser\Metadata\PropertyTypeDateTime;
+use Liip\MetadataParser\Metadata\PropertyTypeEnum;
 use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
 use PHPUnit\Framework\TestCase;
+use Tests\Liip\MetadataParser\ModelParser\Fixtures\SuitEnum;
 
 /**
  * @small
@@ -46,6 +48,15 @@ class PropertyTypeTest extends TestCase
             'stdClass',
             false,
         ];
+
+        if (\PHP_VERSION_ID >= 80100) {
+            yield [
+                new PropertyTypeEnum(SuitEnum::class, true),
+                new PropertyTypeUnknown(false),
+                SuitEnum::class,
+                false,
+            ];
+        }
 
         yield [
             new PropertyTypeIterable(new PropertyTypePrimitive('bool', false), false, true),
@@ -155,7 +166,7 @@ class PropertyTypeTest extends TestCase
      */
     private function getDifferentTypes(): array
     {
-        return [
+        $types = [
             new PropertyTypeUnknown(true),
             new PropertyTypePrimitive('string', true),
             new PropertyTypePrimitive('int', true),
@@ -166,5 +177,11 @@ class PropertyTypeTest extends TestCase
             new PropertyTypeIterable(new PropertyTypePrimitive('int', false), false, true),
             new PropertyTypeIterable(new PropertyTypePrimitive('string', false), true, true),
         ];
+
+        if (\PHP_VERSION_ID >= 80100) {
+            $types[] = new PropertyTypeEnum(SuitEnum::class, true);
+        }
+
+        return $types;
     }
 }

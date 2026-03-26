@@ -11,6 +11,7 @@ use Liip\MetadataParser\Metadata\DateTimeOptions;
 use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
 use Liip\MetadataParser\Metadata\PropertyTypeDateTime;
+use Liip\MetadataParser\Metadata\PropertyTypeEnum;
 use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
@@ -18,6 +19,7 @@ use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
 final class JMSTypeParser
 {
     private const TYPE_ARRAY = 'array';
+    private const TYPE_ENUM = 'enum';
     private const TYPE_ARRAY_COLLECTION = 'ArrayCollection';
     private const TYPE_GENERATOR = 'Generator';
     private const TYPE_ARRAY_ITERATOR = 'ArrayIterator';
@@ -68,6 +70,10 @@ final class JMSTypeParser
                 return PropertyTypeDateTime::fromDateTimeClass($typeInfo['name'], $nullable);
             }
 
+            if (self::TYPE_ENUM === $typeInfo['name']) {
+                throw new InvalidTypeException('JMS enum type requires a class name parameter, e.g. "enum<MyEnum>"');
+            }
+
             return new PropertyTypeClass($typeInfo['name'], $nullable);
         }
 
@@ -104,6 +110,15 @@ final class JMSTypeParser
             );
         }
 
+        if (self::TYPE_ENUM === $typeInfo['name']) {
+            $enumType = $typeInfo['params'][0];
+            $enumType = $enumType['name'] ?? $enumType;
+
+            $serializationMode = $this->getEnumSerializationMode($enumType, $typeInfo['params']);
+
+            return new PropertyTypeEnum($enumType, $nullable, $serializationMode);
+        }
+
         throw new InvalidTypeException(\sprintf('Unknown JMS property found (%s)', var_export($typeInfo, true)));
     }
 
@@ -120,5 +135,19 @@ final class JMSTypeParser
             default:
                 return is_a($name, \Traversable::class, true) ? $name : null;
         }
+    }
+
+    private function getEnumSerializationMode(string $enumType, array $typeParams): ?string
+    {
+        $mode = $typeParams[1] ?? null;
+        if (null === $mode) {
+            return null;
+        }
+
+        if ('value' === $mode && !is_a($enumType, \BackedEnum::class, true)) {
+            throw new InvalidTypeException(\sprintf('The type "%s" is not a backed enum, thus you cannot use "value" as serialization mode for its value.', $enumType));
+        }
+
+        return $mode;
     }
 }

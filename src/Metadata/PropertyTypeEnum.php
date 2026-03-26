@@ -1,0 +1,90 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Liip\MetadataParser\Metadata;
+
+use Liip\MetadataParser\Exception\InvalidTypeException;
+
+final class PropertyTypeEnum extends AbstractPropertyType
+{
+    private string $className;
+    private ?string $backingType;
+
+    /**
+     * @var "name"|"value"|null
+     */
+    private ?string $serializationMode;
+
+    public function __construct(string $className, bool $nullable, ?string $serializationMode = null)
+    {
+        parent::__construct($nullable);
+        if (\PHP_VERSION_ID < 80100 || !enum_exists($className)) {
+            throw new InvalidTypeException(\sprintf('Given type "%s" is not a PHP 8.1 enum', $className));
+        }
+
+        $this->className = $className;
+        $this->backingType = null;
+        $this->serializationMode = $serializationMode;
+
+        if (is_a($className, \BackedEnum::class, true)) {
+            $reflEnum = new \ReflectionEnum($className);
+            $this->backingType = $reflEnum->getBackingType()?->getName();
+        }
+    }
+
+    public function __toString(): string
+    {
+        return $this->className.parent::__toString();
+    }
+
+    public function getClassName(): string
+    {
+        return $this->className;
+    }
+
+    public function getBackingType(): ?string
+    {
+        return $this->backingType;
+    }
+
+    public function isBackedEnum(): bool
+    {
+        return null !== $this->backingType;
+    }
+
+    public function getSerializationMode(): ?string
+    {
+        return $this->serializationMode;
+    }
+
+    public function shouldSerializeAsValue(): bool
+    {
+        return $this->isBackedEnum() && 'name' !== $this->serializationMode;
+    }
+
+    public function merge(PropertyType $other): PropertyType
+    {
+        $nullable = $this->isNullable() && $other->isNullable();
+
+        if ($other instanceof PropertyTypeUnknown) {
+            return new self($this->className, $nullable, $this->serializationMode);
+        }
+
+        if (!$other instanceof self) {
+            throw new \UnexpectedValueException(\sprintf('Can\'t merge type %s with %s, they must be the same or unknown', self::class, \get_class($other)));
+        }
+
+        if ($this->getClassName() !== $other->getClassName()) {
+            throw new \UnexpectedValueException(\sprintf('Can\'t merge type %s with %s, they must be equal', self::class, \get_class($other)));
+        }
+
+        if (null !== $this->serializationMode && null !== $other->getSerializationMode() && $this->serializationMode !== $other->getSerializationMode()) {
+            throw new \UnexpectedValueException(\sprintf('Can\'t merge type %s with conflicting serialization modes "%s" and "%s"', self::class, $this->serializationMode, $other->getSerializationMode()));
+        }
+
+        $serializationMode = $this->serializationMode ?? $other->getSerializationMode();
+
+        return new self($this->className, $nullable, $serializationMode);
+    }
+}
