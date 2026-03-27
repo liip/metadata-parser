@@ -33,11 +33,7 @@ class ClassDiscriminatorMetadata
     {
         $this->classMetadataList = [];
         foreach ($classMetadataList as $classMetadata) {
-            if (!$classMetadata instanceof ClassMetadata) {
-                throw new \InvalidArgumentException(\sprintf('Expected instance of %s', ClassMetadata::class));
-            }
-
-            $this->classMetadataList[$classMetadata->getClassName()] = $classMetadata;
+            $this->addClassMetadata($classMetadata);
         }
     }
 
@@ -49,5 +45,10 @@ class ClassDiscriminatorMetadata
     public function getMetadataForClass(string $className): ?ClassMetadata
     {
         return $this->classMetadataList[$className] ?? null;
+    }
+
+    private function addClassMetadata(ClassMetadata $classMetadata): void
+    {
+        $this->classMetadataList[$classMetadata->getClassName()] = $classMetadata;
     }
 }
