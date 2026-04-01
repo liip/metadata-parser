@@ -11,6 +11,7 @@ use Liip\MetadataParser\Builder;
 use Liip\MetadataParser\Metadata\PropertyMetadata;
 use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
+use Liip\MetadataParser\Metadata\PropertyTypeEnum;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\Metadata\PropertyTypeUnion;
 use Liip\MetadataParser\ModelParser\JMSParser;
@@ -23,6 +24,7 @@ use Psr\Log\LoggerInterface;
 use Tests\Liip\MetadataParser\ModelParser\Model\Car;
 use Tests\Liip\MetadataParser\ModelParser\Model\ClassUsingUnionDiscriminator;
 use Tests\Liip\MetadataParser\ModelParser\Model\ClassUsingUnionTyping;
+use Tests\Liip\MetadataParser\ModelParser\Model\ClassWithEnums;
 use Tests\Liip\MetadataParser\ModelParser\Model\Moped;
 use Tests\Liip\MetadataParser\ModelParser\Model\Nested;
 
@@ -138,6 +140,26 @@ class BuilderTest extends TestCase
 
         $this->assertProperty('property', 'property', true, false, $props[0]);
         $this->assertPropertyType($props[0]->getType(), PropertyTypeUnion::class, 'Tests\Liip\MetadataParser\ModelParser\Model\DiscriminatorComment|Tests\Liip\MetadataParser\ModelParser\Model\DiscriminatorAuthor', false);
+    }
+
+    public function testEnumClassMetadataList(): void
+    {
+        $classMetadata = $this->builder->build(ClassWithEnums::class);
+
+        $props = $classMetadata->getProperties();
+        $this->assertCount(4, $props, 'Number of properties should match');
+
+        $this->assertProperty('suit', 'suit', true, false, $props[0]);
+        $this->assertPropertyType($props[0]->getType(), PropertyTypeEnum::class, 'Tests\Liip\MetadataParser\ModelParser\Fixtures\SuitEnum', false);
+
+        $this->assertProperty('suitWithName', 'suit_with_name', true, false, $props[1]);
+        $this->assertPropertyType($props[1]->getType(), PropertyTypeEnum::class, 'Tests\Liip\MetadataParser\ModelParser\Fixtures\SuitEnum', false);
+
+        $this->assertProperty('suitWithoutType', 'suit_without_type', true, false, $props[2]);
+        $this->assertPropertyType($props[2]->getType(), PropertyTypeEnum::class, 'Tests\Liip\MetadataParser\ModelParser\Fixtures\SuitEnum', false);
+
+        $this->assertProperty('direction', 'direction', true, false, $props[3]);
+        $this->assertPropertyType($props[3]->getType(), PropertyTypeEnum::class, 'Tests\Liip\MetadataParser\ModelParser\Fixtures\DirectionEnum', false);
     }
 
     private function assertProperty(string $name, string $serializedName, bool $public, bool $readOnly, PropertyMetadata $property): void

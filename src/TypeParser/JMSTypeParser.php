@@ -26,26 +26,23 @@ final class JMSTypeParser
     private const TYPE_ITERATOR = 'Iterator';
     private const TYPE_DATETIME_INTERFACE = 'DateTimeInterface';
 
-    /**
-     * @var Parser
-     */
-    private $jmsTypeParser;
+    private Parser $jmsTypeParser;
 
     public function __construct()
     {
         $this->jmsTypeParser = new Parser();
     }
 
-    public function parse(string $rawType, bool $isSubType = false): PropertyType
+    public function parse(string $rawType, \ReflectionProperty|\ReflectionMethod|null $reflection = null, bool $isSubType = false): PropertyType
     {
         if ('' === $rawType) {
             return new PropertyTypeUnknown(true);
         }
 
-        return $this->parseType($this->jmsTypeParser->parse($rawType), $isSubType);
+        return $this->parseType($this->jmsTypeParser->parse($rawType), $reflection, $isSubType);
     }
 
-    private function parseType(array $typeInfo, bool $isSubType = false): PropertyType
+    private function parseType(array $typeInfo, \ReflectionProperty|\ReflectionMethod|null $reflection, bool $isSubType = false): PropertyType
     {
         $typeInfo = array_merge(
             [
@@ -58,7 +55,7 @@ final class JMSTypeParser
         // JMS types are nullable except if it's a sub type (part of array)
         $nullable = !$isSubType;
 
-        if (0 === \count($typeInfo['params'])) {
+        if (0 === \count($typeInfo['params']) && self::TYPE_ENUM !== $typeInfo['name']) {
             if (self::TYPE_ARRAY === $typeInfo['name']) {
                 return new PropertyTypeIterable(new PropertyTypeUnknown(false), false, $nullable);
             }
@@ -70,20 +67,16 @@ final class JMSTypeParser
                 return PropertyTypeDateTime::fromDateTimeClass($typeInfo['name'], $nullable);
             }
 
-            if (self::TYPE_ENUM === $typeInfo['name']) {
-                throw new InvalidTypeException('JMS enum type requires a class name parameter, e.g. "enum<MyEnum>"');
-            }
-
             return new PropertyTypeClass($typeInfo['name'], $nullable);
         }
 
         $traversableClass = $this->getTraversableClass($typeInfo['name']);
         if (self::TYPE_ARRAY === $typeInfo['name'] || $traversableClass) {
             if (1 === \count($typeInfo['params'])) {
-                return new PropertyTypeIterable($this->parseType($typeInfo['params'][0], true), false, $nullable, $traversableClass);
+                return new PropertyTypeIterable($this->parseType($typeInfo['params'][0], $reflection, true), false, $nullable, $traversableClass);
             }
             if (2 === \count($typeInfo['params'])) {
-                return new PropertyTypeIterable($this->parseType($typeInfo['params'][1], true), true, $nullable, $traversableClass);
+                return new PropertyTypeIterable($this->parseType($typeInfo['params'][1], $reflection, true), true, $nullable, $traversableClass);
             }
 
             throw new InvalidTypeException(\sprintf('JMS property type array can\'t have more than 2 parameters (%s)', var_export($typeInfo, true)));
@@ -111,8 +104,7 @@ final class JMSTypeParser
         }
 
         if (self::TYPE_ENUM === $typeInfo['name']) {
-            $enumType = $typeInfo['params'][0];
-            $enumType = $enumType['name'] ?? $enumType;
+            $enumType = $this->getEnumType($typeInfo, $reflection);
 
             $serializationMode = $this->getEnumSerializationMode($enumType, $typeInfo['params']);
 
@@ -149,5 +141,27 @@ final class JMSTypeParser
         }
 
         return $mode;
+    }
+
+    private function getEnumType(array $typeInfo, \ReflectionProperty|\ReflectionMethod|null $reflection): string
+    {
+        $enumType = $typeInfo['params'][0] ?? null;
+        $enumType = $enumType['name'] ?? $enumType;
+        if (null !== $enumType) {
+            return $enumType;
+        }
+
+        $class = null === $reflection ? null : $reflection::class;
+        $type = match ($class) {
+            \ReflectionMethod::class => $reflection->getReturnType(),
+            \ReflectionProperty::class => $reflection->getType(),
+            default => null,
+        };
+
+        if (!$type instanceof \ReflectionNamedType) {
+            throw new InvalidTypeException('Can not determine enum type from reflection, please define one by using "enum<MyEnum>"');
+        }
+
+        return $type->getName();
     }
 }

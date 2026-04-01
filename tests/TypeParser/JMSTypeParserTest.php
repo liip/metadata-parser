@@ -12,6 +12,7 @@ use Liip\MetadataParser\TypeParser\JMSTypeParser;
 use PHPUnit\Framework\TestCase;
 use Tests\Liip\MetadataParser\ModelParser\Fixtures\DirectionEnum;
 use Tests\Liip\MetadataParser\ModelParser\Fixtures\SuitEnum;
+use Tests\Liip\MetadataParser\ModelParser\Model\ClassWithEnums;
 
 /**
  * @small
@@ -273,6 +274,20 @@ class JMSTypeParserTest extends TestCase
         $this->assertInstanceOf(PropertyTypeEnum::class, $subType);
         $this->assertSame(SuitEnum::class, $subType->getClassName());
         $this->assertFalse($subType->isNullable()); // sub-types in JMS arrays are non-nullable
+    }
+
+    public function testEnumWithoutTypeButWithReflection(): void
+    {
+        $reflection = new \ReflectionClass(ClassWithEnums::class);
+        $reflectionProperty = $reflection->getProperty('suitWithoutType');
+
+        /** @var PropertyTypeIterable $type */
+        $type = $this->parser->parse('enum', $reflectionProperty);
+
+        $this->assertInstanceOf(PropertyTypeEnum::class, $type);
+        $this->assertTrue($type->isBackedEnum());
+        $this->assertNull($type->getSerializationMode());
+        $this->assertTrue($type->shouldSerializeAsValue());
     }
 
     public function testEnumWithoutClassParamThrows(): void

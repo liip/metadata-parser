@@ -228,7 +228,7 @@ final class JMSParser implements ModelParserInterface
                         throw ParseException::propertyTypeNameNull((string) $classMetadata, (string) $property);
                     }
                     try {
-                        $type = $this->jmsTypeParser->parse($attribute->name);
+                        $type = $this->jmsTypeParser->parse($attribute->name, $reflection);
                     } catch (InvalidTypeException $e) {
                         throw ParseException::propertyTypeError((string) $classMetadata, (string) $property, $e);
                     }
@@ -282,7 +282,7 @@ final class JMSParser implements ModelParserInterface
                     }
 
                     foreach ($attribute->map as $value) {
-                        $types[] = $this->jmsTypeParser->parse($value, true);
+                        $types[] = $this->jmsTypeParser->parse($value, $reflection, true);
                     }
 
                     $type = new PropertyTypeUnion($types, $isNullable);
