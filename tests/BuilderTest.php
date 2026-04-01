@@ -6,6 +6,7 @@ namespace Tests\Liip\MetadataParser;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use JMS\Serializer\Annotation\SerializedName;
+use JMS\Serializer\Annotation\UnionDiscriminator;
 use Liip\MetadataParser\Builder;
 use Liip\MetadataParser\Metadata\PropertyMetadata;
 use Liip\MetadataParser\Metadata\PropertyType;
@@ -111,6 +112,10 @@ class BuilderTest extends TestCase
 
     public function testUnionDiscriminatorClassMetadataList(): void
     {
+        if (!class_exists(UnionDiscriminator::class)) {
+            $this->markTestSkipped('UnionDiscriminator attribute from JMS missing');
+        }
+
         $classMetadata = $this->builder->build(ClassUsingUnionDiscriminator::class);
 
         $props = $classMetadata->getProperties();
@@ -122,6 +127,10 @@ class BuilderTest extends TestCase
 
     public function testUnionTypingClassMetadataList(): void
     {
+        if (!class_exists(UnionDiscriminator::class)) {
+            $this->markTestSkipped('UnionDiscriminator attribute from JMS missing');
+        }
+
         $classMetadata = $this->builder->build(ClassUsingUnionTyping::class);
 
         $props = $classMetadata->getProperties();

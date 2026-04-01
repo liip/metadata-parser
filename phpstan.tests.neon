@@ -3,5 +3,8 @@ parameters:
     paths:
         - tests/
     excludePaths:
+        # Excluded until the minimum version required from jms/serializer is set to >= 3.31.0
+        - tests/ModelParser/Model/ClassUsingUnionDiscriminator.php
+        - tests/ModelParser/Model/ClassUsingUnionTyping.php
         # looks like phpstan php parser has not implemented union types yet
         - tests/ModelParser/Fixtures/IntersectionTypeDeclarationModel.php

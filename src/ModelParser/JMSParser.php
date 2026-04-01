@@ -274,7 +274,7 @@ final class JMSParser implements ModelParserInterface
                 case $attribute instanceof MaxDepth:
                     $property->setMaxDepth($attribute->depth);
                     break;
-                case $attribute instanceof UnionDiscriminator:
+                case class_exists(UnionDiscriminator::class) && $attribute instanceof UnionDiscriminator:
                     $types = [];
                     $isNullable = $this->isNullable($reflection);
                     if ($isNullable) {

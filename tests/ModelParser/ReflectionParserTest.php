@@ -94,7 +94,7 @@ class ReflectionParserTest extends TestCase
     public function testTypedProperties(): void
     {
         if (version_compare(\PHP_VERSION, '7.4.0', '<')) {
-            $this->markTestSkipped('Primitive property types are only supported in PHP 7.4 or newer');
+            $this->markTestSkipped('UnionDiscriminator attribute from JMS missing');
         }
 
         $rawClassMetadata = new RawClassMetadata(TypeDeclarationModel::class);
@@ -122,7 +122,7 @@ class ReflectionParserTest extends TestCase
     public function testTypedPropertiesUnion(): void
     {
         if (version_compare(\PHP_VERSION, '8.0.0', '<')) {
-            $this->markTestSkipped('Union property types are only supported in PHP 8.0 or newer');
+            $this->markTestSkipped('UnionDiscriminator attribute from JMS missing');
         }
 
         $rawClassMetadata = new RawClassMetadata(UnionTypeDeclarationModel::class);
