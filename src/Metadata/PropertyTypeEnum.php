@@ -27,9 +27,10 @@ final class PropertyTypeEnum extends AbstractPropertyType
         $this->backingType = null;
         $this->serializationMode = $serializationMode;
 
-        if (is_a($className, \BackedEnum::class, true)) {
-            $reflEnum = new \ReflectionEnum($className);
-            $this->backingType = $reflEnum->getBackingType()?->getName();
+        $reflEnum = new \ReflectionEnum($className);
+        $backingType = $reflEnum->getBackingType();
+        if ($backingType instanceof \ReflectionNamedType) {
+            $this->backingType = $backingType->getName();
         }
     }
 
