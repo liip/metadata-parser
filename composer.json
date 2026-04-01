@@ -14,7 +14,7 @@
         "issues": "https://github.com/liip/metadata-parser/issues"
     },
     "require": {
-        "php": "^8.0",
+        "php": "^8.1",
         "ext-json": "*",
         "doctrine/annotations": "^2.0.2",
         "psr/log": "^1|^2|^3"

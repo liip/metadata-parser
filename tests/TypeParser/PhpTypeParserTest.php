@@ -275,10 +275,6 @@ class PhpTypeParserTest extends TestCase
 
     public function testEnumReflectionType(): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            $this->markTestSkipped('Enum support requires PHP 8.1 or newer');
-        }
-
         $reflClass = new \ReflectionClass(EnumModel::class);
 
         $type = $this->parser->parseReflectionType($reflClass->getProperty('direction')->getType());
@@ -292,10 +288,6 @@ class PhpTypeParserTest extends TestCase
 
     public function testBackedEnumReflectionType(): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            $this->markTestSkipped('Enum support requires PHP 8.1 or newer');
-        }
-
         $reflClass = new \ReflectionClass(EnumModel::class);
 
         $type = $this->parser->parseReflectionType($reflClass->getProperty('suit')->getType());
@@ -309,10 +301,6 @@ class PhpTypeParserTest extends TestCase
 
     public function testEnumAnnotationType(): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            $this->markTestSkipped('Enum support requires PHP 8.1 or newer');
-        }
-
         $type = $this->parser->parseAnnotationType('\\'.SuitEnum::class, new \ReflectionClass($this));
 
         $this->assertInstanceOf(PropertyTypeEnum::class, $type);
@@ -324,10 +312,6 @@ class PhpTypeParserTest extends TestCase
 
     public function testNullableUnitEnumAnnotationType(): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            $this->markTestSkipped('Enum support requires PHP 8.1 or newer');
-        }
-
         $type = $this->parser->parseAnnotationType('\\'.DirectionEnum::class.'|null', new \ReflectionClass($this));
 
         $this->assertInstanceOf(PropertyTypeEnum::class, $type);

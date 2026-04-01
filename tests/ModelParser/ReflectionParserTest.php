@@ -144,10 +144,6 @@ class ReflectionParserTest extends TestCase
 
     public function testTypedPropertiesIntersection(): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            $this->markTestSkipped('Intersection property types are only supported in PHP 8.1 or newer');
-        }
-
         $rawClassMetadata = new RawClassMetadata(IntersectionTypeDeclarationModel::class);
         $this->parser->parse($rawClassMetadata, new SnakeCasePropertyNamingStrategy());
 
@@ -163,10 +159,6 @@ class ReflectionParserTest extends TestCase
 
     public function testTypedEnumProperties(): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            $this->markTestSkipped('Enum support requires PHP 8.1 or newer');
-        }
-
         $rawClassMetadata = new RawClassMetadata(EnumModel::class);
         $this->parser->parse($rawClassMetadata, new SnakeCasePropertyNamingStrategy());
 

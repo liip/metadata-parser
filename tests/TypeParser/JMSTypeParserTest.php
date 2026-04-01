@@ -222,10 +222,6 @@ class JMSTypeParserTest extends TestCase
 
     public function testEnumBackedParsesAsPropertyTypeEnum(): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            $this->markTestSkipped('Enum types are only supported in PHP 8.1 or newer');
-        }
-
         /** @var PropertyTypeEnum $type */
         $type = $this->parser->parse('enum<'.SuitEnum::class.'>');
 
@@ -239,10 +235,6 @@ class JMSTypeParserTest extends TestCase
 
     public function testEnumUnitParsesAsPropertyTypeEnum(): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            $this->markTestSkipped('Enum types are only supported in PHP 8.1 or newer');
-        }
-
         /** @var PropertyTypeEnum $type */
         $type = $this->parser->parse('enum<'.DirectionEnum::class.'>');
         $this->assertInstanceOf(PropertyTypeEnum::class, $type);
@@ -254,10 +246,6 @@ class JMSTypeParserTest extends TestCase
 
     public function testEnumWithNameModeDisablesValueSerialization(): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            $this->markTestSkipped('Enum types are only supported in PHP 8.1 or newer');
-        }
-
         /** @var PropertyTypeEnum $type */
         $type = $this->parser->parse('enum<'.SuitEnum::class.", 'name'>");
         $this->assertInstanceOf(PropertyTypeEnum::class, $type);
@@ -268,10 +256,6 @@ class JMSTypeParserTest extends TestCase
 
     public function testEnumWithValueModeKeepsValueSerialization(): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            $this->markTestSkipped('Enum types are only supported in PHP 8.1 or newer');
-        }
-
         /** @var PropertyTypeEnum $type */
         $type = $this->parser->parse('enum<'.SuitEnum::class.", 'value'>");
         $this->assertInstanceOf(PropertyTypeEnum::class, $type);
@@ -282,10 +266,6 @@ class JMSTypeParserTest extends TestCase
 
     public function testArrayOfEnumParsesCorrectly(): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            $this->markTestSkipped('Enum types are only supported in PHP 8.1 or newer');
-        }
-
         /** @var PropertyTypeIterable $type */
         $type = $this->parser->parse('array<enum<'.SuitEnum::class.'>>');
         $this->assertInstanceOf(PropertyTypeIterable::class, $type);
@@ -297,20 +277,12 @@ class JMSTypeParserTest extends TestCase
 
     public function testEnumWithoutClassParamThrows(): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            $this->markTestSkipped('Enum types are only supported in PHP 8.1 or newer');
-        }
-
         $this->expectException(InvalidTypeException::class);
         $this->parser->parse('enum');
     }
 
     public function testEnumWithValueSerializationModeButNoSupportedBackedEnumThrowsException(): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            $this->markTestSkipped('Enum types are only supported in PHP 8.1 or newer');
-        }
-
         $this->expectException(InvalidTypeException::class);
         $this->parser->parse('enum<'.DirectionEnum::class.', \'value\'>');
     }

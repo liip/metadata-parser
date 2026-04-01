@@ -49,14 +49,12 @@ class PropertyTypeTest extends TestCase
             false,
         ];
 
-        if (\PHP_VERSION_ID >= 80100) {
-            yield [
-                new PropertyTypeEnum(SuitEnum::class, true),
-                new PropertyTypeUnknown(false),
-                SuitEnum::class,
-                false,
-            ];
-        }
+        yield [
+            new PropertyTypeEnum(SuitEnum::class, true),
+            new PropertyTypeUnknown(false),
+            SuitEnum::class,
+            false,
+        ];
 
         yield [
             new PropertyTypeIterable(new PropertyTypePrimitive('bool', false), false, true),
@@ -166,22 +164,17 @@ class PropertyTypeTest extends TestCase
      */
     private function getDifferentTypes(): array
     {
-        $types = [
+        return [
             new PropertyTypeUnknown(true),
             new PropertyTypePrimitive('string', true),
             new PropertyTypePrimitive('int', true),
             new PropertyTypeDateTime(false, true),
             new PropertyTypeDateTime(true, true),
+            new PropertyTypeEnum(SuitEnum::class, true),
             new PropertyTypeClass(\stdClass::class, true),
             new PropertyTypeIterable(new PropertyTypePrimitive('bool', false), false, true),
             new PropertyTypeIterable(new PropertyTypePrimitive('int', false), false, true),
             new PropertyTypeIterable(new PropertyTypePrimitive('string', false), true, true),
         ];
-
-        if (\PHP_VERSION_ID >= 80100) {
-            $types[] = new PropertyTypeEnum(SuitEnum::class, true);
-        }
-
-        return $types;
     }
 }

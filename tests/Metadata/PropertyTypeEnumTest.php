@@ -16,13 +16,6 @@ use Tests\Liip\MetadataParser\ModelParser\Fixtures\SuitEnum;
  */
 class PropertyTypeEnumTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        if (\PHP_VERSION_ID < 80100) {
-            $this->markTestSkipped('Enum support requires PHP 8.1 or newer');
-        }
-    }
-
     public function testToStringBackedEnum(): void
     {
         $type = new PropertyTypeEnum(SuitEnum::class, false);

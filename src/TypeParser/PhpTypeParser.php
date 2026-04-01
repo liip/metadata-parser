@@ -118,7 +118,7 @@ final class PhpTypeParser
             return PropertyTypeDateTime::fromDateTimeClass($resolvedClass, $nullable);
         }
 
-        if (\PHP_VERSION_ID >= 80100 && enum_exists($resolvedClass)) {
+        if (enum_exists($resolvedClass)) {
             return new PropertyTypeEnum($resolvedClass, $nullable);
         }
 

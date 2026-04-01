@@ -19,7 +19,7 @@ final class PropertyTypeEnum extends AbstractPropertyType
     public function __construct(string $className, bool $nullable, ?string $serializationMode = null)
     {
         parent::__construct($nullable);
-        if (\PHP_VERSION_ID < 80100 || !enum_exists($className)) {
+        if (!enum_exists($className)) {
             throw new InvalidTypeException(\sprintf('Given type "%s" is not a PHP 8.1 enum', $className));
         }
 

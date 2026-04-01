@@ -1539,10 +1539,6 @@ class JMSParserTest extends TestCase
 
     public function testUnionDiscriminator(): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            $this->markTestSkipped('Intersection property types are only supported in PHP 8.1 or newer');
-        }
-
         $classMetadata = new RawClassMetadata(ClassUsingUnionDiscriminator::class);
 
         $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());
@@ -1558,10 +1554,6 @@ class JMSParserTest extends TestCase
 
     public function testUnionDiscriminatorWithTyping(): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            $this->markTestSkipped('Intersection property types are only supported in PHP 8.1 or newer');
-        }
-
         $classMetadata = new RawClassMetadata(ClassUsingUnionTyping::class);
 
         $this->parser->parse($classMetadata, new SnakeCasePropertyNamingStrategy());

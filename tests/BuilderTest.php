@@ -111,10 +111,6 @@ class BuilderTest extends TestCase
 
     public function testUnionDiscriminatorClassMetadataList(): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            $this->markTestSkipped('Intersection property types are only supported in PHP 8.1 or newer');
-        }
-
         $classMetadata = $this->builder->build(ClassUsingUnionDiscriminator::class);
 
         $props = $classMetadata->getProperties();
@@ -126,10 +122,6 @@ class BuilderTest extends TestCase
 
     public function testUnionTypingClassMetadataList(): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            $this->markTestSkipped('Intersection property types are only supported in PHP 8.1 or newer');
-        }
-
         $classMetadata = $this->builder->build(ClassUsingUnionTyping::class);
 
         $props = $classMetadata->getProperties();
