@@ -2,7 +2,7 @@
 
 # Version 2.x
 
-# 2.1.0 (unreleased)
+# 2.1.0
 
 * Add support for enums
 * Drop support for PHP 8.0
