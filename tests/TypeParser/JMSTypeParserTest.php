@@ -6,8 +6,14 @@ namespace Tests\Liip\MetadataParser\TypeParser;
 
 use Liip\MetadataParser\Exception\InvalidTypeException;
 use Liip\MetadataParser\Metadata\PropertyTypeDateTime;
+use Liip\MetadataParser\Metadata\PropertyTypeEnum;
+use Liip\MetadataParser\Metadata\PropertyTypeIterable;
+use Liip\MetadataParser\Metadata\SerializationMode;
 use Liip\MetadataParser\TypeParser\JMSTypeParser;
 use PHPUnit\Framework\TestCase;
+use Tests\Liip\MetadataParser\ModelParser\Fixtures\DirectionEnum;
+use Tests\Liip\MetadataParser\ModelParser\Fixtures\SuitEnum;
+use Tests\Liip\MetadataParser\ModelParser\Model\ClassWithEnums;
 
 /**
  * @small
@@ -214,5 +220,86 @@ class JMSTypeParserTest extends TestCase
     {
         $this->expectException(InvalidTypeException::class);
         $this->parser->parse('array<string, int, bool>');
+    }
+
+    public function testEnumBackedParsesAsPropertyTypeEnum(): void
+    {
+        /** @var PropertyTypeEnum $type */
+        $type = $this->parser->parse('enum<'.SuitEnum::class.'>');
+
+        $this->assertInstanceOf(PropertyTypeEnum::class, $type);
+        $this->assertSame(SuitEnum::class, $type->getClassName());
+        $this->assertTrue($type->isNullable());
+        $this->assertTrue($type->isBackedEnum());
+        $this->assertNull($type->getSerializationMode());
+        $this->assertTrue($type->shouldSerializeAsValue());
+    }
+
+    public function testEnumUnitParsesAsPropertyTypeEnum(): void
+    {
+        /** @var PropertyTypeEnum $type */
+        $type = $this->parser->parse('enum<'.DirectionEnum::class.'>');
+        $this->assertInstanceOf(PropertyTypeEnum::class, $type);
+        $this->assertSame(DirectionEnum::class, $type->getClassName());
+        $this->assertFalse($type->isBackedEnum());
+        $this->assertNull($type->getSerializationMode());
+        $this->assertFalse($type->shouldSerializeAsValue());
+    }
+
+    public function testEnumWithNameModeDisablesValueSerialization(): void
+    {
+        /** @var PropertyTypeEnum $type */
+        $type = $this->parser->parse('enum<'.SuitEnum::class.", 'name'>");
+        $this->assertInstanceOf(PropertyTypeEnum::class, $type);
+        $this->assertTrue($type->isBackedEnum());
+        $this->assertSame(SerializationMode::Name, $type->getSerializationMode());
+        $this->assertFalse($type->shouldSerializeAsValue());
+    }
+
+    public function testEnumWithValueModeKeepsValueSerialization(): void
+    {
+        /** @var PropertyTypeEnum $type */
+        $type = $this->parser->parse('enum<'.SuitEnum::class.", 'value'>");
+        $this->assertInstanceOf(PropertyTypeEnum::class, $type);
+        $this->assertTrue($type->isBackedEnum());
+        $this->assertSame(SerializationMode::Value, $type->getSerializationMode());
+        $this->assertTrue($type->shouldSerializeAsValue());
+    }
+
+    public function testArrayOfEnumParsesCorrectly(): void
+    {
+        /** @var PropertyTypeIterable $type */
+        $type = $this->parser->parse('array<enum<'.SuitEnum::class.'>>');
+        $this->assertInstanceOf(PropertyTypeIterable::class, $type);
+        $subType = $type->getLeafType();
+        $this->assertInstanceOf(PropertyTypeEnum::class, $subType);
+        $this->assertSame(SuitEnum::class, $subType->getClassName());
+        $this->assertFalse($subType->isNullable()); // sub-types in JMS arrays are non-nullable
+    }
+
+    public function testEnumWithoutTypeButWithReflection(): void
+    {
+        $reflection = new \ReflectionClass(ClassWithEnums::class);
+        $reflectionProperty = $reflection->getProperty('suitWithoutType');
+
+        /** @var PropertyTypeIterable $type */
+        $type = $this->parser->parse('enum', $reflectionProperty);
+
+        $this->assertInstanceOf(PropertyTypeEnum::class, $type);
+        $this->assertTrue($type->isBackedEnum());
+        $this->assertNull($type->getSerializationMode());
+        $this->assertTrue($type->shouldSerializeAsValue());
+    }
+
+    public function testEnumWithoutClassParamThrows(): void
+    {
+        $this->expectException(InvalidTypeException::class);
+        $this->parser->parse('enum');
+    }
+
+    public function testEnumWithValueSerializationModeButNoSupportedBackedEnumThrowsException(): void
+    {
+        $this->expectException(InvalidTypeException::class);
+        $this->parser->parse('enum<'.DirectionEnum::class.', \'value\'>');
     }
 }

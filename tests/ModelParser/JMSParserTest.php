@@ -7,6 +7,7 @@ namespace Tests\Liip\MetadataParser\ModelParser;
 use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Doctrine\Common\Annotations\AnnotationReader;
 use JMS\Serializer\Annotation as JMS;
+use JMS\Serializer\Annotation\UnionDiscriminator;
 use Liip\MetadataParser\Exception\ParseException;
 use Liip\MetadataParser\Metadata\PropertyAccessor;
 use Liip\MetadataParser\Metadata\PropertyType;
@@ -1539,8 +1540,8 @@ class JMSParserTest extends TestCase
 
     public function testUnionDiscriminator(): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            $this->markTestSkipped('Intersection property types are only supported in PHP 8.1 or newer');
+        if (!class_exists(UnionDiscriminator::class)) {
+            $this->markTestSkipped('UnionDiscriminator attribute from JMS missing');
         }
 
         $classMetadata = new RawClassMetadata(ClassUsingUnionDiscriminator::class);
@@ -1558,8 +1559,8 @@ class JMSParserTest extends TestCase
 
     public function testUnionDiscriminatorWithTyping(): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            $this->markTestSkipped('Intersection property types are only supported in PHP 8.1 or newer');
+        if (!class_exists(UnionDiscriminator::class)) {
+            $this->markTestSkipped('UnionDiscriminator attribute from JMS missing');
         }
 
         $classMetadata = new RawClassMetadata(ClassUsingUnionTyping::class);

@@ -22,14 +22,14 @@ final class DateTimeOptions implements \JsonSerializable
     /**
      * Use if different formats should be used for parsing dates than for generating dates.
      *
-     * @var string[]|null
+     * @var list<string>|null
      */
     private $deserializeFormats;
 
     /**
      * @note Passing a string for $deserializeFormats is deprecated, please pass an array instead
      *
-     * @param string[]|null $deserializeFormats
+     * @param list<string>|null $deserializeFormats
      */
     public function __construct(?string $format, ?string $zone, ?array $deserializeFormats)
     {
@@ -48,6 +48,9 @@ final class DateTimeOptions implements \JsonSerializable
         return $this->zone;
     }
 
+    /**
+     * @return list<string>|null
+     */
     public function getDeserializeFormats(): ?array
     {
         return $this->deserializeFormats;

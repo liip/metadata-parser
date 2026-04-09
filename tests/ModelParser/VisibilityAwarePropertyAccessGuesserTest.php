@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Liip\MetadataParser\ModelParser;
 
-use Generator;
 use Liip\MetadataParser\ModelParser\ModelParserInterface;
 use Liip\MetadataParser\ModelParser\NamingStrategy\SnakeCasePropertyNamingStrategy;
 use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
@@ -57,15 +56,15 @@ class VisibilityAwarePropertyAccessGuesserTest extends TestCase
     }
 
     /**
-     * @return Generator<array{
+     * @return \Generator<array{
      *  'class': object,
      *  'parsers': ModelParserInterface[],
      *  'expectedPropertyCount': int,
-     *  'accessType': null|array{
+     *  'accessType': array{
      *     'public': bool,
-     *     'hasGetter': null|bool,
-     *     'hasSetter': null|bool,
-     *  },
+     *     'hasGetter': bool|null,
+     *     'hasSetter': bool|null,
+     *  }|null,
      * }>
      */
     public static function provideSimpleClassesCases(): iterable

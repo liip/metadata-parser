@@ -48,6 +48,7 @@ final class ClassMetadata implements \JsonSerializable
     public function __construct(string $className, array $properties, array $constructorParameters = [], array $postDeserializeMethods = [], ?ClassDiscriminatorMetadata $discriminatorMetadata = null)
     {
         \assert(array_reduce($constructorParameters, static function (bool $carry, $parameter): bool {
+            /* @phpstan-ignore instanceof.alwaysTrue */
             return $carry && $parameter instanceof ParameterMetadata;
         }, true));
 

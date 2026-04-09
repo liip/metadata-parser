@@ -58,6 +58,9 @@ final class PropertyTypeDateTime extends AbstractPropertyType
         return null;
     }
 
+    /**
+     * @return list<string>|null
+     */
     public function getDeserializeFormats(): ?array
     {
         if ($this->dateTimeOptions) {

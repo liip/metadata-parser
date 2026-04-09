@@ -9,6 +9,7 @@ use Liip\MetadataParser\Exception\InvalidTypeException;
 use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
 use Liip\MetadataParser\Metadata\PropertyTypeDateTime;
+use Liip\MetadataParser\Metadata\PropertyTypeEnum;
 use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
@@ -115,6 +116,10 @@ final class PhpTypeParser
 
         if (PropertyTypeDateTime::isTypeDateTime($resolvedClass)) {
             return PropertyTypeDateTime::fromDateTimeClass($resolvedClass, $nullable);
+        }
+
+        if (enum_exists($resolvedClass)) {
+            return new PropertyTypeEnum($resolvedClass, $nullable);
         }
 
         return new PropertyTypeClass($resolvedClass, $nullable);

@@ -139,8 +139,8 @@ final class PropertyTypeUnion extends AbstractPropertyType
                 $secondTypeName = $second->getTypeName();
             }
 
-            $firstOrder = $order[$firstTypeName] ?? self::DEFAULT_ORDER;
-            $secondOrder = $order[$secondTypeName] ?? self::DEFAULT_ORDER;
+            $firstOrder = $order[$firstTypeName ?? ''] ?? self::DEFAULT_ORDER;
+            $secondOrder = $order[$secondTypeName ?? ''] ?? self::DEFAULT_ORDER;
 
             return $firstOrder <=> $secondOrder;
         });

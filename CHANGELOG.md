@@ -2,6 +2,11 @@
 
 # Version 2.x
 
+# 2.1.0 (unreleased)
+
+* Add support for enums
+* Drop support for PHP 8.0
+
 # 2.0.0
 
 * Removed `PropertyTypeArray`, which is superseded by `PropertyTypeIterable`.

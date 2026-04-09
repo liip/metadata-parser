@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace Tests\Liip\MetadataParser\TypeParser;
 
 use Liip\MetadataParser\Exception\InvalidTypeException;
+use Liip\MetadataParser\Metadata\PropertyTypeEnum;
 use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\TypeParser\PhpTypeParser;
 use PHPUnit\Framework\TestCase;
+use Tests\Liip\MetadataParser\ModelParser\Fixtures\DirectionEnum;
+use Tests\Liip\MetadataParser\ModelParser\Fixtures\EnumModel;
+use Tests\Liip\MetadataParser\ModelParser\Fixtures\SuitEnum;
 use Tests\Liip\MetadataParser\ModelParser\Model\BaseModel;
 use Tests\Liip\MetadataParser\ModelParser\Model\ReflectionAbstractModel;
 use Tests\Liip\MetadataParser\ModelParser\Model\WithImports;
@@ -267,5 +271,53 @@ class PhpTypeParserTest extends TestCase
         if (null !== $expectedNullable) {
             $this->assertSame($expectedNullable, $type->isNullable(), 'Nullable flag should match');
         }
+    }
+
+    public function testEnumReflectionType(): void
+    {
+        $reflClass = new \ReflectionClass(EnumModel::class);
+
+        $type = $this->parser->parseReflectionType($reflClass->getProperty('direction')->getType());
+
+        $this->assertInstanceOf(PropertyTypeEnum::class, $type);
+        $this->assertNull($type->getBackingType());
+        $this->assertFalse($type->shouldSerializeAsValue());
+        $this->assertNull($type->getSerializationMode());
+        $this->assertTrue($type->isNullable());
+    }
+
+    public function testBackedEnumReflectionType(): void
+    {
+        $reflClass = new \ReflectionClass(EnumModel::class);
+
+        $type = $this->parser->parseReflectionType($reflClass->getProperty('suit')->getType());
+
+        $this->assertInstanceOf(PropertyTypeEnum::class, $type);
+        $this->assertSame('string', $type->getBackingType());
+        $this->assertTrue($type->shouldSerializeAsValue());
+        $this->assertNull($type->getSerializationMode());
+        $this->assertFalse($type->isNullable());
+    }
+
+    public function testEnumAnnotationType(): void
+    {
+        $type = $this->parser->parseAnnotationType('\\'.SuitEnum::class, new \ReflectionClass($this));
+
+        $this->assertInstanceOf(PropertyTypeEnum::class, $type);
+        $this->assertSame('string', $type->getBackingType());
+        $this->assertTrue($type->shouldSerializeAsValue());
+        $this->assertNull($type->getSerializationMode());
+        $this->assertFalse($type->isNullable());
+    }
+
+    public function testNullableUnitEnumAnnotationType(): void
+    {
+        $type = $this->parser->parseAnnotationType('\\'.DirectionEnum::class.'|null', new \ReflectionClass($this));
+
+        $this->assertInstanceOf(PropertyTypeEnum::class, $type);
+        $this->assertNull($type->getBackingType());
+        $this->assertFalse($type->shouldSerializeAsValue());
+        $this->assertNull($type->getSerializationMode());
+        $this->assertTrue($type->isNullable());
     }
 }

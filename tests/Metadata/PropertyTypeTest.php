@@ -7,10 +7,12 @@ namespace Tests\Liip\MetadataParser\Metadata;
 use Liip\MetadataParser\Metadata\PropertyType;
 use Liip\MetadataParser\Metadata\PropertyTypeClass;
 use Liip\MetadataParser\Metadata\PropertyTypeDateTime;
+use Liip\MetadataParser\Metadata\PropertyTypeEnum;
 use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
 use PHPUnit\Framework\TestCase;
+use Tests\Liip\MetadataParser\ModelParser\Fixtures\SuitEnum;
 
 /**
  * @small
@@ -44,6 +46,13 @@ class PropertyTypeTest extends TestCase
             new PropertyTypeClass(\stdClass::class, true),
             new PropertyTypeUnknown(false),
             'stdClass',
+            false,
+        ];
+
+        yield [
+            new PropertyTypeEnum(SuitEnum::class, true),
+            new PropertyTypeUnknown(false),
+            SuitEnum::class,
             false,
         ];
 
@@ -161,6 +170,7 @@ class PropertyTypeTest extends TestCase
             new PropertyTypePrimitive('int', true),
             new PropertyTypeDateTime(false, true),
             new PropertyTypeDateTime(true, true),
+            new PropertyTypeEnum(SuitEnum::class, true),
             new PropertyTypeClass(\stdClass::class, true),
             new PropertyTypeIterable(new PropertyTypePrimitive('bool', false), false, true),
             new PropertyTypeIterable(new PropertyTypePrimitive('int', false), false, true),
