@@ -8,6 +8,7 @@ use Liip\MetadataParser\Exception\InvalidTypeException;
 use Liip\MetadataParser\Metadata\PropertyTypeDateTime;
 use Liip\MetadataParser\Metadata\PropertyTypeEnum;
 use Liip\MetadataParser\Metadata\PropertyTypeIterable;
+use Liip\MetadataParser\Metadata\SerializationMode;
 use Liip\MetadataParser\TypeParser\JMSTypeParser;
 use PHPUnit\Framework\TestCase;
 use Tests\Liip\MetadataParser\ModelParser\Fixtures\DirectionEnum;
@@ -251,7 +252,7 @@ class JMSTypeParserTest extends TestCase
         $type = $this->parser->parse('enum<'.SuitEnum::class.", 'name'>");
         $this->assertInstanceOf(PropertyTypeEnum::class, $type);
         $this->assertTrue($type->isBackedEnum());
-        $this->assertSame('name', $type->getSerializationMode());
+        $this->assertSame(SerializationMode::Name, $type->getSerializationMode());
         $this->assertFalse($type->shouldSerializeAsValue());
     }
 
@@ -261,7 +262,7 @@ class JMSTypeParserTest extends TestCase
         $type = $this->parser->parse('enum<'.SuitEnum::class.", 'value'>");
         $this->assertInstanceOf(PropertyTypeEnum::class, $type);
         $this->assertTrue($type->isBackedEnum());
-        $this->assertSame('value', $type->getSerializationMode());
+        $this->assertSame(SerializationMode::Value, $type->getSerializationMode());
         $this->assertTrue($type->shouldSerializeAsValue());
     }
 

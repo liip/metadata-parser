@@ -15,6 +15,7 @@ use Liip\MetadataParser\Metadata\PropertyTypeEnum;
 use Liip\MetadataParser\Metadata\PropertyTypeIterable;
 use Liip\MetadataParser\Metadata\PropertyTypePrimitive;
 use Liip\MetadataParser\Metadata\PropertyTypeUnknown;
+use Liip\MetadataParser\Metadata\SerializationMode;
 
 final class JMSTypeParser
 {
@@ -129,18 +130,19 @@ final class JMSTypeParser
         }
     }
 
-    private function getEnumSerializationMode(string $enumType, array $typeParams): ?string
+    private function getEnumSerializationMode(string $enumType, array $typeParams): ?SerializationMode
     {
         $mode = $typeParams[1] ?? null;
         if (null === $mode) {
             return null;
         }
 
-        if ('value' === $mode && !is_a($enumType, \BackedEnum::class, true)) {
+        $serializationMode = SerializationMode::tryFrom($mode);
+        if (SerializationMode::Value === $serializationMode && !is_a($enumType, \BackedEnum::class, true)) {
             throw new InvalidTypeException(\sprintf('The type "%s" is not a backed enum, thus you cannot use "value" as serialization mode for its value.', $enumType));
         }
 
-        return $mode;
+        return $serializationMode;
     }
 
     private function getEnumType(array $typeInfo, \ReflectionProperty|\ReflectionMethod|null $reflection): string

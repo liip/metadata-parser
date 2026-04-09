@@ -11,12 +11,9 @@ final class PropertyTypeEnum extends AbstractPropertyType
     private string $className;
     private ?string $backingType;
 
-    /**
-     * @var "name"|"value"|null
-     */
-    private ?string $serializationMode;
+    private ?SerializationMode $serializationMode;
 
-    public function __construct(string $className, bool $nullable, ?string $serializationMode = null)
+    public function __construct(string $className, bool $nullable, ?SerializationMode $serializationMode = null)
     {
         parent::__construct($nullable);
         if (!enum_exists($className)) {
@@ -54,14 +51,14 @@ final class PropertyTypeEnum extends AbstractPropertyType
         return null !== $this->backingType;
     }
 
-    public function getSerializationMode(): ?string
+    public function getSerializationMode(): ?SerializationMode
     {
         return $this->serializationMode;
     }
 
     public function shouldSerializeAsValue(): bool
     {
-        return $this->isBackedEnum() && 'name' !== $this->serializationMode;
+        return $this->isBackedEnum() && SerializationMode::Name !== $this->serializationMode;
     }
 
     public function merge(PropertyType $other): PropertyType
@@ -81,7 +78,7 @@ final class PropertyTypeEnum extends AbstractPropertyType
         }
 
         if (null !== $this->serializationMode && null !== $other->getSerializationMode() && $this->serializationMode !== $other->getSerializationMode()) {
-            throw new \UnexpectedValueException(\sprintf('Can\'t merge type %s with conflicting serialization modes "%s" and "%s"', self::class, $this->serializationMode, $other->getSerializationMode()));
+            throw new \UnexpectedValueException(\sprintf('Can\'t merge type %s with conflicting serialization modes "%s" and "%s"', self::class, $this->serializationMode->value, $other->getSerializationMode()->value));
         }
 
         $serializationMode = $this->serializationMode ?? $other->getSerializationMode();
