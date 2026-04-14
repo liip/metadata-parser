@@ -6,6 +6,9 @@ namespace Liip\MetadataParser\Metadata;
 
 class ClassDiscriminatorMetadata
 {
+    /**
+     * @var class-string
+     */
     public string $baseClass;
     public string $propertyName;
     public string $value;
@@ -22,7 +25,7 @@ class ClassDiscriminatorMetadata
     public array $groups = [];
 
     /**
-     * @var ClassMetadata[]
+     * @var array<class-string, ClassMetadata>
      */
     private array $classMetadataList = [];
 
@@ -42,6 +45,9 @@ class ClassDiscriminatorMetadata
         return $this->classMetadataList;
     }
 
+    /**
+     * @param class-string $className
+     */
     public function getMetadataForClass(string $className): ?ClassMetadata
     {
         return $this->classMetadataList[$className] ?? null;
