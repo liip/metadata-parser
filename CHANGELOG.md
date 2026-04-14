@@ -2,6 +2,10 @@
 
 # Version 2.x
 
+# 2.1.1
+
+* Improve phpdoc for better phpstan validation
+
 # 2.1.0
 
 * Add support for enums

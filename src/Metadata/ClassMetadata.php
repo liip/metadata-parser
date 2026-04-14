@@ -10,7 +10,7 @@ use Liip\MetadataParser\ModelParser\RawMetadata\RawClassMetadata;
 final class ClassMetadata implements \JsonSerializable
 {
     /**
-     * @var string
+     * @var class-string
      */
     private $className;
 
@@ -41,6 +41,7 @@ final class ClassMetadata implements \JsonSerializable
     private ?ClassDiscriminatorMetadata $discriminatorMetadata = null;
 
     /**
+     * @param class-string        $className
      * @param PropertyMetadata[]  $properties
      * @param ParameterMetadata[] $constructorParameters
      * @param string[]            $postDeserializeMethods
@@ -81,6 +82,9 @@ final class ClassMetadata implements \JsonSerializable
         );
     }
 
+    /**
+     * @return class-string
+     */
     public function getClassName(): string
     {
         return $this->className;
