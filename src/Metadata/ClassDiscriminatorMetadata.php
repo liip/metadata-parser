@@ -15,7 +15,7 @@ class ClassDiscriminatorMetadata
     public bool $disabled = false;
 
     /**
-     * @var string[]
+     * @var array<string, class-string>
      */
     public array $classMap = [];
 
