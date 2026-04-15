@@ -2,6 +2,10 @@
 
 # Version 2.x
 
+# 2.1.2
+
+* Improved phpdoc in additional places
+
 # 2.1.1
 
 * Improve phpdoc for better phpstan validation
